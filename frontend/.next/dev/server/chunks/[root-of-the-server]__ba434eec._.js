@@ -96,7 +96,7 @@ module.exports = mod;
 "[project]/src/lib/auth.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// lib/auth.ts
+// src/lib/auth.ts
 __turbopack_context__.s([
     "getUserFromRequest",
     ()=>getUserFromRequest,
@@ -117,9 +117,26 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__
 ;
 ;
 ;
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "dev-secret";
+const JWT_SECRET = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "dev-secret";
+// Keep legacy candidates for graceful migration; prefer "session".
+const COOKIE_CANDIDATES = [
+    "session",
+    "token",
+    "auth_token",
+    "authToken",
+    "auth"
+];
 function signToken(payload, expiresIn = "7d") {
-    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].sign(payload, JWT_SECRET, {
+    // Build a safe payload that always contains 'id' as canonical user id claim.
+    const finalPayload = {};
+    // Prefer explicit id/userId/sub from provided payload
+    const providedId = payload?.id ?? payload?.userId ?? payload?.sub ?? payload?.uid ?? null;
+    if (providedId) finalPayload.id = String(providedId);
+    if (payload?.email) finalPayload.email = payload.email;
+    if (payload?.role) finalPayload.role = payload.role;
+    // Copy any other non-sensitive claims you intentionally want (none by default).
+    // Sign and return
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].sign(finalPayload, JWT_SECRET, {
         expiresIn
     });
 }
@@ -127,46 +144,109 @@ function verifyToken(token) {
     try {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
     } catch (err) {
+        if ("TURBOPACK compile-time truthy", 1) {
+            console.debug("[auth] verifyToken failed:", err?.message ?? err);
+        }
         return null;
     }
 }
 async function hashPassword(password) {
-    const salt = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].genSalt(10);
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(password, salt);
+    const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(password, saltRounds);
 }
 async function verifyPassword(password, hash) {
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, hash);
+    try {
+        return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, hash);
+    } catch (err) {
+        if ("TURBOPACK compile-time truthy", 1) console.error("[auth] verifyPassword error:", err);
+        return false;
+    }
 }
 async function getUserFromRequest(req) {
     try {
-        const header = req.headers.get("authorization");
-        const token = header?.startsWith("Bearer ") ? header.slice(7) : req.cookies.get("token")?.value;
-        if (!token) return null;
-        const payload = verifyToken(token);
-        if (!payload?.id) return null;
-        const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
-            where: {
-                id: payload.id
-            },
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true
+        // 1) Authorization header (Bearer)
+        const authHeader = req.headers.get("authorization");
+        if (authHeader?.startsWith("Bearer ")) {
+            const token = authHeader.slice(7).trim();
+            const payload = verifyToken(token);
+            if (payload) {
+                // Prefer canonical id, fallback to sub/userId/uid
+                const userId = payload.id ?? payload.sub ?? payload.userId ?? payload.uid;
+                if (userId) {
+                    const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                        where: {
+                            id: String(userId)
+                        },
+                        select: {
+                            id: true,
+                            email: true,
+                            name: true,
+                            role: true
+                        }
+                    });
+                    if (user) return user;
+                }
+            } else if ("TURBOPACK compile-time truthy", 1) {
+                console.debug("[auth] bearer token present but failed verification");
             }
-        });
-        return user;
-    } catch  {
+        }
+        // 2) Cookies
+        // Try the candidate cookie names in order and return the first user matched.
+        for (const name of COOKIE_CANDIDATES){
+            try {
+                // NextRequest exposes cookies via req.cookies.get(name)
+                const cookie = req.cookies.get(name);
+                if (!cookie) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie probe: ${name} => <missing>`);
+                    continue;
+                }
+                const token = cookie.value;
+                if (!token) continue;
+                const payload = verifyToken(token);
+                if (!payload) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} token failed verify/expired`);
+                    continue;
+                }
+                // Prefer id, fall back to sub/userId/uid for migrated tokens
+                const userId = payload.id ?? payload.sub ?? payload.userId ?? payload.uid;
+                if (!userId) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} token missing id/sub/userId/uid`);
+                    continue;
+                }
+                const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                    where: {
+                        id: String(userId)
+                    },
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        role: true
+                    }
+                });
+                if (user) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} matched user id ${user.id}`);
+                    return user;
+                } else {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} decoded id ${userId} not found`);
+                }
+            } catch (err) {
+                // Some runtimes may throw on req.cookies access — continue to next candidate
+                if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie probe error for ${name}:`, err);
+            }
+        }
+        // nothing matched
+        return null;
+    } catch (err) {
+        console.error("[auth] getUserFromRequest error:", err);
         return null;
     }
 }
 async function requireRole(req, allowedRoles = []) {
     const user = await getUserFromRequest(req);
-    if (!user) {
-        throw new Response("Unauthorized", {
-            status: 401
-        });
-    }
+    if (!user) throw new Response("Unauthorized", {
+        status: 401
+    });
     if (allowedRoles.length && !allowedRoles.includes(user.role)) {
         throw new Response("Forbidden", {
             status: 403
@@ -178,7 +258,7 @@ async function requireRole(req, allowedRoles = []) {
 "[project]/src/app/api/me/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// app/api/me/route.ts
+// src/app/api/me/route.ts
 __turbopack_context__.s([
     "GET",
     ()=>GET,
@@ -188,6 +268,8 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/server.js [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/auth.ts [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/@prisma/client [external] (@prisma/client, cjs)");
+;
 ;
 ;
 ;
@@ -196,15 +278,43 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5
     d.setDate(d.getDate() - days);
     return d;
 }
-/** Helper: validate base64 size (bytes) */ function base64SizeBytes(base64String) {
-    // Remove data:*/*;base64, prefix if present
+/** Helper: compute base64 size (bytes) */ function base64SizeBytes(base64String) {
     const comma = base64String.indexOf(",");
     const b64 = comma >= 0 ? base64String.slice(comma + 1) : base64String;
     const padding = b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0;
-    // bytes = (base64Length * 3) / 4 - padding
     return Math.ceil(b64.length * 3 / 4) - padding;
 }
+/** Whitelisted writable profile fields */ const ALLOWED_PROFILE_FIELDS = new Set([
+    "avatarUrl",
+    "displayName",
+    "bio",
+    "metadata",
+    "gender",
+    "countryCode",
+    "countryName",
+    "stateName",
+    "timezone",
+    "countryGeonameId",
+    "stateGeonameId"
+]);
+function sanitizeProfilePayload(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const cleaned = {};
+    const rejectedKeys = [];
+    for (const [k, v] of Object.entries(raw)){
+        if (ALLOWED_PROFILE_FIELDS.has(k)) {
+            cleaned[k] = v === "" ? null : v;
+        } else {
+            rejectedKeys.push(k);
+        }
+    }
+    if (rejectedKeys.length > 0) {
+        console.info("sanitizeProfilePayload dropped unknown/read-only profile keys:", rejectedKeys);
+    }
+    return Object.keys(cleaned).length === 0 ? null : cleaned;
+}
 async function GET(req) {
+    // getUserFromRequest expects NextRequest so pass it directly
     const sessionUser = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getUserFromRequest"])(req);
     if (!sessionUser) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
         user: null
@@ -224,6 +334,14 @@ async function GET(req) {
             updatedAt: true
         }
     });
+    if (!dbUser) {
+        // user disappeared from DB — treat as unauthorized
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            user: null
+        }, {
+            status: 401
+        });
+    }
     const since = sinceDays(30);
     const [logins30d, changes30d] = await Promise.all([
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].activityLog.count({
@@ -261,12 +379,10 @@ async function PATCH(req) {
         status: 401
     });
     const body = await req.json().catch(()=>({}));
-    const updates = {};
-    // allow name update
-    if (typeof body.name === "string") updates.name = body.name;
-    // process profile updates if provided
+    const userUpdates = {};
+    if (typeof body.name === "string") userUpdates.name = body.name;
+    let profilePayload = null;
     if (body.profile && typeof body.profile === "object") {
-        // if avatarBase64 provided, validate size (2MB)
         const incomingProfile = body.profile;
         if (incomingProfile.avatarBase64) {
             const size = base64SizeBytes(incomingProfile.avatarBase64);
@@ -279,25 +395,15 @@ async function PATCH(req) {
                 });
             }
         }
-        // merge existing profile
-        const existing = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
-            where: {
-                id: sessionUser.id
-            },
-            select: {
-                profile: true
-            }
-        });
-        updates.profile = {
-            ...existing?.profile ?? {},
-            ...incomingProfile ?? {}
-        };
-        // For convenience, if avatarBase64 present, also set avatarUrl to the same data URL
+        profilePayload = sanitizeProfilePayload(incomingProfile);
         if (incomingProfile.avatarBase64) {
-            updates.profile.avatarUrl = incomingProfile.avatarBase64;
+            profilePayload = {
+                ...profilePayload ?? {},
+                avatarUrl: incomingProfile.avatarBase64
+            };
         }
     }
-    if (Object.keys(updates).length === 0) {
+    if (Object.keys(userUpdates).length === 0 && !profilePayload) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             error: "Nothing to update"
         }, {
@@ -305,11 +411,22 @@ async function PATCH(req) {
         });
     }
     try {
+        const data = {
+            ...userUpdates
+        };
+        if (profilePayload) {
+            data.profile = {
+                upsert: {
+                    update: profilePayload,
+                    create: profilePayload
+                }
+            };
+        }
         const updated = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
             where: {
                 id: sessionUser.id
             },
-            data: updates,
+            data,
             select: {
                 id: true,
                 email: true,
@@ -319,22 +436,22 @@ async function PATCH(req) {
                 updatedAt: true
             }
         });
-        // record profile change activity
-        try {
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].activityLog.create({
-                data: {
-                    userId: sessionUser.id,
-                    type: "PROFILE_CHANGE",
-                    meta: {
-                        fields: Object.keys(body.profile ?? {}),
-                        ts: new Date().toISOString()
+        if (profilePayload) {
+            try {
+                await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].activityLog.create({
+                    data: {
+                        userId: sessionUser.id,
+                        type: "PROFILE_CHANGE",
+                        meta: {
+                            fields: Object.keys(body.profile ?? {}),
+                            ts: new Date().toISOString()
+                        }
                     }
-                }
-            });
-        } catch (err) {
-            console.error("Failed to write profile change activity:", err);
+                });
+            } catch (err) {
+                console.error("Failed to write profile change activity:", err);
+            }
         }
-        // recompute activity counts
         const since = sinceDays(30);
         const [logins30d, changes30d] = await Promise.all([
             __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].activityLog.count({
@@ -365,8 +482,27 @@ async function PATCH(req) {
         });
     } catch (err) {
         console.error("Profile update error:", err);
+        if (err instanceof __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__["Prisma"].PrismaClientKnownRequestError) {
+            if (err.code === "P2002") {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    error: "Conflict: unique constraint",
+                    detail: err.message
+                }, {
+                    status: 409
+                });
+            }
+            if (err.code === "P2025") {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    error: "Not found",
+                    detail: err.message
+                }, {
+                    status: 404
+                });
+            }
+        }
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: "Failed to update"
+            error: "Failed to update",
+            detail: err?.message ?? String(err)
         }, {
             status: 500
         });

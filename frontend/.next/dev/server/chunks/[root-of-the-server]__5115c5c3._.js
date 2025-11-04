@@ -266,52 +266,84 @@ var __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__
 ;
 ;
 ;
+const OTP_LENGTH = 6;
+const OTP_TTL_MS = 10 * 60 * 1000; // 10 minutes
+function generateOtp(length = OTP_LENGTH) {
+    const min = 10 ** (length - 1);
+    const max = 10 ** length - 1;
+    return Math.floor(min + Math.random() * (max - min + 1)).toString();
+}
 async function POST(req) {
     try {
-        const body = await req.json();
+        const body = await req.json().catch(()=>({}));
         const email = (body?.email || "").toString().trim().toLowerCase();
-        if (!email) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: "Email required"
-        }, {
-            status: 400
-        });
-        // generate 6-digit OTP
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        // hash OTP before storing
-        const codeHash = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(code, 10);
-        const expiresAt = new Date(Date.now() + 60 * 1000); // 60 seconds
-        // find an existing OTP row for this email (works even if email not unique)
-        const existing = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.findFirst({
-            where: {
-                email
-            }
-        });
-        if (existing) {
-            // update by unique id
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.update({
+        if (!email) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "Email required"
+            }, {
+                status: 400
+            });
+        }
+        // generate OTP and hash
+        const otp = generateOtp();
+        const codeHash = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(otp, 10);
+        const expiresAt = new Date(Date.now() + OTP_TTL_MS);
+        // Use upsert so we either create or update the row atomically.
+        // This assumes your EmailOtp model has unique constraint on `email` or you use a unique `id`.
+        // If `email` is not unique in the schema, prisma.upsert with `where: { email }` will fail.
+        // In that case we fall back to findFirst + update/create below.
+        try {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.upsert({
                 where: {
-                    id: existing.id
+                    email
                 },
-                data: {
+                update: {
+                    otp,
                     codeHash,
                     expiresAt,
-                    verified: false,
-                    createdAt: new Date()
-                }
-            });
-        } else {
-            // create new row
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.create({
-                data: {
+                    verified: false
+                },
+                create: {
                     email,
+                    otp,
                     codeHash,
                     expiresAt,
                     verified: false
                 }
             });
+        } catch (e) {
+            // if upsert fails because `email` isn't unique in schema, fallback to findFirst logic
+            const existing = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.findFirst({
+                where: {
+                    email
+                }
+            });
+            if (existing) {
+                await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.update({
+                    where: {
+                        id: existing.id
+                    },
+                    data: {
+                        otp,
+                        codeHash,
+                        expiresAt,
+                        verified: false
+                    }
+                });
+            } else {
+                await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.create({
+                    data: {
+                        email,
+                        otp,
+                        codeHash,
+                        expiresAt,
+                        verified: false
+                    }
+                });
+            }
         }
-        // send email (may throw if SMTP misconfigured)
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mail$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["sendOTPEmail"])(email, code);
+        // send OTP email (let caller know of failures separately)
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mail$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["sendOTPEmail"])(email, otp);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             message: "OTP sent"

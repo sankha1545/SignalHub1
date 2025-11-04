@@ -72,6 +72,7 @@ module.exports = mod;
 "[project]/src/app/api/auth/verify-otp/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/app/api/auth/verify-otp/route.ts
 __turbopack_context__.s([
     "POST",
     ()=>POST
@@ -84,7 +85,9 @@ var __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__
 ;
 async function POST(req) {
     try {
-        const { email, code } = await req.json();
+        const body = await req.json().catch(()=>({}));
+        const email = (body?.email || "").toString().trim().toLowerCase();
+        const code = (body?.code || "").toString().trim();
         if (!email || !code) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "Email and code required"
@@ -92,61 +95,84 @@ async function POST(req) {
                 status: 400
             });
         }
-        // Option 1: if email is @unique
-        // const otp = await prisma.emailOtp.findUnique({ where: { email } });
-        // Option 2: if multiple OTPs per email allowed
-        const otp = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.findFirst({
+        // find the most recent OTP row for this email (if you have unique email, use findUnique)
+        const otpRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.findFirst({
             where: {
                 email
             },
             orderBy: {
-                createdAt: 'desc'
+                createdAt: "desc"
             }
         });
-        if (!otp) {
+        if (!otpRow) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "No OTP found for this email"
             }, {
                 status: 404
             });
         }
-        if (otp.verified) {
+        // Optional expiry check: will only work if your model has expiresAt
+        if (otpRow.expiresAt) {
+            const expiresAt = new Date(otpRow.expiresAt);
+            if (expiresAt < new Date()) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    error: "OTP expired"
+                }, {
+                    status: 410
+                });
+            }
+        }
+        // Determine verification method:
+        // - If codeHash exists, use bcrypt.compare(code, codeHash)
+        // - Otherwise, fall back to direct plaintext comparison against otp field
+        const codeHash = otpRow.codeHash;
+        const plainOtp = otpRow.otp;
+        let verified = false;
+        if (codeHash) {
+            // defensive: ensure both args are defined
+            if (typeof code !== "string" || !codeHash) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    error: "Invalid verification data"
+                }, {
+                    status: 400
+                });
+            }
+            verified = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(code, codeHash);
+        } else if (typeof plainOtp === "string") {
+            verified = code === plainOtp;
+        } else {
+            // neither hash nor plaintext OTP present — can't verify
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                ok: true,
-                message: "Already verified"
+                error: "Server verification misconfiguration"
+            }, {
+                status: 500
             });
         }
-        const isMatch = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(code, otp.codeHash);
-        if (!isMatch) {
+        if (!verified) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "Invalid OTP"
             }, {
                 status: 401
             });
         }
-        if (new Date() > otp.expiresAt) {
-            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "OTP expired"
-            }, {
-                status: 400
-            });
-        }
+        // mark verified (if you store verified flag)
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].emailOtp.update({
             where: {
-                id: otp.id
+                id: otpRow.id
             },
             data: {
                 verified: true
             }
         });
+        // return success (you can also create a session or issue token here)
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            message: "OTP verified"
+            message: "Verified"
         });
     } catch (err) {
         console.error("verify-otp error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: "Internal server error"
+            error: "Server error"
         }, {
             status: 500
         });

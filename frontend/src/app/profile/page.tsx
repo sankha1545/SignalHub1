@@ -34,6 +34,11 @@ type Profile = {
   phoneVerified?: boolean;
   phoneVerifiedAt?: string | null;
   countryCode?: string | null; // ISO alpha-2
+  // possible server names:
+  countryName?: string | null;
+  stateName?: string | null;
+  countryGeonameId?: number | null;
+  stateGeonameId?: number | null;
 };
 
 type User = {
@@ -47,16 +52,10 @@ type User = {
 
 const DEFAULT_DIAL = "+1";
 const DEFAULT_NATIONAL_LENGTH = 10;
-const OTP_LEN = 6;
+const OTP_LEN = 4;
 
 /** Format time relative with extended granularity:
- *  <1 min -> "just now"
- *  <60m -> "Xm ago"
- *  <24h -> "Xh ago"
- *  <7d -> "Xd ago"
- *  <30d -> "Xw ago" (weeks)
- *  <365d -> "Xmo ago" (months)
- *  >=365d -> "Xy ago"
+ *  ... (kept as original)
  */
 function formatRelativeExtended(iso?: string | null) {
   if (!iso) return "—";
@@ -95,6 +94,22 @@ const FALLBACK_LENGTH: Record<string, number> = {
   PK: 10,
 };
 
+/**
+ * normalizeUser:
+ * - maps server-returned profile.countryName / profile.stateName -> profile.country / profile.state
+ * - ensures UI always reads from profile.country / profile.state
+ */
+function normalizeUser(user: any): any {
+  if (!user) return user;
+  const p = user.profile ?? {};
+  const normalizedProfile = {
+    ...p,
+    country: p.country ?? p.countryName ?? p.country_name ?? null,
+    state: p.state ?? p.stateName ?? p.state_name ?? null,
+  };
+  return { ...user, profile: normalizedProfile };
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -113,14 +128,14 @@ export default function ProfilePage() {
     return () => clearInterval(id);
   }, []);
 
-  // fetch /api/me on mount
+  // fetch /api/me on mount — include credentials so cookies are sent
   useEffect(() => {
     let mounted = true;
     const ac = new AbortController();
 
     async function load() {
       try {
-        const res = await fetch("/api/me", { signal: ac.signal });
+        const res = await fetch("/api/me", { signal: ac.signal, credentials: "include" });
         if (!res.ok) {
           if (!mounted) return;
           setUser(null);
@@ -129,10 +144,11 @@ export default function ProfilePage() {
         }
         const json = await res.json();
         if (!mounted) return;
-        setUser(json.user ?? null);
+        // normalize so UI always has profile.country / profile.state
+        setUser(normalizeUser(json.user ?? null));
         setActivity(json.activity ?? null);
       } catch (err: any) {
-        if (err.name === "AbortError") return;
+        if (err?.name === "AbortError") return;
         console.error("fetch /api/me error", err);
         if (!mounted) return;
         setUser(null);
@@ -152,27 +168,29 @@ export default function ProfilePage() {
   // unified save handler used by EditProfileModal (and other callers)
   async function handleSave(updated: Partial<User & { profile?: any }>) {
     const prev = user;
-    // optimistic update
+    // optimistic update: merge shallow
     setUser((prevU) => (prevU ? { ...prevU, ...updated } : prevU));
 
     try {
       const res = await fetch("/api/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(updated),
       });
 
       if (!res.ok) {
-        const txt = await res.text();
+        const txt = await res.text().catch(() => "(no body)");
         console.error("Save failed:", txt);
         setUser(prev ?? null);
         alert("Save failed. See console for details.");
         return false;
       }
 
-      const json = await res.json();
+      const json = await res.json().catch(() => null);
+      console.debug("PATCH response :", json);
       if (json?.user) {
-        setUser(json.user);
+        setUser(normalizeUser(json.user));
       } else if (json) {
         // merge partial response
         setUser((u) => (u ? { ...u, ...json } : u));
@@ -183,7 +201,7 @@ export default function ProfilePage() {
       if (json?.activity) setActivity(json.activity);
       return true;
     } catch (err) {
-      console.error(err);
+      console.error("handleSave error:", err);
       setUser(prev ?? null);
       alert("Save failed due to network/server error.");
       return false;
@@ -205,17 +223,18 @@ export default function ProfilePage() {
       const res = await fetch("/api/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ profile: updatedProfile }),
       });
       if (!res.ok) {
-        const txt = await res.text();
+        const txt = await res.text().catch(() => "(no body)");
         console.error("Add email failed:", txt);
         setUser(prev);
         alert("Failed to add email.");
         return false;
       }
-      const json = await res.json();
-      if (json?.user) setUser(json.user);
+      const json = await res.json().catch(() => null);
+      if (json?.user) setUser(normalizeUser(json.user));
       if (json?.activity) setActivity(json.activity);
       setAddEmailOpen(false);
       return true;
@@ -238,17 +257,18 @@ export default function ProfilePage() {
       const res = await fetch("/api/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ profile: updatedProfile }),
       });
       if (!res.ok) {
-        const txt = await res.text();
+        const txt = await res.text().catch(() => "(no body)");
         console.error("Remove email failed:", txt);
         setUser(prev);
         alert("Failed to remove email.");
         return false;
       }
-      const json = await res.json();
-      if (json?.user) setUser(json.user);
+      const json = await res.json().catch(() => null);
+      if (json?.user) setUser(normalizeUser(json.user));
       if (json?.activity) setActivity(json.activity);
       return true;
     } catch (err) {
@@ -262,16 +282,16 @@ export default function ProfilePage() {
   // When child modal returns an updated user object, accept it; otherwise re-fetch /api/me
   async function applyUpdatedUserFromChild(updatedUser: any) {
     if (updatedUser && updatedUser.id && updatedUser.email) {
-      setUser(updatedUser);
+      setUser(normalizeUser(updatedUser));
       if (updatedUser.activity) setActivity(updatedUser.activity);
       return;
     }
     // fallback refetch
     try {
-      const r = await fetch("/api/me");
+      const r = await fetch("/api/me", { credentials: "include", cache: "no-store" });
       if (!r.ok) return;
-      const j = await r.json();
-      if (j?.user) setUser(j.user);
+      const j = await r.json().catch(() => null);
+      if (j?.user) setUser(normalizeUser(j.user));
       if (j?.activity) setActivity(j.activity);
     } catch (err) {
       console.error("refetch after child update failed", err);
@@ -558,14 +578,26 @@ function PhoneVerifyModal({
   const [loadingCountries, setLoadingCountries] = useState(true);
   const [countriesError, setCountriesError] = useState<string | null>(null);
 
-  const initialCca2 = (initialProfile?.countryCode ?? "IN")?.toUpperCase() ?? "IN";
+  const initialCca2 = ((initialProfile?.countryCode ?? "IN") as string).toUpperCase() ?? "IN";
   const [countryCca2, setCountryCca2] = useState<string>(initialCca2);
 
   const [dialCode, setDialCode] = useState<string>(DEFAULT_DIAL);
   const [digitCount, setDigitCount] = useState<number>(FALLBACK_LENGTH[initialCca2] ?? DEFAULT_NATIONAL_LENGTH);
 
+  // digits local state => ensure it resizes when digitCount changes
   const [digits, setDigits] = useState<string[]>(() => Array(digitCount).fill(""));
+  useEffect(() => {
+    setDigits((prev) => {
+      const next = Array(digitCount).fill("");
+      for (let i = 0; i < Math.min(prev.length, next.length); i++) next[i] = prev[i];
+      return next;
+    });
+  }, [digitCount]);
+
   const digitInputsRef = React.useRef<Array<HTMLInputElement | null>>([]);
+
+  // store e164 phone used for verification
+  const [phoneE164, setPhoneE164] = useState<string | null>(initialProfile?.phoneNumber ?? null);
 
   const [otpSent, setOtpSent] = useState(false);
   const [otpExpiry, setOtpExpiry] = useState<number | null>(null);
@@ -626,11 +658,6 @@ function PhoneVerifyModal({
 
     const len = FALLBACK_LENGTH[countryCca2] ?? DEFAULT_NATIONAL_LENGTH;
     setDigitCount(len);
-    setDigits((prev) => {
-      const next = Array(len).fill("");
-      for (let i = 0; i < Math.min(prev.length, next.length); i++) next[i] = prev[i];
-      return next;
-    });
   }, [countryCca2, countries]);
 
   // focus management & ESC to close
@@ -685,15 +712,20 @@ function PhoneVerifyModal({
       return;
     }
     const e164 = `${dialCode}${localNumber}`;
+    // persist e164 so tryVerifyOtp can reference it
+    setPhoneE164(e164);
+
     setSending(true);
     setMessage(null);
     try {
       const res = await fetch("/api/phone/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ phone: e164, otpLen: OTP_LEN }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => null);
+      console.debug("[PhoneVerifyModal] send-otp response:", res.status, json);
       if (!res.ok || json?.error) {
         setMessage({ text: json?.error || "Failed to send OTP", ok: false });
         setOtpSent(false);
@@ -713,50 +745,80 @@ function PhoneVerifyModal({
   }
 
   async function tryVerifyOtp() {
-    if (!localComplete && !otpSent) {
+    if (!phoneE164) {
       setMessage({ text: "Send OTP first", ok: false });
       return;
     }
-    if (otpValue.length !== OTP_LEN) {
+
+    const otpValueLocal = otpDigits.join("");
+    if (otpValueLocal.length !== OTP_LEN) {
       setMessage({ text: `Enter ${OTP_LEN}-digit code`, ok: false });
       return;
     }
+
     setVerifying(true);
     setMessage(null);
-    const e164 = `${dialCode}${localNumber}`;
+
+    const payload = { phone: phoneE164, otp: otpValueLocal };
+    console.debug("[PhoneVerifyModal] verify payload:", payload);
+
     try {
       const res = await fetch("/api/phone/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: e164, otp: otpValue }),
+        credentials: "include",
+        body: JSON.stringify(payload),
       });
-      const json = await res.json();
-      if (!res.ok || json?.error) {
-        setMessage({ text: json?.error || "Invalid OTP", ok: false });
+
+      let body: any = null;
+      try {
+        body = await res.json().catch(() => null);
+      } catch (e) {
+        body = null;
+      }
+
+      console.debug("[PhoneVerifyModal] verify response status:", res.status, "body:", body);
+
+      if (!res.ok) {
+        const errMsg =
+          (body && (body.error || body.message)) ||
+          (await res.text().catch(() => null)) ||
+          `HTTP ${res.status}`;
+        setMessage({ text: errMsg, ok: false });
         setOtpDigits(Array(OTP_LEN).fill(""));
         otpInputsRef.current[0]?.focus();
+        return;
+      }
+
+      // success
+      setMessage({ text: "Phone number verified", ok: true });
+      setOtpSent(false);
+      setOtpDigits(Array(OTP_LEN).fill(""));
+
+      if (body && body.user) {
+        // call parent callback that the caller passed (onVerified)
+        try {
+          onVerified(body.user);
+        } catch (e) {
+          console.warn("[PhoneVerifyModal] onVerified threw:", e);
+        }
       } else {
-        setMessage({ text: "Phone verified", ok: true });
-        setOtpSent(false);
-        setOtpDigits(Array(OTP_LEN).fill(""));
-        // return updated user (server should return user ideally)
-        if (json?.user) onVerified(json.user);
-        else {
-          try {
-            const r = await fetch("/api/me");
-            if (r.ok) {
-              const j = await r.json();
-              if (j?.user) onVerified(j.user);
-              else onVerified(null);
-            } else onVerified(null);
-          } catch (err) {
-            console.error("fallback fetch /api/me failed", err);
+        // fallback: try re-fetch /api/me and call onVerified with the new user (or null)
+        try {
+          const r = await fetch("/api/me", { credentials: "include", cache: "no-store" });
+          if (r.ok) {
+            const j = await r.json().catch(() => null);
+            onVerified(j?.user ?? null);
+          } else {
             onVerified(null);
           }
+        } catch (err) {
+          console.error("[PhoneVerifyModal] fallback fetch /api/me failed:", err);
+          onVerified(null);
         }
       }
     } catch (err) {
-      console.error(err);
+      console.error("[PhoneVerifyModal] verify network error:", err);
       setMessage({ text: "Network error verifying OTP", ok: false });
     } finally {
       setVerifying(false);
@@ -780,7 +842,6 @@ function PhoneVerifyModal({
     }
   }
 
-  // Responsive classes for boxes
   const digitBoxClass = "w-9 sm:w-10 md:w-12 h-10 rounded border text-center";
   const otpBoxClass = "w-9 sm:w-10 md:w-12 h-10 rounded border text-center";
 
@@ -791,7 +852,7 @@ function PhoneVerifyModal({
         <div className="flex items-start justify-between gap-4 p-5 border-b">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">Verify phone number</h3>
-            <p className="text-sm text-slate-500 mt-1">Select country (dial code derived automatically), enter your phone and verify with a 6-digit code.</p>
+            <p className="text-sm text-slate-500 mt-1">Select country (dial code derived automatically), enter your phone and verify with a {OTP_LEN}-digit code.</p>
           </div>
           <div>
             <button aria-label="Close" onClick={onClose} className="rounded-md p-2 text-slate-600 hover:bg-slate-100">✕</button>
@@ -900,3 +961,4 @@ function PhoneVerifyModal({
     </div>
   );
 }
+

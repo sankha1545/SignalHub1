@@ -176,50 +176,40 @@ export default function LoginPage() {
   }
 
   // Google sign-in success handler
-  async function onGoogleSuccess(credentialResponse: CredentialResponse | any) {
-    setError(null);
-    if (!credentialResponse?.credential) {
-      setError("Google returned no credential. Try again.");
-      return;
-    }
-
-    let decoded: any;
-    try {
-      decoded = jwtDecode(credentialResponse.credential);
-    } catch (err) {
-      console.error("jwt decode error", err);
-      setError("Failed to decode Google token.");
-      return;
-    }
-
-    const googleEmail = decoded?.email;
-    const googleSub = decoded?.sub;
-
-    if (!googleEmail || !googleSub) {
-      setError("Google account did not provide email. Use a Google account with email enabled.");
-      return;
-    }
-
-    setBusy(true);
-    try {
-      const res = await safeJsonFetch("/api/auth/google/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: googleEmail, sub: googleSub }),
-      });
-      if (!res.ok) {
-        setError(res.data?.error ?? "Google login failed. If you don't have an account, sign up first.");
-      } else {
-        setSuccessMsg("Signed in with Google — redirecting…");
-        setTimeout(() => router.push("/welcome"), 600);
-      }
-    } catch (err) {
-      console.error("google login error", err);
-      setError("Network error during Google login.");
-    } finally {
-      setBusy(false);
-    }
+ // replace the existing onGoogleSuccess with this
+async function onGoogleSuccess(credentialResponse: CredentialResponse | any) {
+  setError(null);
+  const idToken = credentialResponse?.credential;
+  if (!idToken) {
+    setError("Google returned no credential. Try again.");
+    return;
   }
+
+  setBusy(true);
+  try {
+    // send idToken to your server for verification & sign-in
+    const res = await safeJsonFetch("/api/auth/google/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!res.ok) {
+      // backend should return helpful error message
+      setError(res.data?.error ?? "Google login failed on server.");
+    } else {
+      setSuccessMsg("Signed in with Google — redirecting…");
+      // if server performed redirect via cookie we can push to welcome
+      setTimeout(() => router.push("/welcome"), 600);
+    }
+  } catch (err) {
+    console.error("google login error", err);
+    setError("Network error during Google login.");
+  } finally {
+    setBusy(false);
+  }
+}
+
 
   function onGoogleError() {
     setError("Google authentication failed or was cancelled.");

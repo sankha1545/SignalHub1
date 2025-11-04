@@ -7,9 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/**
- * Enums
- */
+/** ----------------------------- Enums ----------------------------- */
+
 enum Role {
   VIEWER
   EDITOR
@@ -30,6 +29,17 @@ enum ActivityType {
   OTHER
 }
 
+/** Constrain message direction to avoid freeform values */
+enum Direction {
+  INBOUND
+  OUTBOUND
+}
+
+/** ----------------------------- Models ----------------------------- */
+
+/**
+ * Activity logs for auditing user actions
+ */
 model ActivityLog {
   id        String       @id @default(cuid())
   userId    String
@@ -42,9 +52,12 @@ model ActivityLog {
   @@index([userId, createdAt])
 }
 
+/**
+ * Temporary phone OTPs
+ */
 model PhoneOtp {
   id        String   @id @default(cuid())
-  phone     String // E.164 phone e.g. +918597786209
+  phone     String   // E.164 phone e.g. +918597786209
   otp       String
   used      Boolean  @default(false)
   attempts  Int      @default(0)
@@ -55,32 +68,74 @@ model PhoneOtp {
 
 /**
  * Core user/auth models
+ *
+ * - email: unique at DB level
+ * - role: default VIEWER
+ * - profile: 1:1 relation via Profile.userId (Profile is owning side)
  */
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String   @unique
+  email         String    @unique
   passwordHash  String?
-  provider      String   @default("credentials")
-  emailVerified Boolean  @default(false)
-  role          Role     @default(VIEWER)
-  profile       Json? // <-- ADD THIS LINE
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
+  provider    String   @default("email") // "email" | "google" | "github" | ...
+  providerId  String?  @unique
+  googleSub     String?   // Google's subject id (sub) if available
+  emailVerified Boolean   @default(false)
+  role          Role      @default(VIEWER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  // relation (Profile is the owner via Profile.userId)
+  profile       Profile?
 
   accounts Account[]
   sessions Session[]
 
   // App relationships
-  threads          Thread[]           @relation("UserThreads") // User → Thread (creator)
-  messages         Message[]          @relation("UserMessages") // User → Message (sender)
+  threads          Thread[]           @relation("UserThreads")    // User → Thread (creator)
+  messages         Message[]          @relation("UserMessages")   // User → Message (sender)
   teamMember       TeamMember[]
-  ScheduledMessage ScheduledMessage[]
-  ActivityLog      ActivityLog[]
+  scheduledMessage ScheduledMessage[]  // NOTE: singular/plural naming kept for clarity
+  activityLog      ActivityLog[]
+
+  /// Ensure a googleSub (when present) is unique across users to avoid multiple users sharing the same Google account.
+  @@unique([googleSub])
 }
 
 /**
- * NextAuth-compatible models
+ * Separate Profile model — Profile is the owning side (has userId FK)
+ * userId is unique so a profile cannot be shared across users.
+ */
+model Profile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  displayName        String?
+  avatarUrl          String?
+  bio                String?
+  metadata           Json?
+  phoneNumber   String?   // <-- add this
+  phoneVerified Boolean?  @default(false)
+  phoneVerifiedAt DateTime?
+  // Optional geo / locale fields (nullable so existing rows are compatible)
+  gender             String?      // e.g. "male" | "female" | "other"
+  countryGeonameId   Int?         // GeoNames numeric id (nullable)
+  countryCode        String?      // ISO country code, e.g. "US", "IN"
+  countryName        String?      // readable country name
+  stateGeonameId     Int?         // optional state/province GeoNames id
+  stateName          String?      // readable state/province name
+  timezone           String?      // timezone string shown to user, e.g. "Australia/Brisbane"
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  // Relation to User (same as before)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * NextAuth-compatible models (Account, Session, VerificationToken)
+ * - Account has a unique composite (provider, providerAccountId) to prevent dupes.
  */
 model Account {
   id                String  @id @default(cuid())
@@ -99,6 +154,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -108,6 +164,8 @@ model Session {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -118,12 +176,17 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+/**
+ * Email OTP table (for email-based OTP flows)
+ */
 model EmailOtp {
   id        String   @id @default(cuid())
   email     String
   otp       String
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 /**
@@ -145,15 +208,17 @@ model Thread {
   contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
   contactId String
 
-  // 🔹 added opposite field for UserThreads
+  // opposite field for UserThreads (creator)
   creator   User?   @relation("UserThreads", fields: [creatorId], references: [id], onDelete: SetNull)
   creatorId String?
 
   messages  Message[]
-  scheduled ScheduledMessage[] // 🔹 added opposite field for ScheduledMessage
-  status    String             @default("open")
-  lastAt    DateTime           @updatedAt
-  createdAt DateTime           @default(now())
+  scheduled ScheduledMessage[]
+  status    String   @default("open")
+  lastAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([contactId])
 }
 
 model Message {
@@ -165,7 +230,7 @@ model Message {
   body       String
   channel    Channel
   externalId String? // provider message id
-  direction  String // "inbound" | "outbound"
+  direction  Direction
   metadata   Json?
   createdAt  DateTime @default(now())
 

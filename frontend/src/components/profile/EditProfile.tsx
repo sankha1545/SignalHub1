@@ -6,11 +6,9 @@ import ReactDOM from "react-dom";
 
 /**
  * NOTE: replace GEONAMES_USERNAME with your GeoNames username if you want live country/state lists.
- * If you don't want remote calls, you can remove the GeoNames fetch sections and hardcode countries.
  */
-const GEONAMES_USERNAME = "sankha"; // <-- replace this with your username or leave for now
+const GEONAMES_USERNAME = "sankha"; // <-- replace or leave
 
-// 38 timezones (UTC offset - label).
 const TIMEZONES_38 = [
   "UTC-12:00 - Baker Island",
   "UTC-11:00 - Niue / American Samoa",
@@ -72,16 +70,17 @@ type Props = {
   open: boolean;
   onClose: () => void;
   user: User | null;
-  onSave: (payload: Partial<User & { profile?: any }>) => Promise<boolean> | boolean;
+  // onSave should ideally return boolean or Promise<boolean>. This component will
+  // accept either boolean, Promise<boolean>, or a returned updated user object.
+  onSave: (payload: Partial<User & { profile?: any }>) => Promise<boolean | any> | boolean | any;
 };
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024; // 2 MB
+const COOKIE_CANDIDATES = ["session", "token", "auth_token", "authToken", "auth"];
 
 export default function EditProfile({ open, onClose, user, onSave }: Props) {
-  // saving flag
   const [saving, setSaving] = useState(false);
 
-  // form fields
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [gender, setGender] = useState("");
@@ -93,13 +92,11 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
   const [language, setLanguage] = useState("");
   const [timezone, setTimezone] = useState("");
 
-  // avatar
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null); // data URL or external URL
-  const [avatarFileSize, setAvatarFileSize] = useState<number | null>(null); // bytes
-  const [avatarRemoved, setAvatarRemoved] = useState(false); // true when user clicked "Remove avatar"
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFileSize, setAvatarFileSize] = useState<number | null>(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // lists + loading flags
   const [countries, setCountries] = useState<CountryEntry[]>([]);
   const [states, setStates] = useState<StateEntry[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(false);
@@ -107,7 +104,7 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
 
   const primaryRef = useRef<HTMLButtonElement | null>(null);
 
-  // initialize form values when user or open changes
+  // init form from user
   useEffect(() => {
     if (!user) return;
     setFullName(user.name ?? "");
@@ -124,9 +121,10 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     setAvatarPreview(p.avatarUrl ?? p.avatarBase64 ?? null);
     setAvatarFileSize(null);
     setAvatarRemoved(false);
+    console.debug("[EditProfile] initialized form from user:", { id: user.id, name: user.name, profile: user.profile });
   }, [user, open]);
 
-  // load countries (sessionStorage cached)
+  // load countries (cached)
   useEffect(() => {
     let mounted = true;
     async function loadCountries() {
@@ -141,7 +139,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
         }
 
         if (!GEONAMES_USERNAME) {
-          // user hasn't set username; skip remote fetch
           setCountries([]);
           setLoadingCountries(false);
           return;
@@ -158,7 +155,7 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
         sessionStorage.setItem("geonames_countries_v1", JSON.stringify(list));
         if (mounted) setCountries(list);
       } catch (err) {
-        console.error("Error loading countries:", err);
+        console.error("[EditProfile] Error loading countries:", err);
         if (mounted) setCountries([]);
       } finally {
         if (mounted) setLoadingCountries(false);
@@ -168,10 +165,9 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     return () => { mounted = false; };
   }, []);
 
-  // when countryGeonameId changes, load states/children and set country code/name
+  // load states when country changes
   useEffect(() => {
     let mounted = true;
-
     async function loadStates() {
       if (!countryGeonameId) {
         if (mounted) {
@@ -190,25 +186,20 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
           setLoadingStates(false);
           return;
         }
-
         const res = await fetch(`http://api.geonames.org/childrenJSON?geonameId=${countryGeonameId}&username=${GEONAMES_USERNAME}`);
         if (!res.ok) throw new Error("Failed to fetch states from GeoNames");
         const json = await res.json();
-        const st: StateEntry[] = (json.geonames || []).map((g: any) => ({
-          geonameId: g.geonameId,
-          name: g.name
-        }));
+        const st: StateEntry[] = (json.geonames || []).map((g: any) => ({ geonameId: g.geonameId, name: g.name }));
         if (mounted) {
           setStates(st);
           setLoadingStates(false);
         }
       } catch (err) {
-        console.error("Error loading states:", err);
+        console.error("[EditProfile] Error loading states:", err);
         if (mounted) setLoadingStates(false);
       }
     }
 
-    // update countryCode and countryName from countries list (if present)
     if (countryGeonameId) {
       const found = countries.find((c) => c.geonameId === countryGeonameId);
       if (found) {
@@ -224,7 +215,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     return () => { mounted = false; };
   }, [countryGeonameId, countries]);
 
-  // UX: lock scroll & focus save button when modal opens
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -236,7 +226,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     };
   }, [open]);
 
-  // ESC to close modal
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -245,10 +234,9 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // early exit: don't render anything if not open
   if (!open) return null;
 
-  // ---------- Avatar helpers ----------
+  // avatar helpers
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -256,28 +244,24 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
   }
 
   function pickAvatarFile(file: File) {
-    // basic type check
     if (!file.type.startsWith("image/")) {
       alert("Please select an image file.");
       return;
     }
-
-    // size check
     if (file.size > MAX_AVATAR_BYTES) {
       alert("Avatar must be 2 MB or smaller.");
       return;
     }
-
-    // read as data URL for preview and sending to server
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
       setAvatarPreview(dataUrl);
       setAvatarFileSize(file.size);
       setAvatarRemoved(false);
+      console.debug("[EditProfile] avatar picked, size:", file.size);
     };
     reader.onerror = (err) => {
-      console.error("Failed to read avatar file:", err);
+      console.error("[EditProfile] Failed to read avatar file:", err);
       alert("Failed to read the selected file.");
     };
     reader.readAsDataURL(file);
@@ -291,67 +275,143 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
     setAvatarPreview(null);
     setAvatarFileSize(null);
     setAvatarRemoved(true);
-    // also clear file input value so user can re-upload same file later
     if (fileInputRef.current) fileInputRef.current.value = "";
+    console.debug("[EditProfile] avatar removed by user");
   }
 
-  // ---------- submit handler ----------
-  async function submit(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (!user) return;
-    if (!fullName || typeof fullName !== "string") {
-      alert("Full name is required.");
+  // ---------- submit handler (with debug + robust fallback) ----------
+async function submit(e?: React.FormEvent) {
+  e?.preventDefault();
+  if (!user) {
+    console.warn("[EditProfile] submit called but user is null");
+    return;
+  }
+  if (!fullName || typeof fullName !== "string") {
+    alert("Full name is required.");
+    return;
+  }
+
+  setSaving(true);
+  try {
+    const profilePatch: any = {
+      displayName: displayName || undefined,
+      gender: gender || undefined,
+      countryGeonameId: countryGeonameId || null,
+      countryCode: countryCode || null,
+      countryName: countryName || null,
+      stateGeonameId: stateGeonameId || null,
+      stateName: stateName || null,
+      language: language || undefined,
+      timezone: timezone || undefined
+    };
+
+    if (avatarRemoved) {
+      profilePatch.avatarBase64 = null;
+      profilePatch.avatarUrl = null;
+    } else if (avatarPreview && avatarPreview.startsWith("data:")) {
+      profilePatch.avatarBase64 = avatarPreview;
+      profilePatch.avatarUrl = avatarPreview;
+    }
+
+    const payload: any = {
+      name: fullName,
+      profile: profilePatch
+    };
+
+    console.debug("[EditProfile] submit payload:", payload);
+
+    // Call parent onSave and capture result
+    let okResult: boolean | any = false;
+    try {
+      const maybe = onSave(payload);
+      okResult = typeof maybe === "boolean" ? maybe : await maybe;
+      console.debug("[EditProfile] onSave returned:", okResult);
+    } catch (err) {
+      console.error("[EditProfile] onSave threw error:", err);
+      okResult = false;
+    }
+
+    // If parent returned a truthy object (updated user), use it; if boolean true, proceed to fetch /api/me.
+    let updatedUser: any = null;
+    if (okResult && typeof okResult === "object") {
+      updatedUser = okResult;
+      console.debug("[EditProfile] using updated user returned by parent onSave");
+    } else if (okResult === true) {
+      // parent signalled success but didn't return user => fetch authoritative /api/me
+      try {
+        const r = await fetch("/api/me", { method: "GET", credentials: "include", cache: "no-store" });
+        console.debug("[EditProfile] GET /api/me after save status:", r.status);
+        if (r.ok) {
+          const b = await r.json().catch(() => null);
+          updatedUser = b?.user ?? null;
+          console.debug("[EditProfile] GET /api/me returned:", updatedUser);
+        } else {
+          console.warn("[EditProfile] GET /api/me after save returned non-ok:", r.status);
+        }
+      } catch (err) {
+        console.error("[EditProfile] failed to fetch /api/me after save:", err);
+      }
+    } else {
+      // Parent returned falsy value or failure — attempt direct PATCH as a fallback
+      try {
+        console.debug("[EditProfile] parent onSave failed or returned falsy — trying direct PATCH to /api/me");
+        const r = await fetch("/api/me", {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+        console.debug("[EditProfile] direct PATCH /api/me status:", r.status);
+        if (r.ok) {
+          const b = await r.json().catch(() => null);
+          updatedUser = b?.user ?? null;
+          console.debug("[EditProfile] direct PATCH response body:", b);
+        } else {
+          const txt = await r.text().catch(() => null);
+          console.warn("[EditProfile] direct PATCH returned non-ok:", r.status, txt);
+        }
+      } catch (err) {
+        console.error("[EditProfile] direct PATCH failed:", err);
+      }
+    }
+
+    // If we have updatedUser, dispatch event so app can update global state
+    if (updatedUser) {
+      try {
+        window.dispatchEvent(new CustomEvent("user:updated", { detail: updatedUser }));
+        console.debug("[EditProfile] dispatched user:updated event", updatedUser);
+      } catch (e) {
+        console.error("[EditProfile] dispatch user:updated failed:", e);
+      }
+
+      // close modal
+      onClose?.();
       return;
     }
 
-    setSaving(true);
+    // Nothing worked — dispatch null detail and reload as last resort
     try {
-      // build profile patch
-      const profilePatch: any = {
-        displayName: displayName || undefined,
-        gender: gender || undefined,
-        countryGeonameId: countryGeonameId || null,
-        countryCode: countryCode || null,
-        countryName: countryName || null,
-        stateGeonameId: stateGeonameId || null,
-        stateName: stateName || null,
-        language: language || undefined,
-        timezone: timezone || undefined
-      };
-
-      // avatar handling:
-      // - if user removed avatar explicitly => send avatarBase64: null to signal removal
-      // - if avatarPreview is a data URL => send avatarBase64 with that data URL
-      if (avatarRemoved) {
-        profilePatch.avatarBase64 = null;
-        profilePatch.avatarUrl = null;
-      } else if (avatarPreview && avatarPreview.startsWith("data:")) {
-        // we already validated size when picked
-        profilePatch.avatarBase64 = avatarPreview;
-        profilePatch.avatarUrl = avatarPreview; // server may choose to use this or derive a URL
-      }
-
-      const payload: any = {
-        name: fullName,
-        profile: profilePatch
-      };
-
-      const ok = await onSave(payload);
-      // onSave should return a boolean (true on success)
-      if (!ok) {
-        // leave modal open; onSave may show errors
-      }
-    } finally {
-      setSaving(false);
+      window.dispatchEvent(new CustomEvent("user:updated", { detail: null }));
+      console.debug("[EditProfile] dispatched user:updated null fallback");
+    } catch (e) {
+      console.debug("[EditProfile] dispatch fallback failed", e);
     }
-  }
 
-  // ---------- JSX ----------
+    console.warn("[EditProfile] could not obtain updated user after save; reloading page as fallback");
+    // Reload to show server-side updated state as a last resort
+    window.location.reload();
+  } catch (err) {
+    console.error("[EditProfile] submit unexpected error:", err);
+  } finally {
+    setSaving(false);
+  }
+}
+
+  // end submit
+  // ---------- JSX below ----------
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
-
       <div
         role="dialog"
         aria-modal="true"
@@ -370,7 +430,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
 
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <div className="flex items-start gap-6">
-            {/* avatar column */}
             <div className="flex flex-col items-center gap-3">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border">
@@ -423,7 +482,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
               />
             </div>
 
-            {/* form fields */}
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-slate-600 block">Full name</label>
@@ -466,7 +524,6 @@ export default function EditProfile({ open, onClose, user, onSave }: Props) {
                   onChange={(e) => {
                     const val = e.target.value;
                     setCountryGeonameId(val ? Number(val) : "");
-                    // clear state when country changes
                     setStateGeonameId("");
                     setStateName("");
                   }}

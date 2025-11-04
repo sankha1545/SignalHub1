@@ -3,24 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken } from "@/lib/auth";
 
-/**
- * Build a secure cookie string for the JWT token.
- */
-function buildCookie(token: string) {
-  const maxAge = 7 * 24 * 60 * 60; // 7 days
-  const secure = process.env.NODE_ENV === "production";
-  return [
-    `token=${token}`,
-    "Path=/",
-    "HttpOnly",
-    "SameSite=Strict",
-    `Max-Age=${maxAge}`,
-    secure ? "Secure" : "",
-  ]
-    .filter(Boolean)
-    .join("; ");
-}
-
 type ReqBody = {
   email?: string;
   name?: string;
@@ -29,6 +11,38 @@ type ReqBody = {
   role?: string;
   provider?: "credentials" | "google" | string;
 };
+
+/** Env-aware cookie setter helper (uses res.cookies.set when available, header fallback otherwise) */
+function setSessionCookie(res: NextResponse, token: string) {
+  const isProd = process.env.NODE_ENV === "production";
+  const sameSite = isProd ? "none" : "lax";
+  const secure = isProd;
+  const maxAge = 7 * 24 * 60 * 60; // 7 days
+  const value = encodeURIComponent(token);
+
+  try {
+    res.cookies.set({
+      name: "session",
+      value,
+      httpOnly: true,
+      secure,
+      sameSite: sameSite as "lax" | "none" | "strict",
+      path: "/",
+      maxAge,
+    });
+  } catch {
+    // header fallback for runtimes that expect a Set-Cookie header string
+    const parts = [
+      `session=${value}`,
+      "Path=/",
+      `Max-Age=${maxAge}`,
+      "HttpOnly",
+      isProd ? "SameSite=None" : "SameSite=Lax",
+      secure ? "Secure" : "",
+    ].filter(Boolean);
+    res.headers.set("Set-Cookie", parts.join("; "));
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -106,13 +120,13 @@ export async function POST(req: Request) {
       await prisma.emailOtp.deleteMany({ where: { email } });
 
       // Sign token with id, email, role
-      const token = signToken(
-        { id: user.id, email: user.email, role: user.role },
-        "7d"
-      );
+      const token = signToken({ id: user.id, email: user.email, role: user.role }, "7d");
 
       const res = NextResponse.json({ ok: true, user });
-      res.headers.set("Set-Cookie", buildCookie(token));
+
+      // set cookie in env-aware way
+      setSessionCookie(res, token);
+
       return res;
     }
 
@@ -132,13 +146,10 @@ export async function POST(req: Request) {
         select: { id: true, email: true, name: true, role: true, provider: true },
       });
 
-      const token = signToken(
-        { id: user.id, email: user.email, role: user.role },
-        "7d"
-      );
+      const token = signToken({ id: user.id, email: user.email, role: user.role }, "7d");
 
       const res = NextResponse.json({ ok: true, user });
-      res.headers.set("Set-Cookie", buildCookie(token));
+      setSessionCookie(res, token);
       return res;
     }
 

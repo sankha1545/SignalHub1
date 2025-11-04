@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "prisma-scripts/fix-auth-inconsistencies.js"  ],
   "exclude": ["node_modules"]
 }

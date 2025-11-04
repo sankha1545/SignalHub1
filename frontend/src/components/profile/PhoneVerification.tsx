@@ -19,7 +19,6 @@ type Props = {
 
 /**
  * Minimal mapping of country code => { dial, length }.
- * Add more entries as you need, but include the common ones:
  */
 const COUNTRY_PHONE_RULES: Record<string, { dial: string; length: number }> = {
   IN: { dial: "+91", length: 10 },
@@ -35,6 +34,9 @@ const COUNTRY_PHONE_RULES: Record<string, { dial: string; length: number }> = {
 };
 
 const DEFAULT_RULE = { dial: "+1", length: 10 };
+
+// OTP length single source of truth
+const OTP_LEN = 4;
 
 function onlyDigits(s: string) {
   return s.replace(/\D/g, "");
@@ -56,9 +58,8 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
   const [otpSent, setOtpSent] = useState(false);
   const [otpExpiry, setOtpExpiry] = useState<number | null>(null);
 
-  // otp 4-digit boxes
-  const OTP_LEN = 4;
-  const [otpDigits, setOtpDigits] = useState<string[]>(Array(OTP_LEN).fill(""));
+  // otp boxes use OTP_LEN
+  const [otpDigits, setOtpDigits] = useState<string[]>(() => Array(OTP_LEN).fill(""));
   const otpInputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
   const [verifying, setVerifying] = useState(false);
@@ -126,7 +127,7 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: e164 }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => null);
       if (!res.ok || json?.error) {
         setMessage({ text: json?.error || "Failed to send OTP", ok: false });
         setOtpSent(false);
@@ -139,6 +140,9 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
         setPhoneE164(e164);
         // focus first otp input shortly
         setTimeout(() => otpInputsRef.current[0]?.focus(), 120);
+
+        // debug log so you can confirm OTP length and runtime
+        console.debug("[PhoneVerification] OTP sent, OTP_LEN:", OTP_LEN, "phone:", e164);
       }
     } catch (err) {
       console.error(err);
@@ -189,7 +193,7 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: phoneE164, otp: otpValue }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => null);
       if (!res.ok || json?.error) {
         setMessage({ text: json?.error || "Invalid OTP", ok: false });
         // clear otp boxes (allow retry)
@@ -201,7 +205,7 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
         setOtpSent(false);
         setOtpDigits(Array(OTP_LEN).fill(""));
         // let parent update user object using returned user
-        if (onUserUpdate && json.user) {
+        if (onUserUpdate && json?.user) {
           onUserUpdate(json.user);
         } else {
           // fallback: just show verified
@@ -231,7 +235,6 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
       setDigits(arr);
       // auto send OTP
       setTimeout(() => {
-        // focus send otp button by programmatic action or call sendOtp directly
         sendOtp();
       }, 80);
     }
@@ -261,7 +264,7 @@ export default function PhoneVerification({ profile, onUserUpdate }: Props) {
             onChange={(e) => setCountryCode(e.target.value)}
             className="rounded border px-2 py-1"
           >
-            {/* simple options from mapping */}
+            {/* simple options from mapping */} 
             {Object.keys(COUNTRY_PHONE_RULES).map((cc) => (
               <option key={cc} value={cc}>
                 {cc} {COUNTRY_PHONE_RULES[cc].dial}

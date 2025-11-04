@@ -2,39 +2,48 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendOTPEmail } from "@/lib/mail";
-import bcrypt from "bcrypt";
+
+const OTP_LENGTH = 6;
+const OTP_TTL_MS = 10 * 60 * 1000; // not stored unless you add expiresAt to schema
+
+function generateOtp(length = OTP_LENGTH) {
+  const min = 10 ** (length - 1);
+  const max = 10 ** length - 1;
+  return Math.floor(min + Math.random() * (max - min + 1)).toString();
+}
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const email = (body?.email || "").toString().trim().toLowerCase();
     if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
-    // generate 6-digit OTP
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = generateOtp();
 
-    // hash OTP before storing
-    const codeHash = await bcrypt.hash(code, 10);
-    const expiresAt = new Date(Date.now() + 60 * 1000); // 60 seconds
-
-    // find an existing OTP row for this email (works even if email not unique)
-    const existing = await prisma.emailOtp.findFirst({ where: { email } });
-
-    if (existing) {
-      // update by unique id
-      await prisma.emailOtp.update({
-        where: { id: existing.id },
-        data: { codeHash, expiresAt, verified: false, createdAt: new Date() },
+    // Try to upsert by email if email has a unique constraint; otherwise fallback to findFirst
+    try {
+      await prisma.emailOtp.upsert({
+        where: { email }, // requires `email` to be unique in schema
+        update: { otp, verified: false },
+        create: { email, otp, verified: false },
       });
-    } else {
-      // create new row
-      await prisma.emailOtp.create({
-        data: { email, codeHash, expiresAt, verified: false },
-      });
+    } catch (e) {
+      // fallback if email is not unique in schema
+      const existing = await prisma.emailOtp.findFirst({ where: { email } });
+      if (existing) {
+        await prisma.emailOtp.update({
+          where: { id: existing.id },
+          data: { otp, verified: false },
+        });
+      } else {
+        await prisma.emailOtp.create({
+          data: { email, otp, verified: false },
+        });
+      }
     }
 
-    // send email (may throw if SMTP misconfigured)
-    await sendOTPEmail(email, code);
+    // Send OTP (this uses the plaintext otp)
+    await sendOTPEmail(email, otp);
 
     return NextResponse.json({ ok: true, message: "OTP sent" });
   } catch (err) {

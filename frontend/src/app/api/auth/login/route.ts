@@ -4,17 +4,40 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, signToken } from "@/lib/auth";
 
 /**
- * Builds a secure cookie string for the JWT token.
+ * POST /api/auth/login
+ *
+ * Accepts: { email, password }
+ * - Blocks credential login for OAuth-only accounts.
+ * - Parses legacy provider strings (comma separated).
+ * - Sets an httpOnly session cookie named "session".
  */
-function buildCookie(token: string) {
-  const maxAge = 7 * 24 * 60 * 60; // 7 days
+
+const SESSION_COOKIE_NAME = "session";
+const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+
+function jsonError(msg: string, status = 400) {
+  return NextResponse.json({ ok: false, error: msg }, { status });
+}
+
+/** Parse provider field into normalized array (handles comma-lists, nulls) */
+function parseProviders(providerField: string | null | undefined): string[] {
+  if (!providerField) return [];
+  return providerField
+    .toString()
+    .split(",")
+    .map((p) => p.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** Build fallback Set-Cookie header value (used if res.cookies.set fails) */
+function buildCookieHeader(name: string, value: string, maxAge = SESSION_MAX_AGE) {
   const secure = process.env.NODE_ENV === "production";
   return [
-    `token=${token}`,
+    `${name}=${value}`,
     "Path=/",
-    "HttpOnly",
-    "SameSite=Strict",
     `Max-Age=${maxAge}`,
+    "HttpOnly",
+    "SameSite=Lax",
     secure ? "Secure" : "",
   ]
     .filter(Boolean)
@@ -23,17 +46,15 @@ function buildCookie(token: string) {
 
 export async function POST(req: Request) {
   try {
-    const { email: rawEmail, password } = await req.json();
-    const email = (rawEmail || "").toString().trim().toLowerCase();
+    const body = (await req.json().catch(() => ({} as any))) as { email?: string; password?: string };
+    const rawEmail = (body?.email ?? "").toString();
+    const password = (body?.password ?? "").toString();
 
+    const email = rawEmail.trim().toLowerCase();
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password required" },
-        { status: 400 }
-      );
+      return jsonError("Email and password are required.", 400);
     }
 
-    // 1) Find the user
     const user = await prisma.user.findUnique({
       where: { email },
       select: {
@@ -46,77 +67,75 @@ export async function POST(req: Request) {
       },
     });
 
-    // 2) Validate existence
-    if (!user) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
+    // Do not reveal whether email exists
+    if (!user) return jsonError("Invalid email or password.", 401);
 
-    // 3) Disallow credentials login for OAuth-only users
-    if (user.provider !== "credentials") {
+    // Robust provider parsing
+    const providers = parseProviders(user.provider);
+    const hasCredentials = providers.includes("credentials") || providers.includes("email") || !!user.passwordHash;
+    const oauthProviders = providers.filter((p) => p !== "credentials" && p !== "email");
+
+    // If user does NOT have credentials, but has external provider(s) — block credential login
+    if (!hasCredentials) {
+      const providerLabel = oauthProviders.length ? oauthProviders.join(", ") : "an external provider";
       return NextResponse.json(
         {
-          error: `This account was created using ${user.provider}. Please log in with ${user.provider} instead.`,
+          ok: false,
+          error: `This account was created using ${providerLabel}. Please sign in with ${providerLabel} or link credentials from account settings.`,
         },
         { status: 403 }
       );
     }
 
-    // 4) Ensure password exists
     if (!user.passwordHash) {
-      return NextResponse.json({ error: "Password not set for this account" }, { status: 401 });
+      // Defensive: if provider indicates credentials but no password is stored
+      return jsonError("Password not set for this account. Please reset your password.", 401);
     }
 
-    // 5) Verify password
     const valid = await verifyPassword(password, user.passwordHash);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
+    if (!valid) return jsonError("Invalid email or password.", 401);
 
-    // 6) Sign JWT that includes role for RBAC checks
-    const token = signToken(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      "7d"
-    );
+    // Create session token (7d)
+    const token = signToken({ id: user.id, email: user.email, role: user.role }, "7d");
 
-    // 7) Record login activity (non-blocking; failures shouldn't break login)
+    // Fire-and-forget activity log
     (async () => {
       try {
         await prisma.activityLog.create({
           data: {
             userId: user.id,
             type: "LOGIN",
-            meta: {
-              provider: "credentials",
-              ts: new Date().toISOString(),
-            },
+            meta: { provider: "credentials", ts: new Date().toISOString() },
           },
         });
-      } catch (err) {
-        // log but don't fail login
-        console.error("Failed to record login activity:", err);
+      } catch (e) {
+        console.error("⚠️ Failed to record login activity:", e);
       }
     })();
 
-    // 8) Respond and set cookie
     const res = NextResponse.json({
       ok: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        provider: user.provider,
-      },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, provider: providers.length ? providers.join(",") : "credentials" },
     });
 
-    res.headers.set("Set-Cookie", buildCookie(token));
+    // Prefer NextResponse cookies API; fall back to Set-Cookie header if necessary
+    try {
+      res.cookies.set(SESSION_COOKIE_NAME, token, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: SESSION_MAX_AGE,
+      } as any);
+    } catch {
+      res.headers.set("Set-Cookie", buildCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE));
+    }
+
+    if (process.env.NODE_ENV !== "production") console.debug("[auth/login] session cookie set for userId:", user.id);
+
     return res;
   } catch (err) {
-    console.error("Login error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("❌ Login error:", err);
+    return jsonError("Internal server error.", 500);
   }
 }

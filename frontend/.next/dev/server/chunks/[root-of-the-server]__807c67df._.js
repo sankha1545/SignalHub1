@@ -96,7 +96,7 @@ module.exports = mod;
 "[project]/src/lib/auth.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// lib/auth.ts
+// src/lib/auth.ts
 __turbopack_context__.s([
     "getUserFromRequest",
     ()=>getUserFromRequest,
@@ -117,9 +117,26 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__
 ;
 ;
 ;
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "dev-secret";
+const JWT_SECRET = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "dev-secret";
+const COOKIE_CANDIDATES = [
+    "session",
+    "token",
+    "auth_token",
+    "authToken",
+    "auth"
+];
 function signToken(payload, expiresIn = "7d") {
-    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].sign(payload, JWT_SECRET, {
+    const finalPayload = {
+        ...payload
+    };
+    // Prefer canonical claim `sub` for user id
+    if (!finalPayload.sub) {
+        if (finalPayload.id) finalPayload.sub = finalPayload.id;
+        else if (finalPayload.userId) finalPayload.sub = finalPayload.userId;
+    }
+    // Remove redundant id/userId if present to reduce confusion (optional)
+    // keep email and role as-is
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].sign(finalPayload, JWT_SECRET, {
         expiresIn
     });
 }
@@ -127,46 +144,107 @@ function verifyToken(token) {
     try {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
     } catch (err) {
+        if ("TURBOPACK compile-time truthy", 1) {
+            console.debug("[auth] verifyToken failed:", err?.message ?? err);
+        }
         return null;
     }
 }
 async function hashPassword(password) {
-    const salt = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].genSalt(10);
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(password, salt);
+    const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(password, saltRounds);
 }
 async function verifyPassword(password, hash) {
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, hash);
+    try {
+        return __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, hash);
+    } catch (err) {
+        if ("TURBOPACK compile-time truthy", 1) console.error("[auth] verifyPassword error:", err);
+        return false;
+    }
 }
 async function getUserFromRequest(req) {
     try {
-        const header = req.headers.get("authorization");
-        const token = header?.startsWith("Bearer ") ? header.slice(7) : req.cookies.get("token")?.value;
-        if (!token) return null;
-        const payload = verifyToken(token);
-        if (!payload?.id) return null;
-        const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
-            where: {
-                id: payload.id
-            },
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true
+        // 1) Authorization header (Bearer)
+        const authHeader = req.headers.get("authorization");
+        if (authHeader?.startsWith("Bearer ")) {
+            const token = authHeader.slice(7).trim();
+            const payload = verifyToken(token);
+            if (payload) {
+                const userId = payload.sub ?? payload.id ?? payload.userId ?? payload.uid;
+                if (userId) {
+                    const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                        where: {
+                            id: String(userId)
+                        },
+                        select: {
+                            id: true,
+                            email: true,
+                            name: true,
+                            role: true
+                        }
+                    });
+                    if (user) return user;
+                }
+            } else if ("TURBOPACK compile-time truthy", 1) {
+                console.debug("[auth] bearer token present but failed verification");
             }
-        });
-        return user;
-    } catch  {
+        }
+        // 2) Cookies
+        // Try the candidate cookie names in order and return the first user matched.
+        for (const name of COOKIE_CANDIDATES){
+            // NextRequest exposes cookies via req.cookies.get(name)
+            try {
+                const cookie = req.cookies.get(name);
+                if (!cookie) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie probe: ${name} => <missing>`);
+                    continue;
+                }
+                const token = cookie.value;
+                if (!token) continue;
+                const payload = verifyToken(token);
+                if (!payload) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} token failed verify/expired`);
+                    continue;
+                }
+                const userId = payload.sub ?? payload.id ?? payload.userId ?? payload.uid;
+                if (!userId) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} token missing id/sub/userId/uid`);
+                    continue;
+                }
+                const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                    where: {
+                        id: String(userId)
+                    },
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        role: true
+                    }
+                });
+                if (user) {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} matched user id ${user.id}`);
+                    return user;
+                } else {
+                    if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie ${name} decoded id ${userId} not found`);
+                }
+            } catch (err) {
+                // Some runtimes may throw on req.cookies access — continue to next candidate
+                if ("TURBOPACK compile-time truthy", 1) console.debug(`[auth] cookie probe error for ${name}:`, err);
+            }
+        }
+        // nothing matched
+        return null;
+    } catch (err) {
+        console.error("[auth] getUserFromRequest error:", err);
         return null;
     }
 }
 async function requireRole(req, allowedRoles = []) {
     const user = await getUserFromRequest(req);
-    if (!user) {
-        throw new Response("Unauthorized", {
-            status: 401
-        });
-    }
+    if (!user) throw new Response("Unauthorized", {
+        status: 401
+    });
     if (allowedRoles.length && !allowedRoles.includes(user.role)) {
         throw new Response("Forbidden", {
             status: 403
@@ -184,13 +262,13 @@ __turbopack_context__.s([
     ()=>POST
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/server.js [app-route] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-route] (ecmascript)"); // default export expected
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/auth.ts [app-route] (ecmascript)");
 ;
 ;
 ;
 /**
- * Builds a secure cookie string for the JWT token.
+ * Builds a secure cookie string for JWT token.
  */ function buildCookie(token) {
     const maxAge = 7 * 24 * 60 * 60; // 7 days
     const secure = ("TURBOPACK compile-time value", "development") === "production";
@@ -209,12 +287,12 @@ async function POST(req) {
         const email = (rawEmail || "").toString().trim().toLowerCase();
         if (!email || !password) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "Email and password required"
+                error: "Email and password are required."
             }, {
                 status: 400
             });
         }
-        // 1) Find the user
+        // 1️⃣ Find the user strictly by normalized email
         const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
             where: {
                 email
@@ -228,46 +306,46 @@ async function POST(req) {
                 provider: true
             }
         });
-        // 2) Validate existence
+        // 2️⃣ Validate existence
         if (!user) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "Invalid credentials"
+                error: "Invalid email or password."
             }, {
                 status: 401
             });
         }
-        // 3) Disallow credentials login for OAuth-only users
-        if (user.provider !== "credentials") {
+        // 3️⃣ Block credential login for OAuth-only accounts
+        if (user.provider && user.provider !== "credentials") {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: `This account was created using ${user.provider}. Please log in with ${user.provider} instead.`
+                error: `This account was created using ${user.provider}. Please sign in with ${user.provider} instead.`
             }, {
                 status: 403
             });
         }
-        // 4) Ensure password exists
+        // 4️⃣ Ensure password hash exists
         if (!user.passwordHash) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "Password not set for this account"
+                error: "Password not set for this account."
             }, {
                 status: 401
             });
         }
-        // 5) Verify password
+        // 5️⃣ Verify password using bcrypt (verifyPassword imported from lib/auth)
         const valid = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyPassword"])(password, user.passwordHash);
         if (!valid) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "Invalid credentials"
+                error: "Invalid email or password."
             }, {
                 status: 401
             });
         }
-        // 6) Sign JWT that includes role for RBAC checks
+        // 6️⃣ Sign JWT token containing full user claims (for RBAC)
         const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signToken"])({
             id: user.id,
             email: user.email,
             role: user.role
         }, "7d");
-        // 7) Record login activity (non-blocking; failures shouldn't break login)
+        // 7️⃣ Log login event (non-blocking)
         (async ()=>{
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].activityLog.create({
@@ -281,11 +359,10 @@ async function POST(req) {
                     }
                 });
             } catch (err) {
-                // log but don't fail login
-                console.error("Failed to record login activity:", err);
+                console.error("⚠️ Failed to record login activity:", err);
             }
         })();
-        // 8) Respond and set cookie
+        // 8️⃣ Return successful login with Set-Cookie header
         const res = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             user: {
@@ -299,9 +376,9 @@ async function POST(req) {
         res.headers.set("Set-Cookie", buildCookie(token));
         return res;
     } catch (err) {
-        console.error("Login error:", err);
+        console.error("❌ Login error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: "Server error"
+            error: "Internal server error."
         }, {
             status: 500
         });
