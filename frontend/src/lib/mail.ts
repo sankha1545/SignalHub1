@@ -1,92 +1,73 @@
-// src/lib/mail.ts
-import nodemailer, { Transporter } from "nodemailer";
+// lib/mail.ts
+import nodemailer from "nodemailer";
 
-const host = process.env.SMTP_HOST || "localhost";
-const port = Number(process.env.SMTP_PORT || 587);
-const user = process.env.SMTP_USER || "";
-const pass = process.env.SMTP_PASS || "";
-const from = process.env.SMTP_FROM || (user || `no-reply@localhost`);
+const SMTP_HOST = process.env.SMTP_HOST || "127.0.0.1";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
+const SMTP_USER = process.env.SMTP_USER || "";
+const SMTP_PASS = process.env.SMTP_PASS || "";
+const SMTP_FROM = process.env.SMTP_FROM || "no-reply@example.com";
 
-function createTransporter(): Transporter {
-  const secure = port === 465; // implicit TLS on 465
-  const auth = user ? { user, pass } : undefined;
+let transporter: nodemailer.Transporter | null = null;
 
-  const transporter = nodemailer.createTransport({
+function createTransporter() {
+  // if no host is configured, return null so we can fallback to console logging
+  if (!SMTP_HOST) return null;
+
+  // prefer IPv4 loopback if host equals 'localhost' (to avoid ::1 resolution issues)
+  const host = SMTP_HOST === "localhost" ? "127.0.0.1" : SMTP_HOST;
+
+  const opts: any = {
     host,
-    port,
-    secure,
-    auth,
-    // During development you can allow self-signed certs by setting rejectUnauthorized false.
-    // REMOVE or set to true in production.
-    tls: {
-      rejectUnauthorized: process.env.NODE_ENV === "production" ? true : false,
-    },
-    // Optional: increase connection timeout for slow relays
-    connectionTimeout: 30_000,
-  });
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465, // true for 465, false for other ports
+  };
 
-  return transporter;
-}
-
-export const transporter = createTransporter();
-
-/**
- * Verify transporter connection/auth.
- * Call this at startup or before sending test messages to get clear errors.
- */
-export async function verifyTransporter() {
-  try {
-    const ok = await transporter.verify();
-    console.log("[mail] transporter verified:", ok);
-    return ok;
-  } catch (err) {
-    console.error("[mail] transporter verification failed:", err);
-    throw err;
+  if (SMTP_USER) {
+    opts.auth = { user: SMTP_USER, pass: SMTP_PASS };
   }
+
+  // Allow insecure TLS in dev (use cautiously)
+  if (process.env.NODE_ENV !== "production") {
+    opts.tls = { rejectUnauthorized: false };
+  }
+
+  return nodemailer.createTransport(opts);
 }
 
-/**
- * Send OTP email.
- * Throws if sending fails (so route can return 500).
- */
-export async function sendOTPEmail(to: string, code: string) {
-  console.log("[mail] sendOTPEmail ->", { to, host, port, user: !!user });
+transporter = createTransporter();
 
-  if (!to) throw new Error("Missing recipient address");
-
-  // ensure from is a valid value
-  const envelopeFrom = from || (user ? user : "no-reply@localhost");
-
-  const html = `
-    <div style="font-family: sans-serif; line-height: 1.5;">
-      <h2>Your OTP Code</h2>
-      <p>Use the following 6-digit code to complete your signup:</p>
-      <p style="font-size: 1.5rem; letter-spacing: 6px;"><strong>${code}</strong></p>
-      <p>This code expires in 60 seconds.</p>
-    </div>
-  `;
+export async function sendEmail(to: string, subject: string, html: string, text?: string) {
+  // If transporter not configured, print to console and return a fake info object
+  if (!transporter) {
+    console.warn("[mail] SMTP not configured — logging email to console.");
+    console.log("=== EMAIL START ===");
+    console.log("to:", to);
+    console.log("subject:", subject);
+    console.log("text:", text ?? html);
+    console.log("=== EMAIL END ===");
+    return { logged: true };
+  }
 
   try {
-    // Verify transporter before sending (gives clearer auth/connection errors)
-    await verifyTransporter();
-
     const info = await transporter.sendMail({
-      from: envelopeFrom,
+      from: SMTP_FROM,
       to,
-      subject: "Your verification code",
+      subject,
+      text: text ?? undefined,
       html,
-      text: `Your OTP code is ${code} (valid 60 seconds)`,
     });
-
-    console.log("[mail] sendMail success:", {
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected,
-    });
-
     return info;
   } catch (err) {
-    console.error("[mail] sendMail error:", err);
+    // If sending fails in dev, log the message and error (don't crash app)
+    console.error("[mail] sendMail failed:", err);
+    if (process.env.NODE_ENV !== "production") {
+      console.log("=== EMAIL (failed) ===");
+      console.log("to:", to);
+      console.log("subject:", subject);
+      console.log("text:", text ?? html);
+      console.log("======================");
+      return { error: String(err), logged: true };
+    }
     throw err;
   }
 }
