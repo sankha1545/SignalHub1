@@ -158,6 +158,7 @@ module.exports = mod;
 "[project]/src/app/api/auth/signup/finalize/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// app/api/auth/signup/finalize/route.ts
 __turbopack_context__.s([
     "POST",
     ()=>POST
@@ -195,6 +196,7 @@ async function POST(req) {
                 status: 401
             });
         }
+        // token must contain phone and indicate phone is verified
         if (!decoded?.phone || !decoded?.phoneVerified) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -205,7 +207,7 @@ async function POST(req) {
         }
         const phone = decoded.phone;
         // Pick email from request or from token
-        const emailToSave = email ?? decoded.email ?? undefined;
+        const emailToSave = email ?? decoded?.email ?? null;
         // If your Prisma schema requires email, ensure we have one
         if (!emailToSave) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
@@ -215,16 +217,29 @@ async function POST(req) {
                 status: 400
             });
         }
-        // Check if user already exists
-        const existingUser = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findFirst({
+        // Check if user already exists by phone or email
+        const existingByPhone = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findFirst({
             where: {
                 phone
             }
         });
-        if (existingUser) {
+        if (existingByPhone) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
-                error: "account_already_exists"
+                error: "account_already_exists_phone"
+            }, {
+                status: 400
+            });
+        }
+        const existingByEmail = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+            where: {
+                email: emailToSave
+            }
+        });
+        if (existingByEmail) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "account_already_exists_email"
             }, {
                 status: 400
             });
@@ -244,6 +259,14 @@ async function POST(req) {
                 }
             });
         }
+        /**
+     * Activation policy:
+     * - phoneVerified is true (because temp token required it)
+     * - emailVerified will be set to false at creation (unless token indicates otherwise)
+     * - isActive is true only when both emailVerified && phoneVerified are true
+     */ const phoneVerified = true;
+        const emailVerified = Boolean(decoded?.emailVerified) || false; // token might include emailVerified
+        const isActive = phoneVerified && emailVerified;
         // Create user and connect to org by id (email included)
         const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.create({
             data: {
@@ -252,6 +275,9 @@ async function POST(req) {
                 email: emailToSave,
                 passwordHash: hashedPassword,
                 role: "ADMIN",
+                phoneVerified,
+                emailVerified,
+                isActive,
                 organization: {
                     connect: {
                         id: organization.id
@@ -269,21 +295,28 @@ async function POST(req) {
                 profile: true
             }
         });
-        // Generate session token
-        const sessionToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signSession"])({
-            id: user.id,
-            role: user.role,
-            phone: user.phone,
-            org: user.organization.id
-        });
+        // If account is active (both verified), sign a session token and return it.
+        // Otherwise do NOT sign a persistent session here; respond with activated: false so client prompts email verification.
+        let sessionToken = null;
+        if (isActive) {
+            sessionToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signSession"])({
+                id: user.id,
+                role: user.role,
+                phone: user.phone,
+                org: user.organization.id
+            });
+        }
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
+            activated: isActive,
             user: {
                 id: user.id,
                 name: user.name,
                 phone: user.phone,
                 role: user.role,
-                organization: user.organization.name
+                organization: user.organization.name,
+                emailVerified: user.emailVerified,
+                phoneVerified: user.phoneVerified
             },
             token: sessionToken
         });

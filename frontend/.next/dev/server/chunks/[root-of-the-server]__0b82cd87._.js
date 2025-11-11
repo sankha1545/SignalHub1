@@ -217,49 +217,57 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5
 ;
 ;
 ;
+/**
+ * Helper: parse JSON body safely
+ */ async function jsonSafe(req) {
+    try {
+        return await req.json();
+    } catch  {
+        return {};
+    }
+}
 async function GET(req) {
     try {
-        const user = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
-        if (!user) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+        const sessionUser = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
+        if (!sessionUser) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            error: "unauthenticated"
+            error: "Unauthorized"
         }, {
             status: 401
         });
-        const u = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+        // include Profile relation
+        const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
             where: {
-                id: user.id
+                id: sessionUser.id
             },
-            include: {
-                profile: true,
-                organization: true
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+                profile: true
             }
         });
-        if (!u) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+        if (!user) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            error: "user_not_found"
+            error: "User not found"
         }, {
             status: 404
         });
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            user: {
-                id: u.id,
-                name: u.name,
-                email: u.email,
-                role: u.role,
-                phone: u.phone,
-                organizationId: u.organizationId,
-                organizationName: u.organization?.name ?? null,
-                profile: u.profile ?? null,
-                createdAt: u.createdAt
-            }
+            user
+        }, {
+            status: 200
         });
     } catch (err) {
-        console.error("[/api/me GET] error", err);
+        console.error("GET /api/me error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            error: err.message || "internal_server_error"
+            error: "Internal server error"
         }, {
             status: 500
         });
@@ -267,57 +275,127 @@ async function GET(req) {
 }
 async function PATCH(req) {
     try {
-        const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
-        if (!session) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+        const sessionUser = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
+        if (!sessionUser) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            error: "unauthenticated"
+            error: "Unauthorized"
         }, {
             status: 401
         });
-        const body = await req.json();
-        const { name, phone, profile } = body;
-        // simple validation
-        const updates = {};
-        if (typeof name === "string") updates.name = name.trim();
-        if (typeof phone === "string") updates.phone = phone.trim();
-        // Update user and (optionally) profile
-        const updatedUser = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
+        const body = await jsonSafe(req);
+        console.log("PATCH /api/me payload:", JSON.stringify(body));
+        const name = typeof body.name === "string" ? body.name.trim() : undefined;
+        const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
+        const incomingProfile = typeof body.profile === "object" && body.profile ? body.profile : {};
+        if (typeof name === "undefined" || name.length === 0) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Name is required"
+            }, {
+                status: 400
+            });
+        }
+        // sanitize/limit postal code
+        if (incomingProfile.postalCode && typeof incomingProfile.postalCode === "string" && incomingProfile.postalCode.length > 200) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Postal code too long"
+            }, {
+                status: 400
+            });
+        }
+        // Map incoming fields to Profile columns where possible.
+        // Your Profile model (based on DB logs) has explicit columns:
+        // displayName, avatarUrl, bio, metadata (Json), phoneNumber, phoneVerified, etc.
+        const profileUpdates = {
+            displayName: typeof incomingProfile.displayName === "string" ? incomingProfile.displayName.trim() : undefined,
+            avatarUrl: typeof incomingProfile.avatarUrl === "string" ? incomingProfile.avatarUrl.trim() : undefined,
+            bio: typeof incomingProfile.bio === "string" ? incomingProfile.bio.trim() : undefined,
+            phoneNumber: typeof incomingProfile.phoneNumber === "string" ? incomingProfile.phoneNumber.trim() : phone ?? undefined
+        };
+        // Build metadata JSON for extensible fields (country/region/district/postalCode/language and any extras)
+        const metadata = {};
+        if (typeof incomingProfile.country === "string") metadata.country = incomingProfile.country;
+        if (typeof incomingProfile.region === "string") metadata.region = incomingProfile.region;
+        if (typeof incomingProfile.district === "string") metadata.district = incomingProfile.district;
+        if (typeof incomingProfile.postalCode === "string") metadata.postalCode = incomingProfile.postalCode;
+        if (typeof incomingProfile.language === "string") metadata.language = incomingProfile.language;
+        // Also carry-through any existing metadata keys: fetch existing profile.metadata to merge
+        const existingProfileRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.findUnique({
             where: {
-                id: session.id
+                userId: sessionUser.id
             },
-            data: {
-                ...updates,
-                profile: profile ? {
-                    upsert: {
-                        create: {
-                            displayName: profile.displayName ?? updates.name ?? undefined,
-                            avatarUrl: profile.avatarUrl ?? null,
-                            bio: profile.bio ?? null,
-                            phoneNumber: profile.phoneNumber ?? phone ?? null
-                        },
-                        update: {
-                            displayName: profile.displayName ?? undefined,
-                            avatarUrl: profile.avatarUrl ?? undefined,
-                            bio: profile.bio ?? undefined,
-                            phoneNumber: profile.phoneNumber ?? undefined
-                        }
-                    }
-                } : undefined
-            },
-            include: {
-                profile: true,
-                organization: true
+            select: {
+                metadata: true
             }
         });
+        const existingMetadata = existingProfileRow?.metadata ?? {};
+        const mergedMetadata = {
+            ...existingMetadata,
+            ...metadata
+        };
+        // Now perform an upsert of the profile relation
+        // Prisma nested upsert on a one-to-one relation from User:
+        //   profile: { upsert: { create: { ... }, update: { ... } } }
+        const updatedUser = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
+            where: {
+                id: sessionUser.id
+            },
+            data: {
+                name,
+                phone,
+                profile: {
+                    upsert: {
+                        create: {
+                            displayName: profileUpdates.displayName ?? null,
+                            avatarUrl: profileUpdates.avatarUrl ?? null,
+                            bio: profileUpdates.bio ?? null,
+                            phoneNumber: profileUpdates.phoneNumber ?? null,
+                            metadata: mergedMetadata
+                        },
+                        update: {
+                            // only set fields that are provided (avoid overwriting with undefined)
+                            ...profileUpdates.displayName !== undefined ? {
+                                displayName: profileUpdates.displayName
+                            } : {},
+                            ...profileUpdates.avatarUrl !== undefined ? {
+                                avatarUrl: profileUpdates.avatarUrl
+                            } : {},
+                            ...profileUpdates.bio !== undefined ? {
+                                bio: profileUpdates.bio
+                            } : {},
+                            ...profileUpdates.phoneNumber !== undefined ? {
+                                phoneNumber: profileUpdates.phoneNumber
+                            } : {},
+                            metadata: mergedMetadata
+                        }
+                    }
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+                profile: true
+            }
+        });
+        console.log("PATCH /api/me updated user id:", updatedUser.id);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             user: updatedUser
+        }, {
+            status: 200
         });
     } catch (err) {
-        console.error("[/api/me PATCH] error", err);
+        console.error("PATCH /api/me error:", err?.message ?? err, err?.stack ?? "");
+        if (err.code) console.error("Prisma error code:", err.code, "meta:", err.meta ?? null);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            error: err.message || "internal_server_error"
+            error: "Internal server error"
         }, {
             status: 500
         });

@@ -173,7 +173,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b
 ;
 async function POST(req) {
     try {
-        const { email, phone, password } = await req.json();
+        const body = await req.json();
+        const { email, phone, password } = body ?? {};
         if (!email && !phone || !password) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "missing_credentials"
@@ -181,18 +182,41 @@ async function POST(req) {
                 status: 400
             });
         }
-        // Find user by email or phone
-        let user;
+        // Find user by email or phone (prefer unique lookups)
+        let user = null;
         if (email) {
             user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
                 where: {
                     email
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    phone: true,
+                    passwordHash: true,
+                    role: true,
+                    organizationId: true,
+                    phoneVerified: true,
+                    emailVerified: true,
+                    isActive: true
                 }
             });
-        } else if (phone) {
+        } else {
+            // phone may not be unique in all schemas — use findFirst if necessary
             user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findFirst({
                 where: {
                     phone
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    phone: true,
+                    passwordHash: true,
+                    role: true,
+                    organizationId: true,
+                    phoneVerified: true,
+                    emailVerified: true,
+                    isActive: true
                 }
             });
         }
@@ -204,7 +228,7 @@ async function POST(req) {
             });
         }
         // Compare password
-        const isPasswordValid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, user.passwordHash);
+        const isPasswordValid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(String(password), user.passwordHash);
         if (!isPasswordValid) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "invalid_credentials"
@@ -212,22 +236,25 @@ async function POST(req) {
                 status: 401
             });
         }
-        // --- Enforce both verifications (phone AND email) ---
-        const phoneVerified = Boolean(user.phoneVerified);
-        const emailVerified = Boolean(user.emailVerified);
-        if (!phoneVerified || !emailVerified) {
-            // Provide specific details to help the client show the right UX
+        // Determine activation: prefer explicit isActive if present, otherwise require both flags
+        const hasIsActive = Object.prototype.hasOwnProperty.call(user, "isActive");
+        const isActive = hasIsActive ? Boolean(user.isActive) : Boolean(user.phoneVerified) && Boolean(user.emailVerified);
+        // If not active: return helpful details for client UX
+        if (!isActive) {
+            // In production we may want to avoid exposing exact flags to prevent account enumeration
+            const showDetails = ("TURBOPACK compile-time value", "development") !== "production";
+            const details = ("TURBOPACK compile-time truthy", 1) ? {
+                phoneVerified: Boolean(user.phoneVerified),
+                emailVerified: Boolean(user.emailVerified)
+            } : "TURBOPACK unreachable";
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "account_not_fully_verified",
-                details: {
-                    phoneVerified,
-                    emailVerified
-                }
+                error: "account_not_active",
+                message: "account_not_active: verify_email_and_phone",
+                details
             }, {
                 status: 403
             });
         }
-        // ----------------------------------------------------
         // Sign session JWT - include both keys for compatibility
         const sessionToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signSession"])({
             id: user.id,
@@ -248,6 +275,7 @@ async function POST(req) {
         if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
         ;
         const cookie = cookieParts.join("; ");
+        // Return minimal user info
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             user: {
@@ -264,7 +292,7 @@ async function POST(req) {
     } catch (err) {
         console.error("[Login Error]", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: err.message || "internal_server_error"
+            error: err?.message || "internal_server_error"
         }, {
             status: 500
         });

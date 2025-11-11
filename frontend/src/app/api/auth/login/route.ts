@@ -6,18 +6,46 @@ import { signSession } from "@/lib/jwt";
 
 export async function POST(req: Request) {
   try {
-    const { email, phone, password } = await req.json();
+    const body = await req.json();
+    const { email, phone, password } = body ?? {};
 
     if ((!email && !phone) || !password) {
       return NextResponse.json({ error: "missing_credentials" }, { status: 400 });
     }
 
-    // Find user by email or phone
-    let user;
+    // Find user by email or phone (prefer unique lookups)
+    let user: any = null;
     if (email) {
-      user = await prisma.user.findUnique({ where: { email } });
-    } else if (phone) {
-      user = await prisma.user.findFirst({ where: { phone } });
+      user = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          passwordHash: true,
+          role: true,
+          organizationId: true,
+          phoneVerified: true,
+          emailVerified: true,
+          isActive: true,
+        },
+      });
+    } else {
+      // phone may not be unique in all schemas — use findFirst if necessary
+      user = await prisma.user.findFirst({
+        where: { phone },
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          passwordHash: true,
+          role: true,
+          organizationId: true,
+          phoneVerified: true,
+          emailVerified: true,
+          isActive: true,
+        },
+      });
     }
 
     if (!user || !user.passwordHash) {
@@ -25,26 +53,33 @@ export async function POST(req: Request) {
     }
 
     // Compare password
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(String(password), user.passwordHash);
     if (!isPasswordValid) {
       return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
     }
 
-    // --- Enforce both verifications (phone AND email) ---
-    const phoneVerified = Boolean(user.phoneVerified);
-    const emailVerified = Boolean(user.emailVerified);
+    // Determine activation: prefer explicit isActive if present, otherwise require both flags
+    const hasIsActive = Object.prototype.hasOwnProperty.call(user, "isActive");
+    const isActive = hasIsActive ? Boolean(user.isActive) : (Boolean(user.phoneVerified) && Boolean(user.emailVerified));
 
-    if (!phoneVerified || !emailVerified) {
-      // Provide specific details to help the client show the right UX
+    // If not active: return helpful details for client UX
+    if (!isActive) {
+      // In production we may want to avoid exposing exact flags to prevent account enumeration
+      const showDetails = process.env.NODE_ENV !== "production";
+
+      const details = showDetails
+        ? { phoneVerified: Boolean(user.phoneVerified), emailVerified: Boolean(user.emailVerified) }
+        : undefined;
+
       return NextResponse.json(
         {
-          error: "account_not_fully_verified",
-          details: { phoneVerified, emailVerified },
+          error: "account_not_active",
+          message: "account_not_active: verify_email_and_phone",
+          details,
         },
         { status: 403 }
       );
     }
-    // ----------------------------------------------------
 
     // Sign session JWT - include both keys for compatibility
     const sessionToken = signSession(
@@ -70,6 +105,7 @@ export async function POST(req: Request) {
     if (isProd) cookieParts.push("Secure");
     const cookie = cookieParts.join("; ");
 
+    // Return minimal user info
     return NextResponse.json(
       {
         ok: true,
@@ -79,6 +115,6 @@ export async function POST(req: Request) {
     );
   } catch (err: any) {
     console.error("[Login Error]", err);
-    return NextResponse.json({ error: err.message || "internal_server_error" }, { status: 500 });
+    return NextResponse.json({ error: err?.message || "internal_server_error" }, { status: 500 });
   }
 }

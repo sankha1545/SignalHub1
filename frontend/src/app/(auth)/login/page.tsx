@@ -5,36 +5,44 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * Reworked Login page to match the visual style of the Signup page:
- * - Two-column, full-bleed hero on the right (desktop)
- * - Left column centered card with clean, modern layout (matches Signup)
- * - Tailwind CSS utilities used throughout (ensure Tailwind is configured)
- * - Preserves all functional behaviour and endpoints from your original file
+ * Login page
  *
  * Notes:
- * - Keeps /api/auth/login and Google OAuth link intact
- * - Demo stores session token in cookie + localStorage (same as original)
+ * - Expects /api/auth/login to either set an HttpOnly session cookie (recommended) OR
+ *   return { ok: true, sessionToken } where sessionToken is a fallback.
+ * - Handles 403 / account_not_active responses and shows resend buttons for verification.
  */
 
 type LoginResponse = {
   ok?: boolean;
   sessionToken?: string;
   error?: string;
+  // optional verification details when account inactive:
+  details?: { phoneVerified?: boolean; emailVerified?: boolean };
+  message?: string;
   [k: string]: any;
 };
 
 async function postJSON(url: string, body: any): Promise<LoginResponse> {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    credentials: "include",
-  });
-
   try {
-    return await res.json();
-  } catch {
-    return { ok: res.ok, error: res.statusText || "Unexpected response" };
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      credentials: "include", // allow server-set cookies
+    });
+    let json: any;
+    try {
+      json = await res.json();
+    } catch {
+      // if body is empty but status ok (server set cookie), return ok true
+      if (res.ok) return { ok: true };
+      return { error: res.statusText || "Unexpected response" };
+    }
+    // attach HTTP status for client logic if needed
+    return { ...json, ok: json.ok ?? res.ok };
+  } catch (err: any) {
+    return { error: err?.message || String(err) };
   }
 }
 
@@ -52,35 +60,61 @@ export default function LoginPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  // When account inactive, server may return details; hold them for UI
+  const [verificationDetails, setVerificationDetails] = useState<{ phoneVerified?: boolean; emailVerified?: boolean } | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+
   async function handleLogin(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
     setInfo(null);
+    setVerificationDetails(null);
 
-    if (!email.trim() || !password) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
       setError("Please provide both email and password.");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await postJSON("/api/auth/login", { email: email.trim(), password });
+      const res = await postJSON("/api/auth/login", { email: trimmedEmail, password });
 
-      if (res?.ok && res?.sessionToken) {
-        const maxAge = remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 1;
-        document.cookie = `sessionToken=${res.sessionToken}; path=/; max-age=${maxAge}; SameSite=Strict; Secure`;
-        try {
-          localStorage.setItem("sessionToken", res.sessionToken);
-        } catch {
-          // ignore
+      // If server returned ok and likely set cookie (res.ok true), redirect
+      if (res.ok) {
+        // If server returned a sessionToken in body, we attempt to persist it (fallback)
+        if (res.sessionToken) {
+          // Fallback behavior: store token only if server returned it.
+          // Prefer server-set HttpOnly cookie; this fallback is for systems that return token in JSON.
+          try {
+            const maxAge = remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 1;
+            // store non-HttpOnly cookie (less secure) only if necessary — server-side cookie is preferred.
+            document.cookie = `sessionToken=${res.sessionToken}; path=/; max-age=${maxAge}; Secure; SameSite=Strict`;
+            try {
+              localStorage.setItem("sessionToken", res.sessionToken);
+            } catch {
+              // ignore
+            }
+          } catch {
+            // ignore storage errors
+          }
         }
+
         setInfo("Signed in — redirecting...");
-        setTimeout(() => {
-          router.push("/");
-        }, 250);
-      } else {
-        setError(res?.error || "Invalid credentials. Please try again.");
+        // small delay so info is visible
+        setTimeout(() => router.push("/account"), 250); // <-- redirect to /account (dashboard)
+        return;
       }
+
+      // Not ok: handle specific error shapes
+      if (res.error === "account_not_fully_verified" || res.error === "account_not_active" || res.message?.includes("verify")) {
+        setError("Your account is not active yet. Please verify email and phone to continue.");
+        setVerificationDetails(res.details ?? null);
+        return;
+      }
+
+      // generic invalid credentials
+      setError(res.error || "Invalid credentials. Please try again.");
     } catch (err: any) {
       setError(err?.message || String(err) || "Network error.");
     } finally {
@@ -89,13 +123,69 @@ export default function LoginPage(): JSX.Element {
   }
 
   function startGoogleOAuthLogin() {
+    // redirect to your server oauth start endpoint
     window.location.href = "/api/auth/oauth/google/start?flow=login";
+  }
+
+  async function handleResendEmail() {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("Enter your email to resend verification.");
+      return;
+    }
+    setResendLoading(true);
+    setError(null);
+    try {
+      const payload = { email: trimmedEmail, resend: true };
+      const res = await fetch("/api/auth/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "include",
+      });
+      const json = await res.json().catch(() => ({}));
+      if (json?.ok) {
+        setInfo("Verification email resent. Check your inbox (and spam).");
+      } else {
+        setError(json?.error || "Unable to resend verification email.");
+      }
+    } catch (err: any) {
+      setError(err?.message || String(err));
+    } finally {
+      setResendLoading(false);
+    }
+  }
+
+  async function handleResendPhone() {
+    // phone is not part of login form; backend typically requires phone param or tempToken.
+    // We attempt to call a resend endpoint that may accept email to find user's phone.
+    setResendLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/phone/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // try sending email so server can look up phone from the account; backend should support this pattern.
+        body: JSON.stringify({ email: email.trim(), resend: true }),
+        credentials: "include",
+      });
+      const json = await res.json().catch(() => ({}));
+      if (json?.ok) {
+        setInfo("SMS verification resent (if we have a phone on file).");
+      } else {
+        setError(json?.error || "Unable to resend SMS verification.");
+      }
+    } catch (err: any) {
+      setError(err?.message || String(err));
+    } finally {
+      setResendLoading(false);
+    }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
       <div className="w-full max-w-6xl bg-white/90 rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        {/* LEFT: Login card (matches Signup style) */}
+        {/* LEFT: Login card */}
         <div className="p-8 md:p-12 flex items-start">
           <div className="w-full max-w-md">
             {/* Brand / Header */}
@@ -109,14 +199,7 @@ export default function LoginPage(): JSX.Element {
               </div>
             </div>
 
-            {/* Visual progress/hero hint (subtle, similar to signup card vibe) */}
-            <div className="mb-6">
-              <div className="rounded-lg p-4 bg-gradient-to-bl from-white/60 to-white/40 border border-white/60 shadow-sm">
-                <div className="text-xs text-slate-600">Secure access • Role-based dashboards • Team collaboration</div>
-              </div>
-            </div>
-
-            {/* Status messages */}
+            {/* Info / status */}
             <div role="status" aria-live="polite" className="min-h-[1.25rem] mb-3">
               {error && <div className="text-sm text-red-600">{error}</div>}
               {info && <div className="text-sm text-emerald-600">{info}</div>}
@@ -175,7 +258,7 @@ export default function LoginPage(): JSX.Element {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(s => !s)}
+                    onClick={() => setShowPassword((s) => !s)}
                     className="absolute inset-y-0 right-2 px-2 flex items-center text-slate-500 hover:text-slate-700"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -235,18 +318,40 @@ export default function LoginPage(): JSX.Element {
                 By signing in you agree to our <a href="/terms" className="underline">Terms</a> and <a href="/privacy" className="underline">Privacy Policy</a>.
               </p>
             </form>
+
+            {/* If account is inactive, show resend options */}
+            {verificationDetails && (
+              <div className="mt-4 p-3 border rounded bg-slate-50 text-sm">
+                <div className="mb-2">Your account isn't active yet. Verification required:</div>
+                <ul className="mb-3">
+                  <li>Email: {verificationDetails.emailVerified ? <span className="text-emerald-600">Verified</span> : <span className="text-amber-600">Unverified</span>}</li>
+                  <li>Phone: {verificationDetails.phoneVerified ? <span className="text-emerald-600">Verified</span> : <span className="text-amber-600">Unverified</span>}</li>
+                </ul>
+
+                <div className="flex gap-2">
+                  {!verificationDetails.emailVerified && (
+                    <button onClick={handleResendEmail} disabled={resendLoading} className="px-3 py-2 bg-indigo-600 text-white rounded text-sm">
+                      {resendLoading ? "Resending..." : "Resend email"}
+                    </button>
+                  )}
+                  {!verificationDetails.phoneVerified && (
+                    <button onClick={handleResendPhone} disabled={resendLoading} className="px-3 py-2 border rounded text-sm">
+                      {resendLoading ? "Resending..." : "Resend SMS"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* RIGHT: Hero / Illustration (full-bleed on desktop, hidden on small screens) */}
+        {/* RIGHT: Hero / Illustration */}
         <div className="hidden md:block relative bg-gradient-to-br from-indigo-500 to-emerald-300">
-          {/* Replace with your hero image at /public/images/login-hero.webp or similar */}
           <img src="/signup-hero.jpg" alt="Hero" className="w-full h-full object-cover min-h-[640px]" />
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none" />
         </div>
       </div>
 
-      {/* Small footer note */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-slate-400">
         Prefer magic links or SSO? Ask and I’ll add it.
       </div>

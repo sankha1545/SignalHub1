@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 /* ---------- types ---------- */
-type ApiResp = { ok?: boolean; tempToken?: string; error?: string; reason?: string; [k: string]: any };
+type ApiResp = { ok?: boolean; tempToken?: string; sessionToken?: string; activated?: boolean; error?: string; reason?: string; [k: string]: any };
 type Country = { name: string; cca2: string; callingCode: string; flag?: string };
 
 /* ---------- helpers ---------- */
@@ -27,7 +27,7 @@ async function postJSON(url: string, body: any): Promise<ApiResp> {
   }
 }
 
-/* ---------- CountryDropdown component (searchable, accessible, responsive) ---------- */
+/* ---------- CountryDropdown component (unchanged, preserved) ---------- */
 function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
   useEffect(() => {
     function listener(e: MouseEvent | TouchEvent) {
@@ -66,7 +66,6 @@ function CountryDropdown({
   useOnClickOutside(rootRef, () => setOpen(false));
 
   useEffect(() => {
-    // reset highlight when query changes
     setHighlight(0);
   }, [query, open]);
 
@@ -244,7 +243,6 @@ export default function SignupPage(): JSX.Element {
     return () => window.clearInterval(id);
   }, []);
 
-  // computed step 1..4
   function modeToStep(m: Mode) {
     switch (m) {
       case "choose":
@@ -281,7 +279,6 @@ export default function SignupPage(): JSX.Element {
         if (!mounted) return;
         if (!Array.isArray(json) || json.length === 0) throw new Error("No countries returned");
 
-        // Normalise if needed (proxy already returns normalized objects but we keep resilience)
         const parsed: Country[] = json.map((c: any) => ({
           name: c.name || c.common || "Unknown",
           cca2: (c.cca2 || c.CCA2 || "").toUpperCase(),
@@ -330,7 +327,7 @@ export default function SignupPage(): JSX.Element {
     setter(Date.now() + seconds * 1000);
   }
 
-  // ---------- OTP utilities (unchanged) ----------
+  // ---------- OTP utilities (unchanged behavior) ----------
   function handleOtpInput(e: React.KeyboardEvent<HTMLInputElement>, idx: number, otpArr: string[], setOtpArr: (a: string[]) => void) {
     const target = e.target as HTMLInputElement;
     const key = e.key;
@@ -389,25 +386,23 @@ export default function SignupPage(): JSX.Element {
   useEffect(() => setPhoneCode(phoneOtp.join("")), [phoneOtp]);
 
   // ---------- PASSWORD VALIDATION ----------
-
-function validatePassword(pw: string): string[] {
-  const errs: string[] = [];
-  if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
-  if (!/[A-Z]/.test(pw)) errs.push("Include at least one uppercase letter.");
-  if (!/[a-z]/.test(pw)) errs.push("Include at least one lowercase letter.");
-  if (!/[0-9]/.test(pw)) errs.push("Include at least one number.");
-  if (!/[^A-Za-z0-9]/.test(pw)) errs.push("Include at least one symbol (e.g. !@#$%).");
-  return errs;
-}
+  function validatePassword(pw: string): string[] {
+    const errs: string[] = [];
+    if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
+    if (!/[A-Z]/.test(pw)) errs.push("Include at least one uppercase letter.");
+    if (!/[a-z]/.test(pw)) errs.push("Include at least one lowercase letter.");
+    if (!/[0-9]/.test(pw)) errs.push("Include at least one number.");
+    if (!/[^A-Za-z0-9]/.test(pw)) errs.push("Include at least one symbol (e.g. !@#$%).");
+    return errs;
+  }
 
   useEffect(() => {
-    // run validation as user types
     const errs = validatePassword(password);
     setPasswordErrors(errs);
     setPasswordsMatch(password === confirmPassword || confirmPassword.length === 0);
   }, [password, confirmPassword]);
 
-  // ---------- API actions (unchanged behaviour, except finalize uses collected profile data) ----------
+  // ---------- API actions (updated to handle activated/sessionToken flows) ----------
   async function handleSendEmailOtp(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
@@ -441,10 +436,32 @@ function validatePassword(pw: string): string[] {
     setLoading(true);
     try {
       const data = await postJSON("/api/auth/email/verify", { email, code: emailCode, flow: "signup" });
-      if (data?.ok && data?.tempToken) {
-        setTempToken(data.tempToken);
+      if (data?.ok) {
+        // If account already activated server may return sessionToken and activated:true
+        if (data.activated && data.sessionToken) {
+          // store token in memory (optionally store in localStorage if you choose)
+          // but prefer server-set cookie for security. We'll redirect to account.
+          setSuccess("Email verified — signing you in...");
+          setTimeout(() => router.push("/account"), 700);
+          return;
+        }
+
+        // otherwise we expect a tempToken to continue signup
+        if (data.tempToken) {
+          setTempToken(data.tempToken);
+          setMode("phone");
+          setResendDeadline(setPhoneResendAvailableAt, 45);
+          setPhoneOtp(Array(6).fill(""));
+          setTimeout(() => document.getElementById("otp-phone-0")?.focus(), 120);
+          return;
+        }
+
+        // fallback success
         setMode("phone");
-      } else setError(data?.error || data?.reason || "Invalid or expired code.");
+        setTempToken(data.tempToken ?? null);
+      } else {
+        setError(data?.error || data?.reason || "Invalid or expired code.");
+      }
     } catch (err: any) {
       setError(err?.message || String(err));
     } finally {
@@ -455,10 +472,8 @@ function validatePassword(pw: string): string[] {
   async function handleSendPhoneOtp(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
-    const dial = country?.callingCode ?? "";
-    const typed = phone.trim();
-    const full = typed.startsWith("+") ? typed : `${dial}${typed.replace(/\D/g, "")}`;
-    if (!/^\+?[0-9]{7,20}$/.test(full)) {
+    const full = buildFullPhone(phone, country);
+    if (!full || !/^\+?[0-9]{7,20}$/.test(full)) {
       setError("Please enter a valid phone number including country code (or select country).");
       return;
     }
@@ -487,15 +502,28 @@ function validatePassword(pw: string): string[] {
     }
     setLoading(true);
     try {
-      const dial = country?.callingCode ?? "";
-      const typed = phone.trim();
-      const full = typed.startsWith("+") ? typed : `${dial}${typed.replace(/\D/g, "")}`;
-
+      const full = buildFullPhone(phone, country);
       const res = await postJSON("/api/auth/phone/verify", { phone: full, code: phoneCode, tempToken });
-      if (res?.ok && res?.tempToken) {
-        setTempToken(res.tempToken);
+      if (res?.ok) {
+        // if activation completed server may return sessionToken
+        if (res.activated && res.sessionToken) {
+          setSuccess("Phone verified — signing you in...");
+          setTimeout(() => router.push("/account"), 700);
+          return;
+        }
+
+        // otherwise expect a tempToken to continue finalize step
+        if (res.tempToken) {
+          setTempToken(res.tempToken);
+          setMode("org");
+          return;
+        }
+
+        // fallback to org step
         setMode("org");
-      } else setError(res?.reason || res?.error || "Phone verification failed.");
+      } else {
+        setError(res?.reason || res?.error || "Phone verification failed.");
+      }
     } catch (err: any) {
       setError(String(err));
     } finally {
@@ -503,88 +531,86 @@ function validatePassword(pw: string): string[] {
     }
   }
 
- function buildFullPhone(typed: string | undefined, country?: { callingCode?: string }) {
-  if (!typed) return null;
-  const raw = typed.trim();
-  if (raw.startsWith("+")) {
-    // keep plus and digits only
-    const digits = raw.replace(/[^\d+]/g, "");
-    return digits;
-  }
-  const cc = country?.callingCode ?? "";
-  const onlyDigits = raw.replace(/\D/g, "");
-  if (!cc && !onlyDigits) return null;
-  // if calling code doesn't start with +, ensure it does
-  const normalizedCc = cc.startsWith("+") ? cc : cc ? `+${cc}` : "";
-  return `${normalizedCc}${onlyDigits}`;
-}
-
-// Replace your handleFinalize with this (in src/app/(auth)/signup/page.tsx)
-async function handleFinalize(e?: React.FormEvent) {
-  e?.preventDefault();
-  setError(null);
-
-  // client-side validations (password policy + confirm)
-  setPasswordTouched(true);
-  const errs = validatePassword(password); // keep your validatePassword helper
-  if (errs.length > 0) {
-    setPasswordErrors(errs);
-    setError("Please fix the password requirements.");
-    return;
-  }
-  if (password !== confirmPassword) {
-    setPasswordsMatch(false);
-    setError("Passwords do not match.");
-    return;
-  }
-  if (!orgName?.trim()) {
-    setError("Organization name is required.");
-    return;
-  }
-  if (!name?.trim()) {
-    setError("Your name is required.");
-    return;
-  }
-
-  // build normalized phone if present (you already had this helper)
-  const normalizedPhone =
-    phone && (phone.startsWith("+") ? phone : `${country?.callingCode ?? ""}${phone.replace(/\D/g, "")}`);
-
-  const payload: Record<string, any> = {
-    tempToken,
-    organizationName: orgName.trim(),
-    password,
-    name: name.trim(),
-  };
-  if (email) payload.email = email;
-  if (normalizedPhone) payload.phone = normalizedPhone;
-  if (country) payload.country = { name: country.name, cca2: country.cca2, callingCode: country.callingCode };
-
-  setLoading(true);
-  try {
-    const res = await postJSON("/api/auth/signup/finalize", payload);
-
-    if (res?.ok) {
-      // Server set HttpOnly cookie for session; now redirect to account/dashboard
-      setSuccess("Account created — signing you in...");
-      setMode("done");
-
-      // small delay so success is visible
-      setTimeout(() => {
-        // send user to their account landing (account page will fetch /api/me)
-        router.push("/account");
-      }, 700);
-    } else {
-      // server returned ok: false or error
-      setError(res?.error || res?.reason || "Failed to finalize signup.");
+  function buildFullPhone(typed: string | undefined, country?: { callingCode?: string }) {
+    if (!typed) return null;
+    const raw = typed.trim();
+    if (raw.startsWith("+")) {
+      const digits = raw.replace(/[^\d+]/g, "");
+      return digits;
     }
-  } catch (err: any) {
-    setError(String(err) || "Unexpected error");
-  } finally {
-    setLoading(false);
+    const cc = country?.callingCode ?? "";
+    const onlyDigits = raw.replace(/\D/g, "");
+    if (!cc && !onlyDigits) return null;
+    const normalizedCc = cc.startsWith("+") ? cc : cc ? `+${cc}` : "";
+    return `${normalizedCc}${onlyDigits}`;
   }
-}
 
+  // Finalize signup (create org + user). Uses tempToken to prove prior verifications.
+  async function handleFinalize(e?: React.FormEvent) {
+    e?.preventDefault();
+    setError(null);
+
+    setPasswordTouched(true);
+    const errs = validatePassword(password);
+    if (errs.length > 0) {
+      setPasswordErrors(errs);
+      setError("Please fix the password requirements.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setPasswordsMatch(false);
+      setError("Passwords do not match.");
+      return;
+    }
+    if (!orgName?.trim()) {
+      setError("Organization name is required.");
+      return;
+    }
+    if (!name?.trim()) {
+      setError("Your name is required.");
+      return;
+    }
+
+    const normalizedPhone = buildFullPhone(phone, country);
+
+    const payload: Record<string, any> = {
+      tempToken,
+      organizationName: orgName.trim(),
+      password,
+      name: name.trim(),
+    };
+    if (email) payload.email = email;
+    if (normalizedPhone) payload.phone = normalizedPhone;
+    if (country) payload.country = { name: country.name, cca2: country.cca2, callingCode: country.callingCode };
+
+    setLoading(true);
+    try {
+      const res = await postJSON("/api/auth/signup/finalize", payload);
+
+      if (res?.ok) {
+        // If server set a session cookie, client will be authenticated; redirect to account
+        setSuccess("Account created — signing you in...");
+        setMode("done");
+        setTimeout(() => router.push("/account"), 700);
+        return;
+      }
+
+      // server might return activated: false with helpful error
+      if (res?.activated === false && res?.tempToken) {
+        // keep temp token for user to continue flows (rare)
+        setTempToken(res.tempToken);
+        setError("Account created but not yet activated. Please complete verification.");
+        setMode(res.tempToken ? "org" : "verifyEmail");
+        return;
+      }
+
+      setError(res?.error || res?.reason || "Failed to finalize signup.");
+    } catch (err: any) {
+      setError(String(err) || "Unexpected error");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleResendEmail() {
     if (emailResendAvailableAt && emailResendAvailableAt > Date.now()) return;
@@ -606,7 +632,8 @@ async function handleFinalize(e?: React.FormEvent) {
     setError(null);
     setLoading(true);
     try {
-      const data = await postJSON("/api/auth/phone/send", { phone, resend: true });
+      const full = buildFullPhone(phone, country);
+      const data = await postJSON("/api/auth/phone/send", { phone: full, resend: true });
       if (data?.ok) setResendDeadline(setPhoneResendAvailableAt, 45);
       else setError(data?.error || "Unable to resend SMS OTP.");
     } catch (err: any) {
@@ -616,7 +643,7 @@ async function handleFinalize(e?: React.FormEvent) {
     }
   }
 
-  // compute fill percent (0..100) like before for smooth bar animation
+  // compute fill percent (0..100)
   function computeFillPercent() {
     const s = step;
     if (s <= 1) return 0;
@@ -624,7 +651,7 @@ async function handleFinalize(e?: React.FormEvent) {
   }
   const fillPercent = computeFillPercent();
 
-  /* ---------- UI ---------- */
+  /* ---------- UI (kept intact, only behavior changes) ---------- */
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-6">
       <div className="w-full max-w-7xl bg-white/95 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ring-1 ring-slate-100">
@@ -768,7 +795,6 @@ async function handleFinalize(e?: React.FormEvent) {
                   {/* Country dropdown + phone input */}
                   <div className="flex gap-2 items-start">
                     <div className="w-44">
-                      {/* CountryDropdown component */}
                       <CountryDropdown
                         countries={countries}
                         value={country}
@@ -776,7 +802,6 @@ async function handleFinalize(e?: React.FormEvent) {
                         disabled={countryLoading || !!countryError}
                         placeholder={countryLoading ? "Loading countries..." : countryError ? "Unavailable" : "Select country"}
                       />
-                      {/* small helper */}
                       <div className="text-xs text-slate-400 mt-2">
                         {countryLoading ? "Loading dial codes..." : countryError ? <span className="text-red-500">Unable to load list</span> : "Select country code"}
                       </div>
@@ -997,9 +1022,6 @@ async function handleFinalize(e?: React.FormEvent) {
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none" />
         </div>
       </div>
-
-      {/* small footer */}
-     
     </div>
   );
 }

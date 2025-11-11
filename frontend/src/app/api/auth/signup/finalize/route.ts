@@ -1,3 +1,4 @@
+// app/api/auth/signup/finalize/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyTemp, signSession } from "@/lib/jwt";
@@ -21,23 +22,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "invalid_or_expired_temp_token" }, { status: 401 });
     }
 
+    // token must contain phone and indicate phone is verified
     if (!decoded?.phone || !decoded?.phoneVerified) {
       return NextResponse.json({ ok: false, error: "phone_not_verified" }, { status: 403 });
     }
 
     const phone = decoded.phone;
     // Pick email from request or from token
-    const emailToSave = email ?? decoded.email ?? undefined;
+    const emailToSave = (email ?? decoded?.email ?? null) as string | null;
 
     // If your Prisma schema requires email, ensure we have one
     if (!emailToSave) {
       return NextResponse.json({ ok: false, error: "email_required" }, { status: 400 });
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({ where: { phone } });
-    if (existingUser) {
-      return NextResponse.json({ ok: false, error: "account_already_exists" }, { status: 400 });
+    // Check if user already exists by phone or email
+    const existingByPhone = await prisma.user.findFirst({ where: { phone } });
+    if (existingByPhone) {
+      return NextResponse.json({ ok: false, error: "account_already_exists_phone" }, { status: 400 });
+    }
+    const existingByEmail = await prisma.user.findUnique({ where: { email: emailToSave } });
+    if (existingByEmail) {
+      return NextResponse.json({ ok: false, error: "account_already_exists_email" }, { status: 400 });
     }
 
     // Hash password
@@ -54,6 +60,16 @@ export async function POST(req: Request) {
       });
     }
 
+    /**
+     * Activation policy:
+     * - phoneVerified is true (because temp token required it)
+     * - emailVerified will be set to false at creation (unless token indicates otherwise)
+     * - isActive is true only when both emailVerified && phoneVerified are true
+     */
+    const phoneVerified = true;
+    const emailVerified = Boolean(decoded?.emailVerified) || false; // token might include emailVerified
+    const isActive = phoneVerified && emailVerified;
+
     // Create user and connect to org by id (email included)
     const user = await prisma.user.create({
       data: {
@@ -62,6 +78,9 @@ export async function POST(req: Request) {
         email: emailToSave,
         passwordHash: hashedPassword,
         role: "ADMIN",
+        phoneVerified,
+        emailVerified,
+        isActive,
         organization: {
           connect: { id: organization.id },
         },
@@ -75,22 +94,29 @@ export async function POST(req: Request) {
       },
     });
 
-    // Generate session token
-    const sessionToken = signSession({
-      id: user.id,
-      role: user.role,
-      phone: user.phone,
-      org: user.organization.id,
-    });
+    // If account is active (both verified), sign a session token and return it.
+    // Otherwise do NOT sign a persistent session here; respond with activated: false so client prompts email verification.
+    let sessionToken: string | null = null;
+    if (isActive) {
+      sessionToken = signSession({
+        id: user.id,
+        role: user.role,
+        phone: user.phone,
+        org: user.organization.id,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
+      activated: isActive,
       user: {
         id: user.id,
         name: user.name,
         phone: user.phone,
         role: user.role,
         organization: user.organization.name,
+        emailVerified: user.emailVerified,
+        phoneVerified: user.phoneVerified,
       },
       token: sessionToken,
     });

@@ -320,22 +320,18 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__
  * Body: { phone, code, tempToken?, context? }
  *
  * - Verifies OTP for phone.
- * - Marks OTP used (handled by verifyPhoneOtp).
- * - If a user exists with that phone, set phoneVerified = true.
- * - Merge any payload from incoming tempToken (if valid).
- * - Return a new short-lived tempToken containing phoneVerified: true + merged payload.
+ * - Marks phoneVerified = true for existing user.
+ * - If both emailVerified && phoneVerified -> set isActive = true and issue persistent session.
+ * - Otherwise returns a short-lived tempToken (merged with incoming tempToken payload if present).
  */ function normalizePhone(input) {
     if (!input) return null;
     const s = String(input).trim();
-    // Accept numbers that already start with + or plain digits (we'll try to normalise)
     if (s.startsWith("+")) {
         const clean = "+" + s.slice(1).replace(/\D/g, "");
         return clean.length > 4 ? clean : null;
     }
     const digits = s.replace(/\D/g, "");
     if (!digits) return null;
-    // If digits look like country + local (very rough), prefer + prefix absent -> leave as-is and let caller finalise
-    // But we will return in E.164-like format only if caller included a calling code; for now, prefix with + if length > 6
     return digits.length >= 7 ? `+${digits}` : null;
 }
 async function POST(req) {
@@ -360,7 +356,7 @@ async function POST(req) {
                 status: 400
             });
         }
-        // Validate code shape (6 digits)
+        // Validate code shape (4-6 digits)
         if (!/^\d{4,6}$/.test(String(code))) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -372,7 +368,6 @@ async function POST(req) {
         // Verify OTP via lib/otp
         const v = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$otp$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyPhoneOtp"])(phone, String(code));
         if (!v || v.ok === false) {
-            // propagate reason if available
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 error: "invalid_or_expired_otp",
@@ -381,63 +376,125 @@ async function POST(req) {
                 status: 400
             });
         }
-        // If there's an existing user with this phone — mark phoneVerified true
+        // Default payload for the returned temp token / merged token
+        let payload = {
+            phone,
+            phoneVerified: true
+        };
+        // Merge incoming tempToken payload if present and valid
+        if (tempToken) {
+            try {
+                const old = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyTemp"])(tempToken);
+                if (old && typeof old === "object") {
+                    payload = {
+                        ...old,
+                        ...payload
+                    };
+                }
+            } catch (e) {
+                console.warn("[phone/verify] incoming tempToken invalid or expired — ignoring");
+            }
+        }
+        // Optionally add context
+        if (context) payload._context = context;
+        // Try to update user record: set phoneVerified = true (idempotent)
+        let user = null;
         try {
             const existing = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
                 where: {
                     phone
                 }
             });
-            if (existing && !existing.phoneVerified) {
-                await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
-                    where: {
-                        id: existing.id
-                    },
-                    data: {
-                        phoneVerified: true
-                    }
-                });
-                console.log(`[phone/verify] phoneVerified set for user ${existing.id}`);
+            if (existing) {
+                if (!existing.phoneVerified) {
+                    user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
+                        where: {
+                            id: existing.id
+                        },
+                        data: {
+                            phoneVerified: true
+                        },
+                        select: {
+                            id: true,
+                            email: true,
+                            phone: true,
+                            phoneVerified: true,
+                            emailVerified: true,
+                            isActive: true,
+                            role: true,
+                            organizationId: true
+                        }
+                    });
+                    console.log(`[phone/verify] phoneVerified set for user ${existing.id}`);
+                } else {
+                    // already verified - get latest row
+                    user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                        where: {
+                            id: existing.id
+                        },
+                        select: {
+                            id: true,
+                            email: true,
+                            phone: true,
+                            phoneVerified: true,
+                            emailVerified: true,
+                            isActive: true,
+                            role: true,
+                            organizationId: true
+                        }
+                    });
+                }
             }
         } catch (dbErr) {
-            // log but don't fail the flow — verification succeeded; we still return a temp token
-            console.warn("[phone/verify] DB update error (non-fatal):", dbErr.message || dbErr);
+            console.warn("[phone/verify] DB check/update error (non-fatal):", dbErr.message || dbErr);
         }
-        // Build payload for new temp token
-        let payload = {
-            phone,
-            phoneVerified: true
-        };
-        if (tempToken) {
-            try {
-                // prefer a library helper verifyTemp if available
-                if (typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyTemp"] === "function") {
-                    const old = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyTemp"])(tempToken);
-                    if (old && typeof old === "object") payload = {
-                        ...old,
-                        ...payload
-                    };
-                } else {
-                    // fallback: attempt jwt.verify (rare path)
-                    const jwt = (await __turbopack_context__.A("[project]/node_modules/jsonwebtoken/index.js [app-route] (ecmascript, async loader)")).verify;
-                    const SECRET = process.env.JWT_SECRET;
-                    const oldp = jwt(tempToken, SECRET);
-                    if (oldp && typeof oldp === "object") payload = {
-                        ...oldp,
-                        ...payload
-                    };
-                }
-            } catch (e) {
-                // ignore invalid temp token — continue with phone-only payload
-                console.warn("[phone/verify] incoming tempToken invalid or expired — ignoring");
+        // If we found a user and their email was already verified, activate account now.
+        if (user) {
+            const emailVerified = Boolean(user.emailVerified);
+            const phoneVerified = true; // we just set it
+            if (emailVerified && !user.isActive) {
+                // Activate the account
+                const updated = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
+                    where: {
+                        id: user.id
+                    },
+                    data: {
+                        isActive: true
+                    },
+                    select: {
+                        id: true,
+                        role: true,
+                        organizationId: true
+                    }
+                });
+                // Sign a persistent session token for activated user
+                const sessionToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signSession"])({
+                    id: updated.id,
+                    role: updated.role,
+                    organizationId: updated.organizationId
+                }, "7d");
+                // Return activation + sessionToken (client may store token or you can set cookie)
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: true,
+                    activated: true,
+                    sessionToken
+                });
             }
+            // user exists but not activated yet (email still pending)
+            const newTemp = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signTemp"])(payload, "15m");
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: true,
+                activated: Boolean(user.isActive),
+                phoneVerified: true,
+                emailVerified: Boolean(user.emailVerified),
+                tempToken: newTemp
+            });
         }
-        // Optionally add context to payload (helps finalize route)
-        if (context) payload._context = context;
-        // Issue a new short-lived temp token (15 minutes)
+        // No existing user with this phone: return temp token so caller can continue signup flow
         const newTemp = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signTemp"])(payload, "15m");
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
+            activated: false,
             tempToken: newTemp
         });
     } catch (err) {
