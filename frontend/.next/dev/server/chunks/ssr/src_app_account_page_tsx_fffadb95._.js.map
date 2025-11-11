@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///E:/Attack%20Capital/SignalHub/frontend/src/app/account/page.tsx"],"sourcesContent":["\"use client\";\r\n\r\n\r\nimport React from \"react\";\r\nimport AccountLayout from \"./\";\r\n\r\n\r\nexport default function Page() {\r\nreturn <AccountLayout />;\r\n}"],"names":[],"mappings":";;;;;;;;;;AAAA;;;AAOe,SAAS;IACxB,qBAAO,8OAAC;;;;;AACR","debugId":null}}]
-}

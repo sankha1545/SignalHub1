@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///E:/Attack%20Capital/SignalHub/frontend/src/app/dashboard/admin/sent/layout.tsx"],"sourcesContent":["// app/dashboard/admin/sent/layout.tsx\r\n\"use client\";\r\nimport React from \"react\";\r\nimport { usePathname } from \"next/navigation\";\r\n\r\nexport default function SentLayout({\r\n  children,\r\n}: {\r\n  children: React.ReactNode;\r\n}) {\r\n  const path = usePathname();\r\n  return (\r\n    <div style={{ padding: 16 }}>\r\n      <header>\r\n        <h2>Admin · Sent</h2>\r\n        <small>Path: {path}</small>\r\n      </header>\r\n      <main>{children}</main>\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":"AAAA,sCAAsC;;;;;;AAGtC;AAFA;;;AAIe,SAAS,WAAW,EACjC,QAAQ,EAGT;IACC,MAAM,OAAO,IAAA,iJAAW;IACxB,qBACE,8OAAC;QAAI,OAAO;YAAE,SAAS;QAAG;;0BACxB,8OAAC;;kCACC,8OAAC;kCAAG;;;;;;kCACJ,8OAAC;;4BAAM;4BAAO;;;;;;;;;;;;;0BAEhB,8OAAC;0BAAM;;;;;;;;;;;;AAGb","debugId":null}}]
+}

@@ -4,17 +4,39 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { signSession } from "@/lib/jwt";
 
+/**
+ * POST /api/auth/login
+ *
+ * Expectations:
+ * - Body: { email?: string, phone?: string, password: string }
+ * - Creates an HttpOnly cookie named `session` with a JWT on success.
+ * - Returns minimal user info on success: { ok: true, user: { id, email, phone, role } }
+ *
+ * Notes:
+ * - Ensure your client sends `credentials: "same-origin"` when calling this route,
+ *   otherwise the browser will ignore the Set-Cookie header.
+ * - Adapt the optional account lockout / audit logging bits to your schema if you want them.
+ */
+
+type LoginBody = { email?: string; phone?: string; password?: string };
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { email, phone, password } = body ?? {};
+    const body: LoginBody = (await req.json()) ?? {};
+    let { email, phone, password } = body;
 
+    // Basic validation
     if ((!email && !phone) || !password) {
       return NextResponse.json({ error: "missing_credentials" }, { status: 400 });
     }
 
-    // Find user by email or phone (prefer unique lookups)
-    let user: any = null;
+    // Normalize inputs
+    if (email) email = String(email).trim().toLowerCase();
+    if (phone) phone = String(phone).trim();
+    password = String(password);
+
+    // ----- Find user -----
+    let user: any | null = null;
     if (email) {
       user = await prisma.user.findUnique({
         where: { email },
@@ -28,10 +50,12 @@ export async function POST(req: Request) {
           phoneVerified: true,
           emailVerified: true,
           isActive: true,
+          // OPTIONAL: fields for lockout/audit (uncomment if present in schema)
+          // failedLoginAttempts: true,
+          // lockedUntil: true,
         },
       });
     } else {
-      // phone may not be unique in all schemas — use findFirst if necessary
       user = await prisma.user.findFirst({
         where: { phone },
         select: {
@@ -44,32 +68,47 @@ export async function POST(req: Request) {
           phoneVerified: true,
           emailVerified: true,
           isActive: true,
+          // failedLoginAttempts: true,
+          // lockedUntil: true,
         },
       });
     }
 
+    // If user not found or no passwordHash -> generic invalid_credentials
     if (!user || !user.passwordHash) {
+      // OPTIONAL: record failed login attempt in DB for audit/lockout
+      // await prisma.authLog.create({ data: { type: 'login_failed', identifier: email || phone, reason: 'not_found' } });
+
       return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
     }
 
-    // Compare password
-    const isPasswordValid = await bcrypt.compare(String(password), user.passwordHash);
+    // OPTIONAL: account lockout check (requires fields in your schema)
+    // if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+    //   return NextResponse.json({ error: "account_locked", message: "Too many failed attempts. Try later." }, { status: 423 });
+    // }
+
+    // ----- Verify password -----
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      // OPTIONAL: increment failedLoginAttempts and set lockout if threshold reached
+      // await prisma.user.update({ where: { id: user.id }, data: { failedLoginAttempts: { increment: 1 } } });
+
+      // OPTIONAL audit log
+      // await prisma.authLog.create({ data: { userId: user.id, type: 'login_failed', metadata: { reason: 'bad_password' } } });
+
       return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
     }
 
-    // Determine activation: prefer explicit isActive if present, otherwise require both flags
+    // ----- Account activation check -----
     const hasIsActive = Object.prototype.hasOwnProperty.call(user, "isActive");
     const isActive = hasIsActive ? Boolean(user.isActive) : (Boolean(user.phoneVerified) && Boolean(user.emailVerified));
 
-    // If not active: return helpful details for client UX
     if (!isActive) {
-      // In production we may want to avoid exposing exact flags to prevent account enumeration
       const showDetails = process.env.NODE_ENV !== "production";
+      const details = showDetails ? { phoneVerified: Boolean(user.phoneVerified), emailVerified: Boolean(user.emailVerified) } : undefined;
 
-      const details = showDetails
-        ? { phoneVerified: Boolean(user.phoneVerified), emailVerified: Boolean(user.emailVerified) }
-        : undefined;
+      // OPTIONAL: log this event
+      // await prisma.authLog.create({ data: { userId: user.id, type: 'login_attempt_inactive' } });
 
       return NextResponse.json(
         {
@@ -81,40 +120,53 @@ export async function POST(req: Request) {
       );
     }
 
-    // Sign session JWT - include both keys for compatibility
-    const sessionToken = signSession(
-      {
-        id: user.id,
-        role: user.role,
-        organizationId: user.organizationId,
-        org: user.organizationId,
-      },
-      "7d"
-    );
+    // ----- Create session token -----
+    // Keep payload small: id, role, organizationId
+    const payload = {
+      id: user.id,
+      role: user.role ?? null,
+      organizationId: user.organizationId ?? null,
+    };
 
-    // Set cookie
-    const maxAge = 7 * 24 * 60 * 60; // 7 days
+    // signSession should return a compact JWT string
+    const sessionToken = signSession(payload, "7d");
+
+    // Optional: create a server-side session record tying token -> user id (safer for revoke / logout)
+    // const sessionRecord = await prisma.session.create({ data: { userId: user.id, tokenHash: hash(sessionToken), expiresAt: addDays(new Date(), 7) } });
+
+    // ----- Set cookie using NextResponse API (safer than manual header) -----
+    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
     const isProd = process.env.NODE_ENV === "production";
-    const cookieParts = [
-      `session=${sessionToken}`,
-      `Path=/`,
-      `Max-Age=${maxAge}`,
-      `HttpOnly`,
-      `SameSite=Lax`,
-    ];
-    if (isProd) cookieParts.push("Secure");
-    const cookie = cookieParts.join("; ");
 
-    // Return minimal user info
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         ok: true,
-        user: { id: user.id, email: user.email, phone: user.phone, role: user.role },
+        user: { id: user.id, email: user.email ?? null, phone: user.phone ?? null, role: user.role ?? null },
       },
-      { headers: { "Set-Cookie": cookie } }
+      { status: 200 }
     );
+
+    res.cookies.set({
+      name: "session",
+      value: sessionToken,
+      httpOnly: true,
+      sameSite: "lax", // or 'strict' depending on your needs
+      path: "/",
+      maxAge,
+      secure: isProd, // secure only in production (HTTPS)
+    });
+
+    // OPTIONAL: set a secondary non-http-only cookie for client UI (CSRF or avatar small data),
+    // but avoid storing sensitive tokens in non-HttpOnly cookies.
+    // res.cookies.set({ name: 'session_preview', value: user.email ?? '', maxAge, path: '/', secure: isProd });
+
+    // OPTIONAL: audit log of successful login
+    // await prisma.authLog.create({ data: { userId: user.id, type: 'login_success', metadata: { ip: 'TODO: capture ip if available' } } });
+
+    return res;
   } catch (err: any) {
     console.error("[Login Error]", err);
-    return NextResponse.json({ error: err?.message || "internal_server_error" }, { status: 500 });
+    // Do not leak internal errors in production
+    return NextResponse.json({ error: process.env.NODE_ENV === "production" ? "internal_server_error" : err?.message ?? "internal_server_error" }, { status: 500 });
   }
 }

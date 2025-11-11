@@ -1,3 +1,0 @@
-{
-  "/api/auth/reset-pass/send-otp/route": "app/api/auth/reset-pass/send-otp/route.js"
-}
