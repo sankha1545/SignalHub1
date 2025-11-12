@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///E:/Attack%20Capital/SignalHub/frontend/src/app/%28auth%29/invite/accept/page.tsx"],"sourcesContent":["// app/(auth)/invite/accept/page.tsx\r\n\"use client\";\r\nimport { useSearchParams } from \"next/navigation\";\r\n\r\nexport default function InviteAcceptPage() {\r\n  const searchParams = useSearchParams();\r\n  const token = searchParams.get(\"token\");\r\n\r\n  if (!token) return <p>Invalid invite link</p>;\r\n\r\n  return (\r\n    <div style={{ padding: 24 }}>\r\n      <h1>Accept your invite</h1>\r\n      <p>Token: {token}</p>\r\n      {/* Add form to complete signup */}\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":"AAAA,oCAAoC;;;;;;AAEpC;AADA;;;AAGe,SAAS;IACtB,MAAM,eAAe,IAAA,qJAAe;IACpC,MAAM,QAAQ,aAAa,GAAG,CAAC;IAE/B,IAAI,CAAC,OAAO,qBAAO,8OAAC;kBAAE;;;;;;IAEtB,qBACE,8OAAC;QAAI,OAAO;YAAE,SAAS;QAAG;;0BACxB,8OAAC;0BAAG;;;;;;0BACJ,8OAAC;;oBAAE;oBAAQ;;;;;;;;;;;;;AAIjB","debugId":null}}]
+}

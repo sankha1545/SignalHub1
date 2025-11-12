@@ -20,12 +20,14 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
-import ProfileMenu from "@/components/forms/ProfileMenu"; // <-- adjust if you don't have path alias
+import ProfileMenu from "@/components/forms/ProfileMenu";
 
 type Portal = "admin" | "manager" | "employee" | undefined;
 
 export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
-  const pathname = usePathname() ?? "/";
+  const rawPath = usePathname() ?? "/";
+  // normalize pathname (remove trailing slash except for root)
+  const pathname = rawPath === "/" ? "/" : rawPath.replace(/\/+$/, "");
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -47,8 +49,7 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
 
   /**
    * NAV configuration for portals.
-   * For now we implement admin NAV (as requested).
-   * You can extend with manager/employee arrays later and switch based on `portal`.
+   * Admin routes point to server pages under /app/dashboard/admin.
    */
   const NAV =
     portal === "admin"
@@ -88,7 +89,7 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
           {
             id: "analytics",
             label: "Analytics",
-            href: "/dashboard/admin",
+            href: "/dashboard/admin/analytics",
             icon: BarChart3,
             gradient: "from-pink-500 to-rose-500",
             badge: null,
@@ -102,7 +103,7 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
             badge: null,
           },
         ]
-      : // minimal fallback: show analytics only for other portals; extend later as needed
+      : // minimal fallback for other portals
         [
           {
             id: "analytics",
@@ -114,24 +115,18 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
           },
         ];
 
-  // Determine active item based on pathname.
-  // Handles:
-  //  - /dashboard/admin            => analytics
-  //  - /dashboard/admin/overview   => overview
-  //  - /dashboard/admin/inbox      => inbox
-  //  - etc.
+  // Determine active item based on normalized pathname.
   const computeActive = (path: string) => {
     if (portal === "admin") {
-      if (path === "/dashboard/admin" || path === "/dashboard/admin/") return "analytics";
+      if (path.startsWith ("/dashboard/admin/analytics")) return "analytics";
       if (path.startsWith("/dashboard/admin/overview")) return "overview";
       if (path.startsWith("/dashboard/admin/inbox")) return "inbox";
       if (path.startsWith("/dashboard/admin/sent")) return "sent";
       if (path.startsWith("/dashboard/admin/teams")) return "teams";
       if (path.startsWith("/dashboard/admin/settings")) return "settings";
-      // fallback: if user is at /dashboard treat as analytics
+      // fallback: treat /dashboard as analytics
       if (path === "/dashboard") return "analytics";
     } else {
-      // non-admin fallback
       if (path.startsWith("/dashboard")) return "analytics";
     }
     return undefined;
@@ -221,7 +216,7 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
-                  {/* Active indicator (shared layoutId so it animates between items) */}
+                  {/* Active indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"

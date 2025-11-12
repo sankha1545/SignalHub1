@@ -1,203 +1,313 @@
-
-
-
-
-// File: app/(auth)/invite/page.tsx
 "use client";
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
-async function postJSON(url: string, body: any) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return res.json();
+import React, { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
+/**
+ * Invite signup page
+ * - Reads token from ?token=...
+ * - POST /api/invites/accept { token } -> { ok, email, role, ... }
+ * - Shows a form: non-editable email, username, password, confirm password
+ * - POST /api/invites/finalize { token, username, password } -> creates account & consumes invite
+ * - On success redirect to /auth/login?email=<email>
+ */
+
+/* ---------- helpers ---------- */
+type ApiResp = { ok?: boolean; message?: string; [k: string]: any };
+
+async function postJSON(url: string, body: any): Promise<ApiResp> {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      credentials: "include",
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { message: err?.message || String(err) };
+  }
 }
 
-export default function InviteAcceptPage() {
+function validatePasswordRules(pw: string) {
+  const errs: string[] = [];
+  if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
+  if (!/[A-Z]/.test(pw)) errs.push("Include at least one uppercase letter.");
+  if (!/[a-z]/.test(pw)) errs.push("Include at least one lowercase letter.");
+  if (!/[0-9]/.test(pw)) errs.push("Include at least one number.");
+  if (!/[^A-Za-z0-9]/.test(pw)) errs.push("Include at least one symbol (e.g. !@#$%).");
+  return errs;
+}
+
+/* ---------- component ---------- */
+export default function InviteSignupPage(): JSX.Element {
   const params = useSearchParams();
-  const rawToken = params.get("token");
-  const emailQuery = params.get("email");
-  const tempTokenFromQuery = params.get("tempToken");
+  const router = useRouter();
+  const token = params?.get("token") ?? "";
 
-  const [invite, setInvite] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState(emailQuery || "");
-  const [mode, setMode] = useState<"choose" | "email" | "verifyEmail" | "oauth" | "finalize">("choose");
-  const [emailCode, setEmailCode] = useState("");
-  const [tempToken, setTempToken] = useState<string | null>(tempTokenFromQuery);
-  const [name, setName] = useState("");
+  // invite validation state
+  const [loading, setLoading] = useState(true);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState<string>("");
+  const [inviteRole, setInviteRole] = useState<string | null>(null);
+
+  // form state
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  // Validate token on mount
   useEffect(() => {
-    // If token present, validate invite
-    async function validate() {
-      if (!rawToken && !tempToken) return;
-      setLoading(true);
-      setError(null);
-      try {
-        if (rawToken) {
-          const res = await postJSON("/api/invites/accept", { token: rawToken, email });
-          if (res?.ok) {
-            setInvite(res.invite);
-          } else {
-            setError(res?.error || "Invalid invite");
-          }
-        } else {
-          // tempToken flow (probably from oauth) — try to decode on server if needed
-          // We'll continue to phone verification directly if tempToken exists
-          setMode("oauth");
+    let mounted = true;
+    async function validateToken() {
+      if (!token) {
+        if (mounted) {
+          setInviteError("Missing invite token. Please use the link sent to your email or contact the admin.");
+          setLoading(false);
         }
-      } catch (err: any) {
-        setError(String(err));
-      } finally {
-        setLoading(false);
-      }
-    }
-    validate();
-  }, [rawToken]);
-
-  // start oauth accept
-  function startGoogleAccept() {
-    // include inviteId in start state if we have invite
-    const inviteId = invite?.id;
-    const url = `/api/auth/oauth/google/start?flow=invite${inviteId ? `&inviteId=${inviteId}` : ""}`;
-    window.location.href = url;
-  }
-
-  // email OTP path
-  async function sendEmailOtp(e?: React.FormEvent) {
-    e?.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await postJSON(`/api/auth/email/send`, { email });
-      if (res?.ok) setMode("verifyEmail");
-      else setError(res?.error || "Failed to send code");
-    } catch (err: any) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function verifyEmailOtp(e?: React.FormEvent) {
-    e?.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await postJSON(`/api/auth/email/verify`, { email, code: emailCode, flow: "invite" });
-      if (res?.ok && res?.tempToken) {
-        // we got a temp token — proceed to phone verify
-        setTempToken(res.tempToken);
-        const url = new URL(window.location.origin + "/auth/verify-phone");
-        url.searchParams.set("tempToken", res.tempToken);
-        url.searchParams.set("flow", "invite");
-        if (invite?.id) url.searchParams.set("inviteId", invite.id);
-        window.location.href = url.toString();
         return;
       }
-      setError(res?.error || "Invalid code");
-    } catch (err: any) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  // finalize after OAuth + phone verification — this page may receive tempToken in query
-  async function finalizeInvite(e?: React.FormEvent) {
+      try {
+        setLoading(true);
+        setInviteError(null);
+        const res = await postJSON("/api/invites/accept", { token });
+        if (!res?.ok) {
+          const msg = res?.message || res?.error || "Invalid or expired invite token.";
+          if (mounted) {
+            setInviteError(String(msg));
+            setLoading(false);
+          }
+          return;
+        }
+
+        // success: populate prefilled email
+        if (mounted) {
+          setInviteEmail(res.email || "");
+          setInviteRole(res.role || null);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        if (mounted) {
+          setInviteError(String(err?.message || err));
+          setLoading(false);
+        }
+      }
+    }
+
+    validateToken();
+    return () => {
+      mounted = false;
+    };
+  }, [token]);
+
+  // password validation live
+  useEffect(() => {
+    setPasswordErrors(validatePasswordRules(password));
+    setPasswordsMatch(password === confirmPassword || confirmPassword.length === 0);
+  }, [password, confirmPassword]);
+
+  // submit finalize
+  async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    setError(null);
-    setLoading(true);
+    setFormError(null);
+
+    // client-side checks
+    if (!inviteEmail) {
+      setFormError("Invite email not found. Refresh or contact the admin.");
+      return;
+    }
+    if (!username || username.trim().length < 3) {
+      setFormError("Enter a username (min 3 characters).");
+      return;
+    }
+    const pwErrs = validatePasswordRules(password);
+    if (pwErrs.length > 0) {
+      setPasswordErrors(pwErrs);
+      setFormError("Please fix the password requirements.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setPasswordsMatch(false);
+      setFormError("Passwords do not match.");
+      return;
+    }
+
+    setSubmitting(true);
     try {
-      // we assume tempToken exists (from oauth callback or email flow)
-      if (!tempToken) return setError("Missing temp token");
-      const res = await postJSON(`/api/invites/finalize`, { tempToken, inviteId: invite?.id, password, name });
-      if (res?.ok) {
-        // redirect to login or dashboard
-        window.location.href = "/";
-      } else setError(res?.error || "Failed to finalize");
+      const res = await postJSON("/api/invites/finalize", { token, username: username.trim(), password });
+      if (!res?.ok) {
+        const msg = res?.message || res?.error || "Failed to create account. Contact admin.";
+        setFormError(String(msg));
+        setSubmitting(false);
+        return;
+      }
+
+      // success: redirect to login page and prefill email
+      // The login page can read ?email= and prefill the email input if implemented
+      router.push(`/auth/login?email=${encodeURIComponent(inviteEmail)}`);
     } catch (err: any) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
+      setFormError(String(err?.message || err));
+      setSubmitting(false);
     }
   }
 
+  /* ---------- UI ---------- */
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
-      <h3 className="text-lg font-semibold mb-3">Accept invitation</h3>
-      {loading && <div className="text-sm text-slate-600 mb-2">Validating...</div>}
-      {error && <div className="text-sm text-red-600 mb-3">{error}</div>}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white p-6">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Left: Form */}
+        <div className="p-8 md:p-10">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-slate-900">Complete your account</h1>
+            <p className="text-sm text-slate-500 mt-1">You were invited as <strong>{inviteRole ?? "Manager"}</strong>. Finish creating your account to get access.</p>
+          </div>
 
-      {invite && (
-        <div className="mb-4 text-sm">
-          <p>
-            You were invited to <strong>{invite.organizationId}</strong> as <strong>{invite.role}</strong>. Continue to accept the invite.
-          </p>
-        </div>
-      )}
-
-      {mode === "choose" && (
-        <div className="space-y-3">
-          <button onClick={startGoogleAccept} className="w-full p-3 border rounded-lg flex items-center justify-center gap-3">
-            <img src="/icons/google.svg" alt="Google" className="w-5 h-5" />
-            Accept with Google
-          </button>
-
-          <div className="text-center text-sm text-slate-500">or</div>
-
-          <form onSubmit={sendEmailOtp} className="space-y-3">
-            <label className="block text-sm">Email</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-2 border rounded" />
-            <div className="flex gap-2">
-              <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded">Send code</button>
+          {loading ? (
+            <div className="py-12 flex items-center justify-center">
+              <div className="text-slate-500">Validating invite…</div>
             </div>
-          </form>
+          ) : inviteError ? (
+            <div className="py-6">
+              <div className="text-sm text-rose-600 mb-3">{inviteError}</div>
+              <div className="text-sm text-slate-600">If you believe this is a mistake, contact the administrator who invited you.</div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email (prefilled, non-editable) */}
+              <div>
+                <label className="block text-xs text-slate-600 mb-1">Email</label>
+                <input
+                  value={inviteEmail}
+                  disabled
+                  className="w-full p-3 rounded border bg-slate-100 text-slate-700 text-sm"
+                />
+                <p className="text-xs text-slate-400 mt-1">Email verified by admin — not editable.</p>
+              </div>
+
+              {/* Username */}
+              <div>
+                <label className="block text-xs text-slate-600 mb-1">Username</label>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Choose a username"
+                  className="w-full p-3 rounded border focus:ring-2 focus:ring-indigo-300 text-sm"
+                  autoCapitalize="none"
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-xs text-slate-600 mb-1">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Create a strong password"
+                    className="w-full p-3 rounded border focus:ring-2 focus:ring-indigo-300 text-sm pr-10"
+                    aria-required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-500"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm password */}
+              <div>
+                <label className="block text-xs text-slate-600 mb-1">Confirm password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Retype password"
+                    className={`w-full p-3 rounded border focus:ring-2 focus:ring-indigo-300 text-sm ${!passwordsMatch && confirmPassword.length > 0 ? "border-rose-400" : ""}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-500"
+                    aria-label={showConfirm ? "Hide password" : "Show password"}
+                  >
+                    {showConfirm ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Password requirements */}
+              <div className="text-xs text-slate-500">
+                <div className="mb-2">Password must contain:</div>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                  {[
+                    { ok: password.length >= 8, label: "8+ characters" },
+                    { ok: /[A-Z]/.test(password), label: "Uppercase letter" },
+                    { ok: /[a-z]/.test(password), label: "Lowercase letter" },
+                    { ok: /[0-9]/.test(password), label: "Number" },
+                    { ok: /[^A-Za-z0-9]/.test(password), label: "Symbol" },
+                  ].map((r) => (
+                    <li key={r.label} className="flex items-center gap-2 text-[13px]">
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${r.ok ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-400"}`}>
+                        {r.ok ? "✓" : "•"}
+                      </span>
+                      <span className={`${r.ok ? "text-slate-700" : "text-slate-400"}`}>{r.label}</span>
+                    </li>
+                  ))}
+                </ul>
+                {!passwordsMatch && confirmPassword.length > 0 && (
+                  <div className="mt-2 text-sm text-rose-600">Passwords do not match.</div>
+                )}
+              </div>
+
+              {/* Form error */}
+              {formError && <div className="text-sm text-rose-600">{formError}</div>}
+
+              {/* Submit */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded font-medium hover:bg-indigo-700 transition"
+                >
+                  {submitting ? "Creating account..." : "Create account"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/auth/login")}
+                  className="px-4 py-3 border rounded"
+                >
+                  Already have an account?
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-      )}
 
-      {mode === "verifyEmail" && (
-        <form onSubmit={verifyEmailOtp} className="space-y-3">
-          <p className="text-sm text-slate-600">We sent a code to <strong>{email}</strong></p>
-          <label className="block text-sm">Code</label>
-          <input value={emailCode} onChange={(e) => setEmailCode(e.target.value)} className="w-full p-2 border rounded" />
-          <div className="flex gap-2">
-            <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded">Verify & continue</button>
-            <button type="button" onClick={() => setMode("choose")} className="px-4 py-2 border rounded">Back</button>
+        {/* Right: visual / role */}
+        <div className="hidden md:flex flex-col items-center justify-center p-8 bg-gradient-to-br from-indigo-600 to-emerald-400 text-white">
+          <div className="rounded-lg bg-white/10 p-4 mb-6">
+            <div className="text-sm">Invited role</div>
+            <div className="text-lg font-semibold">{inviteRole ?? "Manager"}</div>
           </div>
-        </form>
-      )}
-
-      {mode === "oauth" && (
-        <div>
-          <p className="text-sm">Continue with OAuth flow. If you already completed phone verification, finalize below.</p>
-          <form onSubmit={finalizeInvite} className="space-y-3 mt-3">
-            <label className="block text-sm">Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-2 border rounded" />
-            <label className="block text-sm">Password (optional)</label>
-            <input value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-2 border rounded" />
-            <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded">Finalize account</button>
-          </form>
+          <div className="max-w-xs text-sm text-white/90 text-center">
+            Your email has already been verified by the administrator. Complete the fields to create your account and then login.
+          </div>
         </div>
-      )}
-
-      {mode === "finalize" && (
-        <form onSubmit={finalizeInvite} className="space-y-3">
-          <label className="block text-sm">Name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-2 border rounded" />
-          <label className="block text-sm">Password</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-2 border rounded" />
-          <div className="flex gap-2">
-            <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded">Create account</button>
-            <a className="px-4 py-2 border rounded" href="/">Cancel</a>
-          </div>
-        </form>
-      )}
+      </div>
     </div>
   );
 }

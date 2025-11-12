@@ -1,31 +1,51 @@
-// app/api/invites/accept/route.ts
+// src/app/api/invites/accept/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyHash } from "@/lib/crypto";
 
+/**
+ * Accept an invite token and return the email and role for signup
+ * 
+ * Flow:
+ * - Token must exist in query body
+ * - Token must exist in DB
+ * - Token must not be expired
+ * - Token must not be already used (acceptedAt is null)
+ */
 export async function POST(req: Request) {
-  const { token, email } = await req.json();
-  if (!token || !email) return NextResponse.json({ error: "missing" }, { status: 400 });
+  try {
+    const { token } = await req.json();
 
-  // find invite by email + not used + not expired
-  const invites = await prisma.invite.findMany({
-    where: { email, used: false, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (!invites || invites.length === 0) return NextResponse.json({ error: "invite_not_found" }, { status: 404 });
-
-  // find matching hashed token
-  let matched = null;
-  for (const inv of invites) {
-    const ok = await verifyHash(token, inv.token);
-    if (ok) {
-      matched = inv;
-      break;
+    if (!token || typeof token !== "string") {
+      return NextResponse.json({ ok: false, message: "Missing or invalid token" }, { status: 400 });
     }
-  }
-  if (!matched) return NextResponse.json({ error: "invalid_token" }, { status: 400 });
 
-  // return invite metadata to client so client can continue (choose OAuth or email OTP)
-  return NextResponse.json({ ok: true, invite: { id: matched.id, role: matched.role, organizationId: matched.organizationId, teamId: matched.teamId, email: matched.email } });
+    // Find invite by token
+    const invite = await prisma.invite.findUnique({
+      where: { token },
+    });
+
+    if (!invite) {
+      return NextResponse.json({ ok: false, message: "Invalid invite token" }, { status: 404 });
+    }
+
+    if (invite.acceptedAt) {
+      return NextResponse.json({ ok: false, message: "Invite already used" }, { status: 410 });
+    }
+
+    if (invite.expiresAt < new Date()) {
+      return NextResponse.json({ ok: false, message: "Invite expired" }, { status: 410 });
+    }
+
+    // Return invite data needed by frontend to prefill signup
+    return NextResponse.json({
+      ok: true,
+      email: invite.email,
+      role: invite.role,
+      organizationId: invite.organizationId || null,
+      teamId: invite.teamId || null,
+    });
+  } catch (err: any) {
+    console.error("invites/accept error:", err);
+    return NextResponse.json({ ok: false, message: err?.message || "Server error" }, { status: 500 });
+  }
 }
