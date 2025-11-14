@@ -204,7 +204,7 @@ async function getSessionUser(req) {
 "[project]/src/app/api/me/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// src/app/api/me/route.ts
+// app/api/me/route.ts
 __turbopack_context__.s([
     "GET",
     ()=>GET,
@@ -222,16 +222,19 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
 ;
 ;
 /**
- * Note:
- * - This route attempts multiple ways to resolve the session:
- *   1) preferred: getSessionUser(req) (your existing helper)
- *   2) fallback: Authorization: Bearer <token> header
- *   3) fallback: read 'session' cookie server-side and verify JWT
+ * GET /api/me
+ * PATCH /api/me
  *
- * - GET responses include Cache-Control: no-store so server components
- *   fetching /api/me always get the latest session state (important).
+ * Behavior preserved:
+ *  - Multiple session resolution strategies:
+ *    1) getSessionUser(req)
+ *    2) Authorization: Bearer <token>
+ *    3) server-side 'session' cookie
  *
- * - If you use a different cookie name than 'session', change COOKIE_NAME.
+ * Additions:
+ *  - GET returns organization: { id, name } so frontend can render org name on account / overview
+ *  - PATCH disallows direct email changes through this endpoint (use dedicated email-change flow)
+ *  - Added defensiveness around metadata merges, length checks and Prisma error logging
  */ const COOKIE_NAME = "session";
 const JWT_SECRET = process.env.JWT_SECRET || "";
 async function jsonSafe(req) {
@@ -243,7 +246,8 @@ async function jsonSafe(req) {
 }
 /**
  * Resolve a session user using multiple fallbacks.
- * Returns { id, name?, email? } or null.
+ * Returns an object that MAY contain { id, name?, email?, org? } or null.
+ * Attempts to preserve your existing getSessionUser behavior.
  */ async function resolveSessionUser(req) {
     try {
         // 1) primary helper (your existing logic)
@@ -258,14 +262,19 @@ async function jsonSafe(req) {
         try {
             const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization");
             if (authHeader?.startsWith("Bearer ")) {
-                const token = authHeader.substring(7);
-                if (JWT_SECRET) {
+                const token = authHeader.substring(7).trim();
+                if (JWT_SECRET && token) {
                     const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
-                    if (payload?.id) return {
-                        id: payload.id,
-                        name: payload.name ?? null,
-                        email: payload.email ?? null
-                    };
+                    if (payload?.id) {
+                        // include org if token contains it
+                        const result = {
+                            id: payload.id,
+                            name: payload.name ?? null,
+                            email: payload.email ?? null
+                        };
+                        if (payload.org) result.org = payload.org;
+                        return result;
+                    }
                 }
             }
         } catch (err) {
@@ -278,11 +287,15 @@ async function jsonSafe(req) {
             const token = cookieStore.get(COOKIE_NAME)?.value;
             if (token && JWT_SECRET) {
                 const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
-                if (payload?.id) return {
-                    id: payload.id,
-                    name: payload.name ?? null,
-                    email: payload.email ?? null
-                };
+                if (payload?.id) {
+                    const result = {
+                        id: payload.id,
+                        name: payload.name ?? null,
+                        email: payload.email ?? null
+                    };
+                    if (payload.org) result.org = payload.org;
+                    return result;
+                }
             }
         } catch (err) {
             console.warn("Cookie token verification failed:", err);
@@ -320,7 +333,13 @@ async function GET(req) {
                 role: true,
                 createdAt: true,
                 updatedAt: true,
-                profile: true
+                profile: true,
+                organization: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
             }
         });
         if (!user) {
@@ -335,9 +354,14 @@ async function GET(req) {
                 }
             });
         }
+        // Return organization as top-level convenience plus inside user
+        const responseUser = {
+            ...user,
+            organization: user.organization ?? null
+        };
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            user
+            user: responseUser
         }, {
             status: 200,
             headers: {
@@ -370,7 +394,17 @@ async function PATCH(req) {
         }
         const body = await jsonSafe(req);
         console.log("PATCH /api/me payload:", JSON.stringify(body));
-        // name is required as per original logic; you can relax this if desired
+        // Prohibit direct email changes in this endpoint to enforce the global-email rules elsewhere.
+        if (typeof body.email === "string" && body.email.trim().length > 0) {
+            // If you need to allow email changes, implement a dedicated, audited flow (verify current password + email verification + uniqueness checks).
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Email cannot be changed via this endpoint"
+            }, {
+                status: 400
+            });
+        }
+        // name is required per original logic
         const name = typeof body.name === "string" ? body.name.trim() : undefined;
         const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
         const incomingProfile = typeof body.profile === "object" && body.profile ? body.profile : {};
@@ -383,7 +417,7 @@ async function PATCH(req) {
             });
         }
         // simple length guards
-        if (typeof name === "string" && name.length > 200) {
+        if (name.length > 200) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 error: "Name too long"
@@ -470,7 +504,13 @@ async function PATCH(req) {
                 role: true,
                 createdAt: true,
                 updatedAt: true,
-                profile: true
+                profile: true,
+                organization: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
             }
         });
         console.log("PATCH /api/me updated user id:", updatedUser.id);

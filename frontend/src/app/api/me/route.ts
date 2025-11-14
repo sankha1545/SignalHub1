@@ -1,4 +1,4 @@
-// src/app/api/me/route.ts
+// app/api/me/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
@@ -6,16 +6,19 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 /**
- * Note:
- * - This route attempts multiple ways to resolve the session:
- *   1) preferred: getSessionUser(req) (your existing helper)
- *   2) fallback: Authorization: Bearer <token> header
- *   3) fallback: read 'session' cookie server-side and verify JWT
+ * GET /api/me
+ * PATCH /api/me
  *
- * - GET responses include Cache-Control: no-store so server components
- *   fetching /api/me always get the latest session state (important).
+ * Behavior preserved:
+ *  - Multiple session resolution strategies:
+ *    1) getSessionUser(req)
+ *    2) Authorization: Bearer <token>
+ *    3) server-side 'session' cookie
  *
- * - If you use a different cookie name than 'session', change COOKIE_NAME.
+ * Additions:
+ *  - GET returns organization: { id, name } so frontend can render org name on account / overview
+ *  - PATCH disallows direct email changes through this endpoint (use dedicated email-change flow)
+ *  - Added defensiveness around metadata merges, length checks and Prisma error logging
  */
 
 const COOKIE_NAME = "session";
@@ -31,7 +34,8 @@ async function jsonSafe(req: Request) {
 
 /**
  * Resolve a session user using multiple fallbacks.
- * Returns { id, name?, email? } or null.
+ * Returns an object that MAY contain { id, name?, email?, org? } or null.
+ * Attempts to preserve your existing getSessionUser behavior.
  */
 async function resolveSessionUser(req: Request) {
   try {
@@ -48,10 +52,15 @@ async function resolveSessionUser(req: Request) {
     try {
       const authHeader = (req.headers.get("authorization") ?? req.headers.get("Authorization")) as string | null;
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.substring(7);
-        if (JWT_SECRET) {
+        const token = authHeader.substring(7).trim();
+        if (JWT_SECRET && token) {
           const payload = jwt.verify(token, JWT_SECRET) as any;
-          if (payload?.id) return { id: payload.id, name: payload.name ?? null, email: payload.email ?? null };
+          if (payload?.id) {
+            // include org if token contains it
+            const result: any = { id: payload.id, name: payload.name ?? null, email: payload.email ?? null };
+            if (payload.org) result.org = payload.org;
+            return result;
+          }
         }
       }
     } catch (err) {
@@ -65,7 +74,11 @@ async function resolveSessionUser(req: Request) {
       const token = cookieStore.get(COOKIE_NAME)?.value;
       if (token && JWT_SECRET) {
         const payload = jwt.verify(token, JWT_SECRET) as any;
-        if (payload?.id) return { id: payload.id, name: payload.name ?? null, email: payload.email ?? null };
+        if (payload?.id) {
+          const result: any = { id: payload.id, name: payload.name ?? null, email: payload.email ?? null };
+          if (payload.org) result.org = payload.org;
+          return result;
+        }
       }
     } catch (err) {
       console.warn("Cookie token verification failed:", err);
@@ -85,7 +98,10 @@ export async function GET(req: Request) {
   try {
     const sessionUser = await resolveSessionUser(req);
     if (!sessionUser) {
-      return NextResponse.json({ ok: false, user: null, error: "Unauthorized" }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json(
+        { ok: false, user: null, error: "Unauthorized" },
+        { status: 401, headers: { "Cache-Control": "no-store" } }
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -99,23 +115,42 @@ export async function GET(req: Request) {
         createdAt: true,
         updatedAt: true,
         profile: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
     if (!user) {
-      return NextResponse.json({ ok: false, user: null, error: "User not found" }, { status: 404, headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json(
+        { ok: false, user: null, error: "User not found" },
+        { status: 404, headers: { "Cache-Control": "no-store" } }
+      );
     }
 
-    return NextResponse.json({ ok: true, user }, { status: 200, headers: { "Cache-Control": "no-store" } });
+    // Return organization as top-level convenience plus inside user
+    const responseUser = {
+      ...user,
+      organization: user.organization ?? null,
+    };
+
+    return NextResponse.json({ ok: true, user: responseUser }, { status: 200, headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     console.error("GET /api/me error:", err);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500, headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json(
+      { ok: false, error: "Internal server error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 
 /**
  * PATCH /api/me
  * - Upserts the user's profile and merges extensible metadata.
+ * - Disallows changing email via this endpoint (use dedicated email-change flow).
  */
 export async function PATCH(req: Request) {
   try {
@@ -127,7 +162,13 @@ export async function PATCH(req: Request) {
     const body = await jsonSafe(req);
     console.log("PATCH /api/me payload:", JSON.stringify(body));
 
-    // name is required as per original logic; you can relax this if desired
+    // Prohibit direct email changes in this endpoint to enforce the global-email rules elsewhere.
+    if (typeof body.email === "string" && body.email.trim().length > 0) {
+      // If you need to allow email changes, implement a dedicated, audited flow (verify current password + email verification + uniqueness checks).
+      return NextResponse.json({ ok: false, error: "Email cannot be changed via this endpoint" }, { status: 400 });
+    }
+
+    // name is required per original logic
     const name = typeof body.name === "string" ? body.name.trim() : undefined;
     const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
     const incomingProfile = typeof body.profile === "object" && body.profile ? body.profile : {};
@@ -137,7 +178,7 @@ export async function PATCH(req: Request) {
     }
 
     // simple length guards
-    if (typeof name === "string" && name.length > 200) {
+    if (name.length > 200) {
       return NextResponse.json({ ok: false, error: "Name too long" }, { status: 400 });
     }
     if (phone && phone.length > 40) {
@@ -202,6 +243,12 @@ export async function PATCH(req: Request) {
         createdAt: true,
         updatedAt: true,
         profile: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 

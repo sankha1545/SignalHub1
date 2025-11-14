@@ -1,18 +1,25 @@
-// app/dashboard/admin/sent/layout.tsx
+// app/dashboard/layout.tsx
+"use client";
+
 import React from "react";
+import type { ReactNode } from "react";
+import NavLoader from "@/components/ui/header/Navloader"; // client component (sidebar + header)
 
-export const metadata = {
-  title: "Sent — Admin · SignalHub",
-  description: "Sent messages — admin view",
-};
-
-export default function SentLayout({ children }: { children: React.ReactNode }) {
+// Dashboard layout: renders sidebar/header only for routes under /dashboard
+// Children are placed in the right-hand content area.
+export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-       
+    <div className="min-h-screen flex bg-slate-50">
+      {/* NavLoader is a client component that renders the sidebar and top header */}
+      <NavLoader />
 
-        <main>{children}</main>
+      {/* Main content area */}
+      <div className="flex-1 min-h-screen">
+        <main className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

@@ -15,7 +15,6 @@ enum Role {
   ADMIN
   MANAGER
   EMPLOYEE
-  EDITOR
 }
 
 enum Channel {
@@ -51,13 +50,19 @@ enum NotificationType {
   GENERIC
 }
 
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
 /**
  * ----------------------------- Models -----------------------------
  */
 
 model Organization {
   id        String   @id @default(cuid())
-  name      String
+  name      String   @unique
   domain    String? // optional
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -82,7 +87,7 @@ model Organization {
  * Core user/auth models
  * - email: unique at DB level (global uniqueness)
  * - organization: required — every user belongs to an organization
- * - role: ADMIN | MANAGER | EMPLOYEE | EDITOR
+ * - role: ADMIN | MANAGER | EMPLOYEE
  */
 model User {
   id             String       @id @default(cuid())
@@ -159,6 +164,7 @@ model Profile {
 
 /**
  * Invite model for Managers / Employees
+ * Consolidated and aligned so there is only one invite model in the schema.
  */
 model Invite {
   id             String       @id @default(cuid())
@@ -172,7 +178,8 @@ model Invite {
   teamId         String?
   team           Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
   expiresAt      DateTime
-  used           Boolean      @default(false)
+  status         InviteStatus @default(PENDING)
+  acceptedAt     DateTime?
   createdAt      DateTime     @default(now())
 
   @@index([organizationId, email])
@@ -373,7 +380,7 @@ model Team {
   threads        Thread[]
   invites        Invite[] // opposite for Invite.team
 
-  // <-- ADD THIS: opposite for Task.team
+  // opposite for Task.team
   tasks Task[]
 
   createdAt DateTime @default(now())

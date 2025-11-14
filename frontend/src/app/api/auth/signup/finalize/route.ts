@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyTemp, signSession } from "@/lib/jwt";
 import bcrypt from "bcrypt";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +11,10 @@ export async function POST(req: Request) {
     const { name, organizationName, password, tempToken, email } = body;
 
     if (!name || !organizationName || !password || !tempToken) {
-      return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "missing_fields" },
+        { status: 400 }
+      );
     }
 
     // Verify temp token
@@ -19,109 +23,203 @@ export async function POST(req: Request) {
       decoded = verifyTemp(tempToken);
     } catch (err) {
       console.error("[verifyTemp failed]", err);
-      return NextResponse.json({ ok: false, error: "invalid_or_expired_temp_token" }, { status: 401 });
+      return NextResponse.json(
+        { ok: false, error: "invalid_or_expired_temp_token" },
+        { status: 401 }
+      );
     }
 
     // token must contain phone and indicate phone is verified
     if (!decoded?.phone || !decoded?.phoneVerified) {
-      return NextResponse.json({ ok: false, error: "phone_not_verified" }, { status: 403 });
+      return NextResponse.json(
+        { ok: false, error: "phone_not_verified" },
+        { status: 403 }
+      );
     }
 
-    const phone = decoded.phone;
+    const phone = decoded.phone as string;
+
     // Pick email from request or from token
-    const emailToSave = (email ?? decoded?.email ?? null) as string | null;
-
-    // If your Prisma schema requires email, ensure we have one
-    if (!emailToSave) {
-      return NextResponse.json({ ok: false, error: "email_required" }, { status: 400 });
+    const rawEmail = (email ?? decoded?.email ?? null) as string | null;
+    if (!rawEmail) {
+      return NextResponse.json(
+        { ok: false, error: "email_required" },
+        { status: 400 }
+      );
     }
+    const emailToSave = rawEmail.trim().toLowerCase();
 
-    // Check if user already exists by phone or email
+    // Pre-checks (helpful early failures + better error messages)
     const existingByPhone = await prisma.user.findFirst({ where: { phone } });
     if (existingByPhone) {
-      return NextResponse.json({ ok: false, error: "account_already_exists_phone" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "account_already_exists_phone" },
+        { status: 409 }
+      );
     }
-    const existingByEmail = await prisma.user.findUnique({ where: { email: emailToSave } });
+    const existingByEmail = await prisma.user.findUnique({
+      where: { email: emailToSave },
+    });
     if (existingByEmail) {
-      return NextResponse.json({ ok: false, error: "account_already_exists_email" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "account_already_exists_email" },
+        { status: 409 }
+      );
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // find or create organization
-    let organization = await prisma.organization.findFirst({
-      where: { name: organizationName },
-    });
+    // Canonicalize organization name (trim)
+    const orgName = organizationName.trim();
 
-    if (!organization) {
-      organization = await prisma.organization.create({
-        data: { name: organizationName },
+    // Use a transaction to create organization + admin atomically,
+    // and to re-check existence inside the transaction to avoid races.
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        // 1) Re-check user/email/phone inside transaction to avoid TOCTOU
+        const userByEmail = await tx.user.findUnique({
+          where: { email: emailToSave },
+        });
+        if (userByEmail) {
+          throw new Error("EMAIL_TAKEN");
+        }
+        const userByPhone = await tx.user.findFirst({
+          where: { phone },
+        });
+        if (userByPhone) {
+          throw new Error("PHONE_TAKEN");
+        }
+
+        // 2) Check organization existence.
+        // Intention: when a user is creating an org via signup, they must create a new org.
+        // If an org with that name already exists, reject the signup (prevent duplicate org names).
+        const existingOrg = await tx.organization.findFirst({
+          where: { name: orgName },
+        });
+        if (existingOrg) {
+          // Organization already exists -> block creation.
+          throw new Error("ORG_EXISTS");
+        }
+
+        // 3) Create organization
+        const organization = await tx.organization.create({
+          data: {
+            name: orgName,
+          },
+        });
+
+        // 4) Compute verification flags
+        const phoneVerified = true; // required by temp token
+        const emailVerified = Boolean(decoded?.emailVerified) || false;
+        const isActive = phoneVerified && emailVerified;
+
+        // 5) Create user (admin) connected to organization
+        const user = await tx.user.create({
+          data: {
+            name,
+            phone,
+            email: emailToSave,
+            passwordHash: hashedPassword,
+            role: "ADMIN",
+            phoneVerified,
+            emailVerified,
+            isActive,
+            organization: {
+              connect: { id: organization.id },
+            },
+            profile: {
+              create: { displayName: name, phoneNumber: phone },
+            },
+          },
+          include: {
+            organization: true,
+            profile: true,
+          },
+        });
+
+        return { user, organization };
       });
-    }
 
-    /**
-     * Activation policy:
-     * - phoneVerified is true (because temp token required it)
-     * - emailVerified will be set to false at creation (unless token indicates otherwise)
-     * - isActive is true only when both emailVerified && phoneVerified are true
-     */
-    const phoneVerified = true;
-    const emailVerified = Boolean(decoded?.emailVerified) || false; // token might include emailVerified
-    const isActive = phoneVerified && emailVerified;
+      const { user, organization } = result;
 
-    // Create user and connect to org by id (email included)
-    const user = await prisma.user.create({
-      data: {
-        name,
-        phone,
-        email: emailToSave,
-        passwordHash: hashedPassword,
-        role: "ADMIN",
-        phoneVerified,
-        emailVerified,
-        isActive,
-        organization: {
-          connect: { id: organization.id },
+      // Sign session only if fully active (both phone + email verified)
+      let sessionToken: string | null = null;
+      if (user.isActive) {
+        sessionToken = signSession({
+          id: user.id,
+          role: user.role,
+          phone: user.phone,
+          org: user.organization.id,
+        });
+      }
+
+      return NextResponse.json(
+        {
+          ok: true,
+          activated: user.isActive,
+          user: {
+            id: user.id,
+            name: user.name,
+            phone: user.phone,
+            role: user.role,
+            organization: organization.name,
+            emailVerified: user.emailVerified,
+            phoneVerified: user.phoneVerified,
+          },
+          token: sessionToken,
         },
-        profile: {
-          create: { displayName: name, phoneNumber: phone },
-        },
-      },
-      include: {
-        organization: true,
-        profile: true,
-      },
-    });
+        { status: 201 }
+      );
+    } catch (txErr: any) {
+      // Known flow errors thrown above
+      if (txErr?.message === "ORG_EXISTS") {
+        return NextResponse.json(
+          { ok: false, error: "organization_already_exists" },
+          { status: 409 }
+        );
+      }
+      if (txErr?.message === "EMAIL_TAKEN") {
+        return NextResponse.json(
+          { ok: false, error: "account_already_exists_email" },
+          { status: 409 }
+        );
+      }
+      if (txErr?.message === "PHONE_TAKEN") {
+        return NextResponse.json(
+          { ok: false, error: "account_already_exists_phone" },
+          { status: 409 }
+        );
+      }
 
-    // If account is active (both verified), sign a session token and return it.
-    // Otherwise do NOT sign a persistent session here; respond with activated: false so client prompts email verification.
-    let sessionToken: string | null = null;
-    if (isActive) {
-      sessionToken = signSession({
-        id: user.id,
-        role: user.role,
-        phone: user.phone,
-        org: user.organization.id,
-      });
+      // Prisma unique violation fallback (in case DB has unique constraint names)
+      if (txErr instanceof Prisma.PrismaClientKnownRequestError && txErr.code === "P2002") {
+        const target = (txErr.meta as any)?.target;
+        if (Array.isArray(target) && target.includes("email")) {
+          return NextResponse.json(
+            { ok: false, error: "account_already_exists_email" },
+            { status: 409 }
+          );
+        }
+        if (Array.isArray(target) && (target.includes("name") || target.includes("organization_name"))) {
+          return NextResponse.json(
+            { ok: false, error: "organization_already_exists" },
+            { status: 409 }
+          );
+        }
+      }
+
+      console.error("[Signup transaction error]", txErr);
+      return NextResponse.json(
+        { ok: false, error: txErr.message || "internal_server_error" },
+        { status: 500 }
+      );
     }
-
-    return NextResponse.json({
-      ok: true,
-      activated: isActive,
-      user: {
-        id: user.id,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        organization: user.organization.name,
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
-      },
-      token: sessionToken,
-    });
   } catch (err: any) {
     console.error("[Signup Finalize Error]", err);
-    return NextResponse.json({ ok: false, error: err.message || "internal_server_error" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: err.message || "internal_server_error" },
+      { status: 500 }
+    );
   }
 }

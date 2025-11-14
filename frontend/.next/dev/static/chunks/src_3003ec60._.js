@@ -2467,7 +2467,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/arrow-right.js [app-client] (ecmascript) <export default as ArrowRight>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/forms/ProfileForm.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$modals$2f$PasswordModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/modals/PasswordModal.tsx [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/forms/ProfileMenu.tsx [app-client] (ecmascript)"); // optional, mirrors Sidebar's profile area
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/forms/ProfileMenu.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -2480,103 +2480,252 @@ var _s = __turbopack_context__.k.signature();
 ;
 function AccountLayout() {
     _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(30);
-    if ($[0] !== "834a5f99fdd81376cf9aff56eac0235a2494d1d8dc00a6f956b2f9aa91883bf8") {
-        for(let $i = 0; $i < 30; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(75);
+    if ($[0] !== "c2eb7697f317c9ce244efa1b11c39ce43f402a26dea2423346d19f5c3691cf83") {
+        for(let $i = 0; $i < 75; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "834a5f99fdd81376cf9aff56eac0235a2494d1d8dc00a6f956b2f9aa91883bf8";
+        $[0] = "c2eb7697f317c9ce244efa1b11c39ce43f402a26dea2423346d19f5c3691cf83";
     }
     const [showPasswordModal, setShowPasswordModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [me, setMe] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     let t0;
     let t1;
-    let t2;
     if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-        t0 = {
-            opacity: 0,
-            y: -8
-        };
-        t1 = {
-            opacity: 1,
-            y: 0
-        };
-        t2 = {
-            duration: 0.35
-        };
+        t0 = ({
+            "AccountLayout[useEffect()]": ()=>{
+                let mounted = true;
+                setLoading(true);
+                fetch("/api/me", {
+                    cache: "no-store"
+                }).then(_AccountLayoutUseEffectAnonymous).then({
+                    "AccountLayout[useEffect() > (anonymous)()]": (data)=>{
+                        if (!mounted) {
+                            return;
+                        }
+                        if (data?.ok && data.user) {
+                            setMe(data.user);
+                            setError(null);
+                        } else {
+                            setError(data?.error ?? "Failed to load profile");
+                        }
+                    }
+                }["AccountLayout[useEffect() > (anonymous)()]"]).catch({
+                    "AccountLayout[useEffect() > (anonymous)()]": (err)=>{
+                        console.error("Failed to fetch /api/me:", err);
+                        if (!mounted) {
+                            return;
+                        }
+                        setError("Failed to load profile");
+                    }
+                }["AccountLayout[useEffect() > (anonymous)()]"]).finally({
+                    "AccountLayout[useEffect() > (anonymous)()]": ()=>{
+                        if (mounted) {
+                            setLoading(false);
+                        }
+                    }
+                }["AccountLayout[useEffect() > (anonymous)()]"]);
+                return ()=>{
+                    mounted = false;
+                };
+            }
+        })["AccountLayout[useEffect()]"];
+        t1 = [];
         $[1] = t0;
         $[2] = t1;
-        $[3] = t2;
     } else {
         t0 = $[1];
         t1 = $[2];
-        t2 = $[3];
     }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t0, t1);
+    const orgName = me?.organization?.name ?? null;
+    const orgId = me?.organization?.id ?? null;
+    const role = me?.role ?? null;
+    let t2;
+    if ($[3] !== me) {
+        t2 = me?.createdAt ? new Date(me.createdAt).toLocaleDateString() : "\u2014";
+        $[3] = me;
+        $[4] = t2;
+    } else {
+        t2 = $[4];
+    }
+    const memberSince = t2;
     let t3;
-    if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-        t3 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+    let t4;
+    let t5;
+    if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = {
+            opacity: 0,
+            y: -8
+        };
+        t4 = {
+            opacity: 1,
+            y: 0
+        };
+        t5 = {
+            duration: 0.35
+        };
+        $[5] = t3;
+        $[6] = t4;
+        $[7] = t5;
+    } else {
+        t3 = $[5];
+        t4 = $[6];
+        t5 = $[7];
+    }
+    let t6;
+    if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
+        t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
             className: "text-2xl font-bold text-slate-800",
             children: "Account settings"
         }, void 0, false, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 45,
+            lineNumber: 125,
             columnNumber: 10
         }, this);
-        $[4] = t3;
+        $[8] = t6;
     } else {
-        t3 = $[4];
+        t6 = $[8];
     }
-    let t4;
-    if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t7;
+    if ($[9] !== loading || $[10] !== orgName) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex items-baseline gap-3",
             children: [
-                t3,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mt-1 text-sm text-slate-500 flex items-center gap-2",
+                t6,
+                loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "text-sm text-slate-400",
+                    children: "Loading organization…"
+                }, void 0, false, {
+                    fileName: "[project]/src/app/account/Accountlayout.tsx",
+                    lineNumber: 132,
+                    columnNumber: 68
+                }, this) : orgName ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "text-sm text-slate-600 bg-slate-50 px-2 py-1 rounded-full border border-slate-100",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__["Sparkles"], {
-                            className: "w-4 h-4 text-slate-400"
+                        "Organization: ",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                            className: "ml-2",
+                            children: orgName
                         }, void 0, false, {
                             fileName: "[project]/src/app/account/Accountlayout.tsx",
-                            lineNumber: 52,
-                            columnNumber: 88
-                        }, this),
-                        "Manage your personal info, security, and visibility"
+                            lineNumber: 132,
+                            columnNumber: 261
+                        }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 52,
-                    columnNumber: 19
+                    lineNumber: 132,
+                    columnNumber: 148
+                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "text-sm text-rose-500",
+                    children: "No organization"
+                }, void 0, false, {
+                    fileName: "[project]/src/app/account/Accountlayout.tsx",
+                    lineNumber: 132,
+                    columnNumber: 313
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 52,
+            lineNumber: 132,
             columnNumber: 10
         }, this);
-        $[5] = t4;
+        $[9] = loading;
+        $[10] = orgName;
+        $[11] = t7;
     } else {
-        t4 = $[5];
+        t7 = $[11];
     }
-    let t5;
-    let t6;
-    if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-        t5 = {
+    let t8;
+    if ($[12] === Symbol.for("react.memo_cache_sentinel")) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__["Sparkles"], {
+            className: "w-4 h-4 text-slate-400"
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 141,
+            columnNumber: 10
+        }, this);
+        $[12] = t8;
+    } else {
+        t8 = $[12];
+    }
+    let t9;
+    if ($[13] !== loading || $[14] !== role) {
+        t9 = !loading && role ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            className: `ml-3 inline-flex items-center gap-2 px-2 py-0.5 text-xs rounded-full border ${role === "ADMIN" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-slate-50 text-slate-700 border-slate-100"}`,
+            title: `Role: ${role}`,
+            children: role
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 148,
+            columnNumber: 29
+        }, this) : null;
+        $[13] = loading;
+        $[14] = role;
+        $[15] = t9;
+    } else {
+        t9 = $[15];
+    }
+    let t10;
+    if ($[16] !== t9) {
+        t10 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mt-1 text-sm text-slate-500 flex items-center gap-2",
+            children: [
+                t8,
+                "Manage your personal info, security, and visibility",
+                t9
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 157,
+            columnNumber: 11
+        }, this);
+        $[16] = t9;
+        $[17] = t10;
+    } else {
+        t10 = $[17];
+    }
+    let t11;
+    if ($[18] !== t10 || $[19] !== t7) {
+        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            children: [
+                t7,
+                t10
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 165,
+            columnNumber: 11
+        }, this);
+        $[18] = t10;
+        $[19] = t7;
+        $[20] = t11;
+    } else {
+        t11 = $[20];
+    }
+    let t12;
+    let t13;
+    if ($[21] === Symbol.for("react.memo_cache_sentinel")) {
+        t12 = {
             scale: 1.03
         };
-        t6 = {
+        t13 = {
             scale: 0.97
         };
-        $[6] = t5;
-        $[7] = t6;
+        $[21] = t12;
+        $[22] = t13;
     } else {
-        t5 = $[6];
-        t6 = $[7];
+        t12 = $[21];
+        t13 = $[22];
     }
-    let t7;
-    if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-            whileHover: t5,
-            whileTap: t6,
+    let t14;
+    if ($[23] === Symbol.for("react.memo_cache_sentinel")) {
+        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+            whileHover: t12,
+            whileTap: t13,
             className: "inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-semibold shadow-lg shadow-blue-500/20",
             onClick: _AccountLayoutMotionButtonOnClick,
             "aria-label": "Upgrade account",
@@ -2586,93 +2735,101 @@ function AccountLayout() {
                     className: "w-4 h-4"
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 74,
-                    columnNumber: 297
+                    lineNumber: 189,
+                    columnNumber: 300
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 74,
-            columnNumber: 10
+            lineNumber: 189,
+            columnNumber: 11
         }, this);
-        $[8] = t7;
+        $[23] = t14;
     } else {
-        t7 = $[8];
+        t14 = $[23];
     }
-    let t8;
-    if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
-        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].header, {
-            initial: t0,
-            animate: t1,
-            transition: t2,
-            className: "mb-6 flex items-center justify-between gap-4",
+    let t15;
+    if ($[24] === Symbol.for("react.memo_cache_sentinel")) {
+        t15 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "hidden sm:flex items-center gap-3",
             children: [
-                t4,
+                t14,
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "hidden sm:flex items-center gap-3",
-                    children: [
-                        t7,
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "bg-white rounded-xl p-1 border border-slate-100",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-                                fileName: "[project]/src/app/account/Accountlayout.tsx",
-                                lineNumber: 81,
-                                columnNumber: 248
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/account/Accountlayout.tsx",
-                            lineNumber: 81,
-                            columnNumber: 183
-                        }, this)
-                    ]
-                }, void 0, true, {
+                    className: "bg-white rounded-xl p-1 border border-slate-100",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                        fileName: "[project]/src/app/account/Accountlayout.tsx",
+                        lineNumber: 196,
+                        columnNumber: 132
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 81,
-                    columnNumber: 128
+                    lineNumber: 196,
+                    columnNumber: 67
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 81,
-            columnNumber: 10
+            lineNumber: 196,
+            columnNumber: 11
         }, this);
-        $[9] = t8;
+        $[24] = t15;
     } else {
-        t8 = $[9];
+        t15 = $[24];
     }
-    let t10;
-    let t11;
-    let t9;
-    if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
-        t9 = {
+    let t16;
+    if ($[25] !== t11) {
+        t16 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].header, {
+            initial: t3,
+            animate: t4,
+            transition: t5,
+            className: "mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+            children: [
+                t11,
+                t15
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 203,
+            columnNumber: 11
+        }, this);
+        $[25] = t11;
+        $[26] = t16;
+    } else {
+        t16 = $[26];
+    }
+    let t17;
+    let t18;
+    let t19;
+    if ($[27] === Symbol.for("react.memo_cache_sentinel")) {
+        t17 = {
             opacity: 0,
             y: 8
         };
-        t10 = {
+        t18 = {
             opacity: 1,
             y: 0
         };
-        t11 = {
+        t19 = {
             duration: 0.4
         };
-        $[10] = t10;
-        $[11] = t11;
-        $[12] = t9;
+        $[27] = t17;
+        $[28] = t18;
+        $[29] = t19;
     } else {
-        t10 = $[10];
-        t11 = $[11];
-        t9 = $[12];
+        t17 = $[27];
+        t18 = $[28];
+        t19 = $[29];
     }
-    let t12;
-    if ($[13] === Symbol.for("react.memo_cache_sentinel")) {
-        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t20;
+    if ($[30] === Symbol.for("react.memo_cache_sentinel")) {
+        t20 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                     className: "text-lg font-semibold text-slate-800",
                     children: "Profile"
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 111,
+                    lineNumber: 234,
                     columnNumber: 16
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2680,25 +2837,25 @@ function AccountLayout() {
                     children: "Edit your profile details and preferences."
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 111,
+                    lineNumber: 234,
                     columnNumber: 81
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 111,
+            lineNumber: 234,
             columnNumber: 11
         }, this);
-        $[13] = t12;
+        $[30] = t20;
     } else {
-        t12 = $[13];
+        t20 = $[30];
     }
-    let t13;
-    if ($[14] === Symbol.for("react.memo_cache_sentinel")) {
-        t13 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t21;
+    if ($[31] === Symbol.for("react.memo_cache_sentinel")) {
+        t21 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex items-center justify-between mb-4",
             children: [
-                t12,
+                t20,
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "sm:hidden",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
@@ -2715,78 +2872,102 @@ function AccountLayout() {
                         children: "Change password"
                     }, void 0, false, {
                         fileName: "[project]/src/app/account/Accountlayout.tsx",
-                        lineNumber: 118,
+                        lineNumber: 241,
                         columnNumber: 99
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 118,
+                    lineNumber: 241,
                     columnNumber: 72
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 118,
+            lineNumber: 241,
             columnNumber: 11
         }, this);
-        $[14] = t13;
+        $[31] = t21;
     } else {
-        t13 = $[14];
+        t21 = $[31];
     }
-    let t14;
-    if ($[15] === Symbol.for("react.memo_cache_sentinel")) {
-        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].main, {
+    let t22;
+    if ($[32] !== error) {
+        t22 = error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mb-4 rounded-md bg-rose-50 border border-rose-100 p-3 text-sm text-rose-700",
+            children: error
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 254,
+            columnNumber: 19
+        }, this) : null;
+        $[32] = error;
+        $[33] = t22;
+    } else {
+        t22 = $[33];
+    }
+    let t23;
+    if ($[34] === Symbol.for("react.memo_cache_sentinel")) {
+        t23 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+            onChangePassword: {
+                "AccountLayout[<ProfileForm>.onChangePassword]": ()=>setShowPasswordModal(true)
+            }["AccountLayout[<ProfileForm>.onChangePassword]"]
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 262,
+            columnNumber: 11
+        }, this);
+        $[34] = t23;
+    } else {
+        t23 = $[34];
+    }
+    let t24;
+    if ($[35] !== t22) {
+        t24 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].main, {
             className: "lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-200",
-            initial: t9,
-            animate: t10,
-            transition: t11,
+            initial: t17,
+            animate: t18,
+            transition: t19,
             children: [
-                t13,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                    onChangePassword: {
-                        "AccountLayout[<ProfileForm>.onChangePassword]": ()=>setShowPasswordModal(true)
-                    }["AccountLayout[<ProfileForm>.onChangePassword]"]
-                }, void 0, false, {
-                    fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 131,
-                    columnNumber: 158
-                }, this)
+                t21,
+                t22,
+                t23
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 131,
+            lineNumber: 271,
             columnNumber: 11
         }, this);
-        $[15] = t14;
+        $[35] = t22;
+        $[36] = t24;
     } else {
-        t14 = $[15];
+        t24 = $[36];
     }
-    let t15;
-    let t16;
-    let t17;
-    let t18;
-    let t19;
-    if ($[16] === Symbol.for("react.memo_cache_sentinel")) {
-        t15 = {
+    let t25;
+    let t26;
+    let t27;
+    let t28;
+    let t29;
+    if ($[37] === Symbol.for("react.memo_cache_sentinel")) {
+        t25 = {
             opacity: 0,
             x: 8
         };
-        t16 = {
+        t26 = {
             opacity: 1,
             x: 0
         };
-        t17 = {
+        t27 = {
             duration: 0.4,
             delay: 0.05
         };
-        t18 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        t28 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                     className: "text-sm font-semibold text-slate-700",
                     children: "Account"
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 156,
+                    lineNumber: 295,
                     columnNumber: 16
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2794,37 +2975,184 @@ function AccountLayout() {
                     children: "Manage your account settings and profile visibility."
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 156,
+                    lineNumber: 295,
                     columnNumber: 81
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 156,
+            lineNumber: 295,
             columnNumber: 11
         }, this);
-        t19 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        t29 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "pt-2 border-t"
         }, void 0, false, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 157,
+            lineNumber: 296,
             columnNumber: 11
         }, this);
-        $[16] = t15;
-        $[17] = t16;
-        $[18] = t17;
-        $[19] = t18;
-        $[20] = t19;
+        $[37] = t25;
+        $[38] = t26;
+        $[39] = t27;
+        $[40] = t28;
+        $[41] = t29;
     } else {
-        t15 = $[16];
-        t16 = $[17];
-        t17 = $[18];
-        t18 = $[19];
-        t19 = $[20];
+        t25 = $[37];
+        t26 = $[38];
+        t27 = $[39];
+        t28 = $[40];
+        t29 = $[41];
     }
-    let t20;
-    if ($[21] === Symbol.for("react.memo_cache_sentinel")) {
-        t20 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+    let t30;
+    if ($[42] === Symbol.for("react.memo_cache_sentinel")) {
+        t30 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "text-xs text-slate-500",
+            children: "Organization"
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 311,
+            columnNumber: 11
+        }, this);
+        $[42] = t30;
+    } else {
+        t30 = $[42];
+    }
+    const t31 = loading ? "Loading\u2026" : orgName ?? "\u2014";
+    let t32;
+    if ($[43] !== t31) {
+        t32 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "text-sm font-medium text-slate-800",
+            children: t31
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 319,
+            columnNumber: 11
+        }, this);
+        $[43] = t31;
+        $[44] = t32;
+    } else {
+        t32 = $[44];
+    }
+    let t33;
+    if ($[45] !== memberSince) {
+        t33 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "text-xs text-slate-500 mt-1",
+            children: [
+                "Member since: ",
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                    id: "member-since",
+                    children: memberSince
+                }, void 0, false, {
+                    fileName: "[project]/src/app/account/Accountlayout.tsx",
+                    lineNumber: 327,
+                    columnNumber: 70
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 327,
+            columnNumber: 11
+        }, this);
+        $[45] = memberSince;
+        $[46] = t33;
+    } else {
+        t33 = $[46];
+    }
+    let t34;
+    if ($[47] !== t32 || $[48] !== t33) {
+        t34 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            children: [
+                t30,
+                t32,
+                t33
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 335,
+            columnNumber: 11
+        }, this);
+        $[47] = t32;
+        $[48] = t33;
+        $[49] = t34;
+    } else {
+        t34 = $[49];
+    }
+    let t35;
+    if ($[50] !== loading || $[51] !== orgId || $[52] !== role) {
+        t35 = !loading && role === "ADMIN" && orgId ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                href: "/dashboard/admin/overview",
+                onClick: _AccountLayoutAOnClick,
+                className: "inline-flex items-center gap-2 px-3 py-1 rounded-md border bg-white hover:bg-slate-50 text-sm",
+                title: "Manage organization",
+                children: [
+                    "Manage",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
+                        className: "w-3 h-3"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/account/Accountlayout.tsx",
+                        lineNumber: 344,
+                        columnNumber: 265
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/account/Accountlayout.tsx",
+                lineNumber: 344,
+                columnNumber: 56
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 344,
+            columnNumber: 51
+        }, this) : null;
+        $[50] = loading;
+        $[51] = orgId;
+        $[52] = role;
+        $[53] = t35;
+    } else {
+        t35 = $[53];
+    }
+    let t36;
+    if ($[54] !== t34 || $[55] !== t35) {
+        t36 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex items-center justify-between",
+                children: [
+                    t34,
+                    t35
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/account/Accountlayout.tsx",
+                lineNumber: 354,
+                columnNumber: 16
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 354,
+            columnNumber: 11
+        }, this);
+        $[54] = t34;
+        $[55] = t35;
+        $[56] = t36;
+    } else {
+        t36 = $[56];
+    }
+    let t37;
+    if ($[57] === Symbol.for("react.memo_cache_sentinel")) {
+        t37 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "pt-2 border-t"
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 363,
+            columnNumber: 11
+        }, this);
+        $[57] = t37;
+    } else {
+        t37 = $[57];
+    }
+    let t38;
+    if ($[58] === Symbol.for("react.memo_cache_sentinel")) {
+        t38 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
             whileHover: {
                 scale: 1.02
             },
@@ -2838,16 +3166,16 @@ function AccountLayout() {
             children: "Security & password"
         }, void 0, false, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 172,
+            lineNumber: 370,
             columnNumber: 11
         }, this);
-        $[21] = t20;
+        $[58] = t38;
     } else {
-        t20 = $[21];
+        t38 = $[58];
     }
-    let t21;
-    if ($[22] === Symbol.for("react.memo_cache_sentinel")) {
-        t21 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+    let t39;
+    if ($[59] === Symbol.for("react.memo_cache_sentinel")) {
+        t39 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
             whileHover: {
                 scale: 1.02
             },
@@ -2859,21 +3187,21 @@ function AccountLayout() {
             children: "Notifications"
         }, void 0, false, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 185,
+            lineNumber: 383,
             columnNumber: 11
         }, this);
-        $[22] = t21;
+        $[59] = t39;
     } else {
-        t21 = $[22];
+        t39 = $[59];
     }
-    let t22;
-    let t23;
-    if ($[23] === Symbol.for("react.memo_cache_sentinel")) {
-        t22 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t40;
+    let t41;
+    if ($[60] === Symbol.for("react.memo_cache_sentinel")) {
+        t40 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex flex-col gap-2",
             children: [
-                t20,
-                t21,
+                t38,
+                t39,
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
                     whileHover: {
                         scale: 1.02
@@ -2886,135 +3214,139 @@ function AccountLayout() {
                     children: "Billing"
                 }, void 0, false, {
                     fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 197,
+                    lineNumber: 395,
                     columnNumber: 58
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 197,
+            lineNumber: 395,
             columnNumber: 11
         }, this);
-        t23 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        t41 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "pt-2 border-t"
         }, void 0, false, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 202,
+            lineNumber: 400,
             columnNumber: 11
         }, this);
-        $[23] = t22;
-        $[24] = t23;
+        $[60] = t40;
+        $[61] = t41;
     } else {
-        t22 = $[23];
-        t23 = $[24];
+        t40 = $[60];
+        t41 = $[61];
     }
-    let t24;
-    if ($[25] === Symbol.for("react.memo_cache_sentinel")) {
-        t24 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "text-xs text-slate-500",
+    let t42;
+    if ($[62] === Symbol.for("react.memo_cache_sentinel")) {
+        t42 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "pt-1",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/src/app/account/Accountlayout.tsx",
+                lineNumber: 409,
+                columnNumber: 33
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 409,
+            columnNumber: 11
+        }, this);
+        $[62] = t42;
+    } else {
+        t42 = $[62];
+    }
+    let t43;
+    if ($[63] !== t36) {
+        t43 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].aside, {
+            className: "bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col gap-6",
+            initial: t25,
+            animate: t26,
+            transition: t27,
             children: [
-                "Member since: ",
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                    id: "member-since",
-                    children: "—"
-                }, void 0, false, {
-                    fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 211,
-                    columnNumber: 65
-                }, this)
+                t28,
+                t29,
+                t36,
+                t37,
+                t40,
+                t41,
+                t42
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 211,
+            lineNumber: 416,
             columnNumber: 11
         }, this);
-        $[25] = t24;
+        $[63] = t36;
+        $[64] = t43;
     } else {
-        t24 = $[25];
+        t43 = $[64];
     }
-    let t25;
-    if ($[26] === Symbol.for("react.memo_cache_sentinel")) {
-        t25 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t44;
+    if ($[65] !== t24 || $[66] !== t43) {
+        t44 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "grid grid-cols-1 lg:grid-cols-3 gap-6 items-start",
             children: [
-                t14,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].aside, {
-                    className: "bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col gap-6",
-                    initial: t15,
-                    animate: t16,
-                    transition: t17,
-                    children: [
-                        t18,
-                        t19,
-                        t22,
-                        t23,
-                        t24,
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "pt-1",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-                                fileName: "[project]/src/app/account/Accountlayout.tsx",
-                                lineNumber: 218,
-                                columnNumber: 280
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/account/Accountlayout.tsx",
-                            lineNumber: 218,
-                            columnNumber: 258
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 218,
-                    columnNumber: 83
-                }, this)
+                t24,
+                t43
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 218,
+            lineNumber: 424,
             columnNumber: 11
         }, this);
-        $[26] = t25;
+        $[65] = t24;
+        $[66] = t43;
+        $[67] = t44;
     } else {
-        t25 = $[26];
+        t44 = $[67];
     }
-    let t26;
-    if ($[27] === Symbol.for("react.memo_cache_sentinel")) {
-        t26 = ({
+    let t45;
+    if ($[68] === Symbol.for("react.memo_cache_sentinel")) {
+        t45 = ({
             "AccountLayout[<PasswordModal>.onClose]": ()=>setShowPasswordModal(false)
         })["AccountLayout[<PasswordModal>.onClose]"];
-        $[27] = t26;
+        $[68] = t45;
     } else {
-        t26 = $[27];
+        t45 = $[68];
     }
-    let t27;
-    if ($[28] !== showPasswordModal) {
-        t27 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t46;
+    if ($[69] !== showPasswordModal) {
+        t46 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$modals$2f$PasswordModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+            open: showPasswordModal,
+            onClose: t45
+        }, void 0, false, {
+            fileName: "[project]/src/app/account/Accountlayout.tsx",
+            lineNumber: 442,
+            columnNumber: 11
+        }, this);
+        $[69] = showPasswordModal;
+        $[70] = t46;
+    } else {
+        t46 = $[70];
+    }
+    let t47;
+    if ($[71] !== t16 || $[72] !== t44 || $[73] !== t46) {
+        t47 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "p-6 max-w-6xl mx-auto",
             children: [
-                t8,
-                t25,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$modals$2f$PasswordModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                    open: showPasswordModal,
-                    onClose: t26
-                }, void 0, false, {
-                    fileName: "[project]/src/app/account/Accountlayout.tsx",
-                    lineNumber: 234,
-                    columnNumber: 59
-                }, this)
+                t16,
+                t44,
+                t46
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/account/Accountlayout.tsx",
-            lineNumber: 234,
+            lineNumber: 450,
             columnNumber: 11
         }, this);
-        $[28] = showPasswordModal;
-        $[29] = t27;
+        $[71] = t16;
+        $[72] = t44;
+        $[73] = t46;
+        $[74] = t47;
     } else {
-        t27 = $[29];
+        t47 = $[74];
     }
-    return t27;
+    return t47;
 }
-_s(AccountLayout, "yMRvdHVOO009h8/w9VO6GQeC2Ac=");
+_s(AccountLayout, "xS0OnvvbOJAoOMW9194YHELA1wE=");
 _c = AccountLayout;
 function _AccountLayoutMotionButtonOnClick3() {
     console.log("Billing clicked");
@@ -3022,8 +3354,12 @@ function _AccountLayoutMotionButtonOnClick3() {
 function _AccountLayoutMotionButtonOnClick2() {
     console.log("Notifications clicked");
 }
+function _AccountLayoutAOnClick(e) {}
 function _AccountLayoutMotionButtonOnClick() {
     console.log("Upgrade clicked");
+}
+function _AccountLayoutUseEffectAnonymous(res) {
+    return res.json();
 }
 var _c;
 __turbopack_context__.k.register(_c, "AccountLayout");
