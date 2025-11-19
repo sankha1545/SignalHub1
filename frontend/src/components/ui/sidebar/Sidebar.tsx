@@ -1,4 +1,4 @@
-// src/components/Sidebar.tsx
+// components/ui/sidebar/Sidebar.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -24,11 +24,55 @@ import ProfileMenu from "@/components/forms/ProfileMenu";
 
 type Portal = "admin" | "manager" | "employee" | undefined;
 
-export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
+type Props = {
+  portal?: Portal;
+  /**
+   * Optional controlled open state for mobile drawer.
+   * If not provided, the component manages open state internally.
+   */
+  isOpen?: boolean;
+  /**
+   * Optional callback invoked when the mobile drawer should close (escape, backdrop, link click).
+   */
+  onClose?: () => void;
+  /**
+   * Optional prop to hide the built-in floating hamburger toggle (useful if your header has its own).
+   * Default: false (toggle shown)
+   */
+  hideToggle?: boolean;
+};
+
+/**
+ * Sidebar component
+ *
+ * - Desktop: fixed to the left (lg+). Width is w-72 and min-h-screen; this guarantees consistent alignment.
+ * - Mobile: floating hamburger toggle (unless hideToggle=true) opens a slide-in drawer (w-80).
+ * - Controlled/uncontrolled mobile open state supported via isOpen/onClose props.
+ * - Preserves all original UI: search, badges, framer-motion animations, profile menu, quick actions.
+ */
+export default function Sidebar({
+  portal = "admin",
+  isOpen: isOpenProp,
+  onClose,
+  hideToggle = false,
+}: Props) {
   const rawPath = usePathname() ?? "/";
-  // normalize pathname (remove trailing slash except for root)
   const pathname = rawPath === "/" ? "/" : rawPath.replace(/\/+$/, "");
-  const [open, setOpen] = useState(false);
+
+  // Controlled/uncontrolled pattern for mobile drawer open state
+  const [internalOpen, setInternalOpen] = useState(false);
+  const openControlled = typeof isOpenProp === "boolean";
+  const open = openControlled ? isOpenProp! : internalOpen;
+  const setOpen = (next: boolean) => {
+    if (openControlled) {
+      if (!next && onClose) onClose();
+      // note: when controlled and onClose not provided, parent should manage
+    } else {
+      setInternalOpen(next);
+      if (!next && onClose) onClose(); // still call onClose for side-effects if provided
+    }
+  };
+
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -40,17 +84,14 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
     }
     window.addEventListener("keydown", onEsc);
     return () => window.removeEventListener("keydown", onEsc);
-  }, []);
+  }, [isOpenProp]);
 
   // Focus close button when drawer opens (accessibility)
   useEffect(() => {
     if (open) closeBtnRef.current?.focus();
   }, [open]);
 
-  /**
-   * NAV configuration for portals.
-   * Admin routes point to server pages under /app/dashboard/admin.
-   */
+  // NAV configuration (preserve your original structure)
   const NAV =
     portal === "admin"
       ? [
@@ -103,8 +144,7 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
             badge: null,
           },
         ]
-      : // minimal fallback for other portals
-        [
+      : [
           {
             id: "analytics",
             label: "Analytics",
@@ -115,16 +155,15 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
           },
         ];
 
-  // Determine active item based on normalized pathname.
+  // Compute active item based on normalized pathname (preserve logic)
   const computeActive = (path: string) => {
     if (portal === "admin") {
-      if (path.startsWith ("/dashboard/admin/analytics")) return "analytics";
+      if (path.startsWith("/dashboard/admin/analytics")) return "analytics";
       if (path.startsWith("/dashboard/admin/overview")) return "overview";
       if (path.startsWith("/dashboard/admin/inbox")) return "inbox";
       if (path.startsWith("/dashboard/admin/sent")) return "sent";
       if (path.startsWith("/dashboard/admin/teams")) return "teams";
       if (path.startsWith("/dashboard/admin/settings")) return "settings";
-      // fallback: treat /dashboard as analytics
       if (path === "/dashboard") return "analytics";
     } else {
       if (path.startsWith("/dashboard")) return "analytics";
@@ -137,8 +176,8 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sidebar content used in both desktop and mobile drawer
-  const sidebarContent = (isMobile: boolean = false) => (
+  // Sidebar inner content (keeps original structure/animations)
+  const sidebarContent = (isMobile = false) => (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-6 pb-4">
@@ -189,7 +228,10 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+      <nav
+        className="flex-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent"
+        aria-label="Primary"
+      >
         <div className="space-y-1">
           {filteredNav.map((item, index) => {
             const Icon = item.icon as any;
@@ -205,7 +247,9 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
               >
                 <Link
                   href={item.href}
-                  onClick={() => isMobile && setOpen(false)}
+                  onClick={() => {
+                    if (isMobile) setOpen(false);
+                  }}
                   onMouseEnter={() => setHoveredItem(item.id)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={clsx(
@@ -230,7 +274,9 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
                     <motion.div
                       className={clsx(
                         "w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200",
-                        isActive ? `bg-gradient-to-br ${item.gradient} shadow-lg` : "bg-slate-100 group-hover:bg-slate-200"
+                        isActive
+                          ? `bg-gradient-to-br ${item.gradient} shadow-lg`
+                          : "bg-slate-100 group-hover:bg-slate-200"
                       )}
                       animate={isActive ? { scale: [1, 1.05, 1] } : {}}
                       transition={{ duration: 0.25 }}
@@ -240,7 +286,12 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
 
                     {/* Notification badge */}
                     {item.badge && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-gradient-to-br from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-gradient-to-br from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
+                        aria-hidden="true"
+                      >
                         {item.badge}
                       </motion.div>
                     )}
@@ -250,7 +301,12 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
                   <span className="flex-1 text-left">{item.label}</span>
 
                   {/* Hover arrow */}
-                  <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: isHovered && !isActive ? 1 : 0, x: isHovered && !isActive ? 0 : -5 }} transition={{ duration: 0.18 }}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: isHovered && !isActive ? 1 : 0, x: isHovered && !isActive ? 0 : -5 }}
+                    transition={{ duration: 0.18 }}
+                    aria-hidden="true"
+                  >
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </motion.div>
 
@@ -293,40 +349,79 @@ export default function Sidebar({ portal = "admin" }: { portal?: Portal }) {
 
   return (
     <>
-      {/* Mobile toggle button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen((s) => !s)} className="p-3 rounded-xl bg-white shadow-lg shadow-slate-900/10 text-slate-700 border border-slate-200 backdrop-blur-sm">
-          <AnimatePresence mode="wait">
-            {open ? (
-              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}>
-                <X className="w-5 h-5" />
-              </motion.div>
-            ) : (
-              <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}>
-                <Menu className="w-5 h-5" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.button>
-      </div>
+      {/* Floating mobile hamburger toggle (keeps original behavior). If parent provides header and wants to handle toggling,
+          pass hideToggle={true} and control via props isOpen/onClose. */}
+      {!hideToggle && (
+        <div className="lg:hidden fixed top-4 left-4 z-50">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen(!open)}
+            className="p-3 rounded-xl bg-white shadow-lg shadow-slate-900/10 text-slate-700 border border-slate-200 backdrop-blur-sm"
+          >
+            <AnimatePresence mode="wait">
+              {open ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}>
+                  <X className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}>
+                  <Menu className="w-5 h-5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      )}
 
-      {/* Desktop sidebar */}
-      <motion.aside initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.36 }} className="hidden lg:flex lg:flex-col lg:w-72 lg:min-h-screen lg:border-r lg:border-slate-200 lg:bg-white/80 lg:backdrop-blur-xl">
+      {/* Desktop fixed left sidebar: fixed ensures it is flush to the left in all pages */}
+      <motion.aside
+        initial={{ x: -12, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.36 }}
+        className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:flex-col lg:w-72 lg:min-h-screen lg:border-r lg:border-slate-200 lg:bg-white/80 lg:backdrop-blur-xl z-30"
+        aria-hidden={false}
+      >
         {sidebarContent(false)}
       </motion.aside>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer (overlay) */}
       <AnimatePresence>
         {open && (
           <>
             {/* Backdrop */}
-            <motion.div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} onClick={() => setOpen(false)} />
+            <motion.div
+              className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28 }}
+              onClick={() => setOpen(false)}
+              aria-hidden="true"
+            />
 
-            {/* Drawer */}
-            <motion.aside initial={{ x: "-100%", opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: "-100%", opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl" role="dialog" aria-modal="true">
-              {/* Close button */}
+            {/* Drawer panel */}
+            <motion.aside
+              initial={{ x: "-100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Main menu"
+            >
+              {/* Close button (visible inside drawer) */}
               <div className="absolute top-4 right-4 z-10">
-                <motion.button ref={closeBtnRef} whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" aria-label="Close menu" onClick={() => setOpen(false)}>
+                <motion.button
+                  ref={closeBtnRef}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                  aria-label="Close menu"
+                  onClick={() => setOpen(false)}
+                >
                   <X className="w-5 h-5" />
                 </motion.button>
               </div>

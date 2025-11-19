@@ -171,12 +171,30 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b
 ;
 ;
 ;
+const ALT_SESSION_COOKIE_NAMES = [
+    "admin_session",
+    "next-auth.session-token",
+    "session_preview"
+];
+function getClientIp(req) {
+    try {
+        const xf = req.headers.get("x-forwarded-for");
+        if (xf) return xf.split(",")[0].trim();
+        const cf = req.headers.get("cf-connecting-ip");
+        if (cf) return cf;
+        return undefined;
+    } catch  {
+        return undefined;
+    }
+}
 async function POST(req) {
     try {
+        const start = Date.now();
         const body = await req.json() ?? {};
         let { email, phone, password } = body;
         // Basic validation
         if (!email && !phone || !password) {
+            console.warn("[login] missing credentials");
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "missing_credentials"
             }, {
@@ -187,6 +205,11 @@ async function POST(req) {
         if (email) email = String(email).trim().toLowerCase();
         if (phone) phone = String(phone).trim();
         password = String(password);
+        const ip = getClientIp(req);
+        console.info("[login] attempt", {
+            identifier: email ?? phone,
+            ip
+        });
         // ----- Find user -----
         let user = null;
         if (email) {
@@ -224,65 +247,91 @@ async function POST(req) {
                 }
             });
         }
-        // If user not found or no passwordHash -> generic invalid_credentials
-        if (!user || !user.passwordHash) {
-            // OPTIONAL: record failed login attempt in DB for audit/lockout
-            // await prisma.authLog.create({ data: { type: 'login_failed', identifier: email || phone, reason: 'not_found' } });
+        if (!user) {
+            console.warn("[login] user not found", {
+                identifier: email ?? phone
+            });
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "invalid_credentials"
             }, {
                 status: 401
             });
         }
-        // OPTIONAL: account lockout check (requires fields in your schema)
-        // if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-        //   return NextResponse.json({ error: "account_locked", message: "Too many failed attempts. Try later." }, { status: 423 });
-        // }
+        if (!user.passwordHash) {
+            console.warn("[login] user missing passwordHash", {
+                userId: user.id
+            });
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "invalid_credentials"
+            }, {
+                status: 401
+            });
+        }
         // ----- Verify password -----
         const isPasswordValid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, user.passwordHash);
         if (!isPasswordValid) {
-            // OPTIONAL: increment failedLoginAttempts and set lockout if threshold reached
-            // await prisma.user.update({ where: { id: user.id }, data: { failedLoginAttempts: { increment: 1 } } });
-            // OPTIONAL audit log
-            // await prisma.authLog.create({ data: { userId: user.id, type: 'login_failed', metadata: { reason: 'bad_password' } } });
+            console.warn("[login] bad password", {
+                userId: user.id
+            });
+            // OPTIONAL: increment failed login attempts here
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "invalid_credentials"
             }, {
                 status: 401
             });
         }
-        // ----- Account activation check -----
+        // ----- Account activation - role-based rules -----
+        // If explicit isActive present on record, respect it (true => active, false => inactive).
         const hasIsActive = Object.prototype.hasOwnProperty.call(user, "isActive");
-        const isActive = hasIsActive ? Boolean(user.isActive) : Boolean(user.phoneVerified) && Boolean(user.emailVerified);
+        const explicitIsActive = hasIsActive ? Boolean(user.isActive) : null;
+        // Determine role (normalize lowercase)
+        const roleStr = (user.role ?? "").toString().trim().toLowerCase();
+        // Admins require both email && phone verified unless explicitIsActive === true
+        const adminRequiresPhone = roleStr === "admin";
+        const fallbackIsActive = adminRequiresPhone ? Boolean(user.emailVerified) && Boolean(user.phoneVerified) : Boolean(user.emailVerified);
+        const isActive = explicitIsActive !== null ? explicitIsActive : fallbackIsActive;
         if (!isActive) {
+            // Non-production can surface details — in prod we keep generic messaging
             const showDetails = ("TURBOPACK compile-time value", "development") !== "production";
             const details = ("TURBOPACK compile-time truthy", 1) ? {
+                required: adminRequiresPhone ? "email+phone" : "email",
+                emailVerified: Boolean(user.emailVerified),
                 phoneVerified: Boolean(user.phoneVerified),
-                emailVerified: Boolean(user.emailVerified)
+                role: user.role ?? null
             } : "TURBOPACK unreachable";
-            // OPTIONAL: log this event
-            // await prisma.authLog.create({ data: { userId: user.id, type: 'login_attempt_inactive' } });
+            console.info("[login] inactive account", {
+                userId: user.id,
+                ...details ?? {}
+            });
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "account_not_active",
-                message: "account_not_active: verify_email_and_phone",
+                message: adminRequiresPhone ? "account_not_active: require_email_and_phone_verification" : "account_not_active: require_email_verification",
                 details
             }, {
                 status: 403
             });
         }
         // ----- Create session token -----
-        // Keep payload small: id, role, organizationId
         const payload = {
             id: user.id,
             role: user.role ?? null,
             organizationId: user.organizationId ?? null
         };
-        // signSession should return a compact JWT string
         const sessionToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$jwt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["signSession"])(payload, "7d");
-        // Optional: create a server-side session record tying token -> user id (safer for revoke / logout)
-        // const sessionRecord = await prisma.session.create({ data: { userId: user.id, tokenHash: hash(sessionToken), expiresAt: addDays(new Date(), 7) } });
-        // ----- Set cookie using NextResponse API (safer than manual header) -----
-        const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+        if (!sessionToken) {
+            console.error("[login] signSession returned empty token", {
+                userId: user.id
+            });
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "internal_server_error"
+            }, {
+                status: 500
+            });
+        }
+        // Optional: record server-side session for revocation (commented)
+        // await prisma.session.create({ data: { userId: user.id, tokenHash: hash(sessionToken), expiresAt: addDays(new Date(), 7) } });
+        // ----- Build response + cookies -----
+        const maxAge = 7 * 24 * 60 * 60; // seconds
         const isProd = ("TURBOPACK compile-time value", "development") === "production";
         const res = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
@@ -295,6 +344,16 @@ async function POST(req) {
         }, {
             status: 200
         });
+        // Defensive: clear other common session cookie names (helps with stale cookies)
+        for (const altName of ALT_SESSION_COOKIE_NAMES){
+            try {
+                res.cookies.delete(altName, {
+                    path: "/"
+                });
+            } catch (err) {
+            // ignore deletion errors
+            }
+        }
         res.cookies.set({
             name: "session",
             value: sessionToken,
@@ -304,15 +363,15 @@ async function POST(req) {
             maxAge,
             secure: isProd
         });
-        // OPTIONAL: set a secondary non-http-only cookie for client UI (CSRF or avatar small data),
-        // but avoid storing sensitive tokens in non-HttpOnly cookies.
-        // res.cookies.set({ name: 'session_preview', value: user.email ?? '', maxAge, path: '/', secure: isProd });
-        // OPTIONAL: audit log of successful login
-        // await prisma.authLog.create({ data: { userId: user.id, type: 'login_success', metadata: { ip: 'TODO: capture ip if available' } } });
+        console.info("[login] success", {
+            userId: user.id,
+            role: user.role,
+            orgId: user.organizationId,
+            tookMs: Date.now() - start
+        });
         return res;
     } catch (err) {
         console.error("[Login Error]", err);
-        // Do not leak internal errors in production
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             error: ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : err?.message ?? "internal_server_error"
         }, {

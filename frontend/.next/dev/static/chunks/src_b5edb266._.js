@@ -538,7 +538,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/src/components/ui/sidebar/Sidebar.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// components/ui/sidebar/Sidebar.tsx
+// src/components/Sidebar.tsx
 __turbopack_context__.s([
     "default",
     ()=>Sidebar
@@ -577,50 +577,24 @@ var _s = __turbopack_context__.k.signature();
 ;
 function Sidebar(t0) {
     _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(40);
-    if ($[0] !== "df968c7679936f76ebf5946596ae1e394ea1656cc11396d5c12e74b8121f915e") {
-        for(let $i = 0; $i < 40; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(42);
+    if ($[0] !== "83c65d19e99cf344b132916b7ef087e93740ed3dd8c0ebab20869c1c0ad2a892") {
+        for(let $i = 0; $i < 42; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "df968c7679936f76ebf5946596ae1e394ea1656cc11396d5c12e74b8121f915e";
+        $[0] = "83c65d19e99cf344b132916b7ef087e93740ed3dd8c0ebab20869c1c0ad2a892";
     }
-    const { portal: t1, isOpen: isOpenProp, onClose, hideToggle: t2 } = t0;
+    const { portal: t1 } = t0;
     const portal = t1 === undefined ? "admin" : t1;
-    const hideToggle = t2 === undefined ? false : t2;
     const rawPath = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])() ?? "/";
     const pathname = rawPath === "/" ? "/" : rawPath.replace(/\/+$/, "");
-    const [internalOpen, setInternalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const openControlled = typeof isOpenProp === "boolean";
-    const open = openControlled ? isOpenProp : internalOpen;
-    let t3;
-    if ($[1] !== onClose || $[2] !== openControlled) {
-        t3 = ({
-            "Sidebar[setOpen]": (next)=>{
-                if (openControlled) {
-                    if (!next && onClose) {
-                        onClose();
-                    }
-                } else {
-                    setInternalOpen(next);
-                    if (!next && onClose) {
-                        onClose();
-                    }
-                }
-            }
-        })["Sidebar[setOpen]"];
-        $[1] = onClose;
-        $[2] = openControlled;
-        $[3] = t3;
-    } else {
-        t3 = $[3];
-    }
-    const setOpen = t3;
+    const [open, setOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [hoveredItem, setHoveredItem] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const closeBtnRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    let t4;
-    if ($[4] !== setOpen) {
-        t4 = ({
+    let t2;
+    if ($[1] !== setOpen) {
+        t2 = ({
             "Sidebar[useEffect()]": ()=>{
                 const onEsc = function onEsc(e) {
                     if (e.key === "Escape") {
@@ -631,43 +605,40 @@ function Sidebar(t0) {
                 return ()=>window.removeEventListener("keydown", onEsc);
             }
         })["Sidebar[useEffect()]"];
-        $[4] = setOpen;
-        $[5] = t4;
+        $[1] = setOpen;
+        $[2] = t2;
     } else {
-        t4 = $[5];
+        t2 = $[2];
     }
+    let t3;
+    if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = [];
+        $[3] = t3;
+    } else {
+        t3 = $[3];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t2, t3);
+    let t4;
     let t5;
-    if ($[6] !== isOpenProp) {
-        t5 = [
-            isOpenProp
-        ];
-        $[6] = isOpenProp;
-        $[7] = t5;
-    } else {
-        t5 = $[7];
-    }
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t4, t5);
-    let t6;
-    let t7;
-    if ($[8] !== open) {
-        t6 = ({
+    if ($[4] !== open) {
+        t4 = ({
             "Sidebar[useEffect()]": ()=>{
                 if (open) {
                     closeBtnRef.current?.focus();
                 }
             }
         })["Sidebar[useEffect()]"];
-        t7 = [
+        t5 = [
             open
         ];
-        $[8] = open;
-        $[9] = t6;
-        $[10] = t7;
+        $[4] = open;
+        $[5] = t4;
+        $[6] = t5;
     } else {
-        t6 = $[9];
-        t7 = $[10];
+        t4 = $[5];
+        t5 = $[6];
     }
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t6, t7);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t4, t5);
     const NAV = portal === "admin" ? [
         {
             id: "overview",
@@ -727,9 +698,9 @@ function Sidebar(t0) {
             badge: null
         }
     ];
-    let t8;
-    if ($[11] !== portal) {
-        t8 = ({
+    let t6;
+    if ($[7] !== portal) {
+        t6 = ({
             "Sidebar[computeActive]": (path)=>{
                 if (portal === "admin") {
                     if (path.startsWith("/dashboard/admin/analytics")) {
@@ -760,21 +731,21 @@ function Sidebar(t0) {
                 }
             }
         })["Sidebar[computeActive]"];
-        $[11] = portal;
-        $[12] = t8;
+        $[7] = portal;
+        $[8] = t6;
     } else {
-        t8 = $[12];
+        t6 = $[8];
     }
-    const computeActive = t8;
+    const computeActive = t6;
     const activeId = computeActive(pathname);
     const filteredNav = NAV.filter({
         "Sidebar[NAV.filter()]": (item)=>item.label.toLowerCase().includes(searchQuery.toLowerCase())
     }["Sidebar[NAV.filter()]"]);
-    let t9;
-    if ($[13] !== activeId || $[14] !== filteredNav || $[15] !== hoveredItem || $[16] !== searchQuery || $[17] !== setHoveredItem || $[18] !== setOpen || $[19] !== setSearchQuery) {
-        t9 = ({
-            "Sidebar[sidebarContent]": (t10)=>{
-                const isMobile = t10 === undefined ? false : t10;
+    let t7;
+    if ($[9] !== activeId || $[10] !== filteredNav || $[11] !== hoveredItem || $[12] !== searchQuery || $[13] !== setHoveredItem || $[14] !== setOpen || $[15] !== setSearchQuery) {
+        t7 = ({
+            "Sidebar[sidebarContent]": (t8)=>{
+                const isMobile = t8 === undefined ? false : t8;
                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex flex-col h-full",
                     children: [
@@ -803,7 +774,7 @@ function Sidebar(t0) {
                                                     children: "S"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 238,
+                                                    lineNumber: 182,
                                                     columnNumber: 83
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -821,13 +792,13 @@ function Sidebar(t0) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 238,
+                                                    lineNumber: 182,
                                                     columnNumber: 271
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 182,
                                             columnNumber: 57
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -838,7 +809,7 @@ function Sidebar(t0) {
                                                     children: "SignalHub"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 243,
+                                                    lineNumber: 187,
                                                     columnNumber: 52
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -848,26 +819,26 @@ function Sidebar(t0) {
                                                             className: "w-3 h-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 243,
+                                                            lineNumber: 187,
                                                             columnNumber: 255
                                                         }, this),
                                                         "Unified Inbox"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 243,
+                                                    lineNumber: 187,
                                                     columnNumber: 179
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 243,
+                                            lineNumber: 187,
                                             columnNumber: 28
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 230,
+                                    lineNumber: 174,
                                     columnNumber: 80
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -889,7 +860,7 @@ function Sidebar(t0) {
                                             className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 252,
+                                            lineNumber: 196,
                                             columnNumber: 16
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -902,24 +873,23 @@ function Sidebar(t0) {
                                             className: "w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 252,
+                                            lineNumber: 196,
                                             columnNumber: 153
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 243,
+                                    lineNumber: 187,
                                     columnNumber: 325
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 230,
+                            lineNumber: 174,
                             columnNumber: 54
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
                             className: "flex-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent",
-                            "aria-label": "Primary",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "space-y-1",
@@ -944,11 +914,7 @@ function Sidebar(t0) {
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                     href: item_0.href,
                                                     onClick: {
-                                                        "Sidebar[sidebarContent > filteredNav.map() > <Link>.onClick]": ()=>{
-                                                            if (isMobile) {
-                                                                setOpen(false);
-                                                            }
-                                                        }
+                                                        "Sidebar[sidebarContent > filteredNav.map() > <Link>.onClick]": ()=>isMobile && setOpen(false)
                                                     }["Sidebar[sidebarContent > filteredNav.map() > <Link>.onClick]"],
                                                     onMouseEnter: {
                                                         "Sidebar[sidebarContent > filteredNav.map() > <Link>.onMouseEnter]": ()=>setHoveredItem(item_0.id)
@@ -969,7 +935,7 @@ function Sidebar(t0) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 278,
+                                                            lineNumber: 218,
                                                             columnNumber: 395
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -991,12 +957,12 @@ function Sidebar(t0) {
                                                                         className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])("w-4 h-4 transition-colors", isActive ? "text-white" : "text-slate-600")
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                        lineNumber: 286,
+                                                                        lineNumber: 226,
                                                                         columnNumber: 28
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                    lineNumber: 282,
+                                                                    lineNumber: 222,
                                                                     columnNumber: 55
                                                                 }, this),
                                                                 item_0.badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1007,17 +973,16 @@ function Sidebar(t0) {
                                                                         scale: 1
                                                                     },
                                                                     className: "absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-gradient-to-br from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg",
-                                                                    "aria-hidden": "true",
                                                                     children: item_0.badge
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                    lineNumber: 286,
+                                                                    lineNumber: 226,
                                                                     columnNumber: 156
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 282,
+                                                            lineNumber: 222,
                                                             columnNumber: 29
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1025,8 +990,8 @@ function Sidebar(t0) {
                                                             children: item_0.label
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 290,
-                                                            columnNumber: 278
+                                                            lineNumber: 230,
+                                                            columnNumber: 259
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                                             initial: {
@@ -1040,18 +1005,17 @@ function Sidebar(t0) {
                                                             transition: {
                                                                 duration: 0.18
                                                             },
-                                                            "aria-hidden": "true",
                                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                lineNumber: 298,
-                                                                columnNumber: 45
+                                                                lineNumber: 238,
+                                                                columnNumber: 26
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 290,
-                                                            columnNumber: 334
+                                                            lineNumber: 230,
+                                                            columnNumber: 315
                                                         }, this),
                                                         isActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                                             initial: {
@@ -1069,31 +1033,31 @@ function Sidebar(t0) {
                                                                 className: "w-4 h-4 text-blue-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                lineNumber: 306,
+                                                                lineNumber: 246,
                                                                 columnNumber: 26
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 298,
-                                                            columnNumber: 122
+                                                            lineNumber: 238,
+                                                            columnNumber: 103
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 268,
+                                                    lineNumber: 212,
                                                     columnNumber: 22
                                                 }, this)
                                             }, item_0.id, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 259,
+                                                lineNumber: 203,
                                                 columnNumber: 26
                                             }, this);
                                         }
                                     }["Sidebar[sidebarContent > filteredNav.map()]"])
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 254,
-                                    columnNumber: 459
+                                    lineNumber: 198,
+                                    columnNumber: 438
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                     initial: {
@@ -1115,7 +1079,7 @@ function Sidebar(t0) {
                                             children: "Quick Actions"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 317,
+                                            lineNumber: 257,
                                             columnNumber: 43
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1125,7 +1089,7 @@ function Sidebar(t0) {
                                                     className: "absolute inset-0 bg-gradient-to-br from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 317,
+                                                    lineNumber: 257,
                                                     columnNumber: 326
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1136,7 +1100,7 @@ function Sidebar(t0) {
                                                             children: "Upgrade to Pro"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 317,
+                                                            lineNumber: 257,
                                                             columnNumber: 497
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1144,7 +1108,7 @@ function Sidebar(t0) {
                                                             children: "Unlock premium features"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 317,
+                                                            lineNumber: 257,
                                                             columnNumber: 557
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1161,218 +1125,245 @@ function Sidebar(t0) {
                                                                     className: "w-3 h-3"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                                    lineNumber: 321,
+                                                                    lineNumber: 261,
                                                                     columnNumber: 32
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 317,
+                                                            lineNumber: 257,
                                                             columnNumber: 627
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 317,
+                                                    lineNumber: 257,
                                                     columnNumber: 471
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 321,
+                                                    lineNumber: 261,
                                                     columnNumber: 85
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 317,
+                                            lineNumber: 257,
                                             columnNumber: 146
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 308,
+                                    lineNumber: 248,
                                     columnNumber: 71
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 254,
+                            lineNumber: 198,
                             columnNumber: 324
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "p-4 border-t border-slate-200 bg-slate-50/50",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                lineNumber: 321,
+                                lineNumber: 261,
                                 columnNumber: 263
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 321,
+                            lineNumber: 261,
                             columnNumber: 201
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 230,
+                    lineNumber: 174,
                     columnNumber: 16
                 }, this);
             }
         })["Sidebar[sidebarContent]"];
-        $[13] = activeId;
-        $[14] = filteredNav;
-        $[15] = hoveredItem;
-        $[16] = searchQuery;
-        $[17] = setHoveredItem;
-        $[18] = setOpen;
-        $[19] = setSearchQuery;
-        $[20] = t9;
+        $[9] = activeId;
+        $[10] = filteredNav;
+        $[11] = hoveredItem;
+        $[12] = searchQuery;
+        $[13] = setHoveredItem;
+        $[14] = setOpen;
+        $[15] = setSearchQuery;
+        $[16] = t7;
     } else {
-        t9 = $[20];
+        t7 = $[16];
     }
-    const sidebarContent = t9;
-    let t10;
-    if ($[21] !== hideToggle || $[22] !== open || $[23] !== setOpen) {
-        t10 = !hideToggle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "lg:hidden fixed top-4 left-4 z-50",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                whileHover: {
-                    scale: 1.05
+    const sidebarContent = t7;
+    let t8;
+    let t9;
+    if ($[17] === Symbol.for("react.memo_cache_sentinel")) {
+        t8 = {
+            scale: 1.05
+        };
+        t9 = {
+            scale: 0.95
+        };
+        $[17] = t8;
+        $[18] = t9;
+    } else {
+        t8 = $[17];
+        t9 = $[18];
+    }
+    const t10 = open ? "Close menu" : "Open menu";
+    let t11;
+    if ($[19] !== setOpen) {
+        t11 = ({
+            "Sidebar[<motion.button>.onClick]": ()=>setOpen(_SidebarMotionButtonOnClickSetOpen)
+        })["Sidebar[<motion.button>.onClick]"];
+        $[19] = setOpen;
+        $[20] = t11;
+    } else {
+        t11 = $[20];
+    }
+    let t12;
+    if ($[21] !== open) {
+        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
+            mode: "wait",
+            children: open ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: {
+                    rotate: -90,
+                    opacity: 0
                 },
-                whileTap: {
-                    scale: 0.95
+                animate: {
+                    rotate: 0,
+                    opacity: 1
                 },
-                "aria-label": open ? "Close menu" : "Open menu",
-                onClick: {
-                    "Sidebar[<motion.button>.onClick]": ()=>setOpen(!open)
-                }["Sidebar[<motion.button>.onClick]"],
-                className: "p-3 rounded-xl bg-white shadow-lg shadow-slate-900/10 text-slate-700 border border-slate-200 backdrop-blur-sm",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
-                    mode: "wait",
-                    children: open ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                        initial: {
-                            rotate: -90,
-                            opacity: 0
-                        },
-                        animate: {
-                            rotate: 0,
-                            opacity: 1
-                        },
-                        exit: {
-                            rotate: 90,
-                            opacity: 0
-                        },
-                        transition: {
-                            duration: 0.18
-                        },
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
-                            className: "w-5 h-5"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 355,
-                            columnNumber: 14
-                        }, this)
-                    }, "close", false, {
-                        fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                        lineNumber: 344,
-                        columnNumber: 205
-                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                        initial: {
-                            rotate: 90,
-                            opacity: 0
-                        },
-                        animate: {
-                            rotate: 0,
-                            opacity: 1
-                        },
-                        exit: {
-                            rotate: -90,
-                            opacity: 0
-                        },
-                        transition: {
-                            duration: 0.18
-                        },
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
-                            className: "w-5 h-5"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 366,
-                            columnNumber: 14
-                        }, this)
-                    }, "menu", false, {
-                        fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                        lineNumber: 355,
-                        columnNumber: 55
-                    }, this)
+                exit: {
+                    rotate: 90,
+                    opacity: 0
+                },
+                transition: {
+                    duration: 0.18
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
+                    className: "w-5 h-5"
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 344,
-                    columnNumber: 168
+                    lineNumber: 315,
+                    columnNumber: 10
                 }, this)
-            }, void 0, false, {
+            }, "close", false, {
                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                lineNumber: 338,
-                columnNumber: 77
+                lineNumber: 304,
+                columnNumber: 48
+            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: {
+                    rotate: 90,
+                    opacity: 0
+                },
+                animate: {
+                    rotate: 0,
+                    opacity: 1
+                },
+                exit: {
+                    rotate: -90,
+                    opacity: 0
+                },
+                transition: {
+                    duration: 0.18
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
+                    className: "w-5 h-5"
+                }, void 0, false, {
+                    fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
+                    lineNumber: 326,
+                    columnNumber: 10
+                }, this)
+            }, "menu", false, {
+                fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
+                lineNumber: 315,
+                columnNumber: 51
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-            lineNumber: 338,
-            columnNumber: 26
+            lineNumber: 304,
+            columnNumber: 11
         }, this);
-        $[21] = hideToggle;
-        $[22] = open;
-        $[23] = setOpen;
-        $[24] = t10;
+        $[21] = open;
+        $[22] = t12;
     } else {
-        t10 = $[24];
+        t12 = $[22];
     }
-    let t11;
-    let t12;
     let t13;
-    if ($[25] === Symbol.for("react.memo_cache_sentinel")) {
-        t11 = {
+    if ($[23] !== t10 || $[24] !== t11 || $[25] !== t12) {
+        t13 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "lg:hidden fixed top-4 left-4 z-50",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                whileHover: t8,
+                whileTap: t9,
+                "aria-label": t10,
+                onClick: t11,
+                className: "p-3 rounded-xl bg-white shadow-lg shadow-slate-900/10 text-slate-700 border border-slate-200 backdrop-blur-sm",
+                children: t12
+            }, void 0, false, {
+                fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
+                lineNumber: 334,
+                columnNumber: 62
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
+            lineNumber: 334,
+            columnNumber: 11
+        }, this);
+        $[23] = t10;
+        $[24] = t11;
+        $[25] = t12;
+        $[26] = t13;
+    } else {
+        t13 = $[26];
+    }
+    let t14;
+    let t15;
+    let t16;
+    if ($[27] === Symbol.for("react.memo_cache_sentinel")) {
+        t14 = {
             x: -12,
             opacity: 0
         };
-        t12 = {
+        t15 = {
             x: 0,
             opacity: 1
         };
-        t13 = {
+        t16 = {
             duration: 0.36
         };
-        $[25] = t11;
-        $[26] = t12;
-        $[27] = t13;
+        $[27] = t14;
+        $[28] = t15;
+        $[29] = t16;
     } else {
-        t11 = $[25];
-        t12 = $[26];
-        t13 = $[27];
+        t14 = $[27];
+        t15 = $[28];
+        t16 = $[29];
     }
-    let t14;
-    if ($[28] !== sidebarContent) {
-        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].aside, {
-            initial: t11,
-            animate: t12,
-            transition: t13,
-            className: "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:flex-col lg:w-72 lg:min-h-screen lg:border-r lg:border-slate-200 lg:bg-white/80 lg:backdrop-blur-xl z-30",
-            "aria-hidden": false,
+    let t17;
+    if ($[30] !== sidebarContent) {
+        t17 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].aside, {
+            initial: t14,
+            animate: t15,
+            transition: t16,
+            className: "hidden lg:flex lg:flex-col lg:w-72 lg:min-h-screen lg:border-r lg:border-slate-200 lg:bg-white/80 lg:backdrop-blur-xl",
             children: sidebarContent(false)
         }, void 0, false, {
             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-            lineNumber: 399,
+            lineNumber: 367,
             columnNumber: 11
         }, this);
-        $[28] = sidebarContent;
-        $[29] = t14;
+        $[30] = sidebarContent;
+        $[31] = t17;
     } else {
-        t14 = $[29];
+        t17 = $[31];
     }
-    let t15;
-    if ($[30] !== open || $[31] !== setOpen || $[32] !== sidebarContent) {
-        t15 = open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+    let t18;
+    if ($[32] !== open || $[33] !== setOpen || $[34] !== sidebarContent) {
+        t18 = open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                     className: "fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm",
@@ -1390,11 +1381,10 @@ function Sidebar(t0) {
                     },
                     onClick: {
                         "Sidebar[<motion.div>.onClick]": ()=>setOpen(false)
-                    }["Sidebar[<motion.div>.onClick]"],
-                    "aria-hidden": "true"
+                    }["Sidebar[<motion.div>.onClick]"]
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 407,
+                    lineNumber: 375,
                     columnNumber: 21
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].aside, {
@@ -1418,7 +1408,6 @@ function Sidebar(t0) {
                     className: "fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl",
                     role: "dialog",
                     "aria-modal": "true",
-                    "aria-label": "Main menu",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "absolute top-4 right-4 z-10",
@@ -1440,188 +1429,78 @@ function Sidebar(t0) {
                                     className: "w-5 h-5"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 437,
+                                    lineNumber: 405,
                                     columnNumber: 50
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                lineNumber: 430,
-                                columnNumber: 175
+                                lineNumber: 398,
+                                columnNumber: 152
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 430,
-                            columnNumber: 130
+                            lineNumber: 398,
+                            columnNumber: 107
                         }, this),
                         sidebarContent(true)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 417,
-                    columnNumber: 64
+                    lineNumber: 385,
+                    columnNumber: 45
                 }, this)
             ]
         }, void 0, true);
-        $[30] = open;
-        $[31] = setOpen;
-        $[32] = sidebarContent;
-        $[33] = t15;
+        $[32] = open;
+        $[33] = setOpen;
+        $[34] = sidebarContent;
+        $[35] = t18;
     } else {
-        t15 = $[33];
+        t18 = $[35];
     }
-    let t16;
-    if ($[34] !== t15) {
-        t16 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
-            children: t15
+    let t19;
+    if ($[36] !== t18) {
+        t19 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
+            children: t18
         }, void 0, false, {
             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-            lineNumber: 447,
+            lineNumber: 415,
             columnNumber: 11
         }, this);
-        $[34] = t15;
-        $[35] = t16;
+        $[36] = t18;
+        $[37] = t19;
     } else {
-        t16 = $[35];
+        t19 = $[37];
     }
-    let t17;
-    if ($[36] !== t10 || $[37] !== t14 || $[38] !== t16) {
-        t17 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+    let t20;
+    if ($[38] !== t13 || $[39] !== t17 || $[40] !== t19) {
+        t20 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
             children: [
-                t10,
-                t14,
-                t16
+                t13,
+                t17,
+                t19
             ]
         }, void 0, true);
-        $[36] = t10;
-        $[37] = t14;
-        $[38] = t16;
+        $[38] = t13;
         $[39] = t17;
+        $[40] = t19;
+        $[41] = t20;
     } else {
-        t17 = $[39];
+        t20 = $[41];
     }
-    return t17;
+    return t20;
 }
-_s(Sidebar, "AQ8s9xmoJyeMLrofphDF/Mg9r0U=", false, function() {
+_s(Sidebar, "N3xugC/vLGgbKc+DLlkuedVbqq8=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
     ];
 });
 _c = Sidebar;
+function _SidebarMotionButtonOnClickSetOpen(s) {
+    return !s;
+}
 var _c;
 __turbopack_context__.k.register(_c, "Sidebar");
-if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
-    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
-}
-}),
-"[project]/src/components/ui/header/Navloader.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
-"use strict";
-
-// src/components/ui/NavLoader.tsx
-__turbopack_context__.s([
-    "default",
-    ()=>NavLoader
-]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/sidebar/Sidebar.tsx [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
-;
-var _s = __turbopack_context__.k.signature();
-"use client";
-;
-;
-;
-;
-function NavLoader(t0) {
-    _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(3);
-    if ($[0] !== "5b0b840c490bbcc2b68340998d845c6e4741a7991e2525a27a56db3dcb82a97f") {
-        for(let $i = 0; $i < 3; $i += 1){
-            $[$i] = Symbol.for("react.memo_cache_sentinel");
-        }
-        $[0] = "5b0b840c490bbcc2b68340998d845c6e4741a7991e2525a27a56db3dcb82a97f";
-    }
-    const { user } = t0;
-    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
-    if (!user) {
-        return null;
-    }
-    if (!pathname) {
-        return null;
-    }
-    const isAuthPage = pathname.startsWith("/auth") || pathname === "/login" || pathname === "/signup" || pathname.startsWith("/auth/");
-    if (isAuthPage) {
-        return null;
-    }
-    let t1;
-    if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-        t1 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
-            className: "w-72 hidden md:block bg-white border-r",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-                fileName: "[project]/src/components/ui/header/Navloader.tsx",
-                lineNumber: 41,
-                columnNumber: 68
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/components/ui/header/Navloader.tsx",
-            lineNumber: 41,
-            columnNumber: 10
-        }, this);
-        $[1] = t1;
-    } else {
-        t1 = $[1];
-    }
-    let t2;
-    if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-        t2 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-            children: [
-                t1,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                    className: "bg-white border-b",
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-4",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                href: "/",
-                                className: "flex items-center gap-3"
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/ui/header/Navloader.tsx",
-                                lineNumber: 48,
-                                columnNumber: 180
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/ui/header/Navloader.tsx",
-                            lineNumber: 48,
-                            columnNumber: 139
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/ui/header/Navloader.tsx",
-                        lineNumber: 48,
-                        columnNumber: 54
-                    }, this)
-                }, void 0, false, {
-                    fileName: "[project]/src/components/ui/header/Navloader.tsx",
-                    lineNumber: 48,
-                    columnNumber: 16
-                }, this)
-            ]
-        }, void 0, true);
-        $[2] = t2;
-    } else {
-        t2 = $[2];
-    }
-    return t2;
-}
-_s(NavLoader, "xbyQPtUVMO7MNj7WjJlpdWqRcTo=", false, function() {
-    return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
-    ];
-});
-_c = NavLoader;
-var _c;
-__turbopack_context__.k.register(_c, "NavLoader");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -1629,90 +1508,226 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/src/app/dashboard/layout.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// app/dashboard/layout.tsx
 __turbopack_context__.s([
     "default",
     ()=>DashboardLayout
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$header$2f$Navloader$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/header/Navloader.tsx [app-client] (ecmascript)"); // client component (sidebar + header)
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/sidebar/Sidebar.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+(()=>{
+    const e = new Error("Cannot find module '@/components/ui/header/Header'");
+    e.code = 'MODULE_NOT_FOUND';
+    throw e;
+})();
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/sidebar/Sidebar.tsx [app-client] (ecmascript)"); // make sure this exists (see example below)
+;
+var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
 ;
 ;
 function DashboardLayout(t0) {
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(5);
-    if ($[0] !== "d13106c4ba1709635aff703af9296625ff5b4c91c19db6030d5a0e45620003df") {
-        for(let $i = 0; $i < 5; $i += 1){
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(18);
+    if ($[0] !== "1127ff038621c93b3949b1f08871ba233bfe2537f1b1ecc971d25d6a4380c4ce") {
+        for(let $i = 0; $i < 18; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "d13106c4ba1709635aff703af9296625ff5b4c91c19db6030d5a0e45620003df";
+        $[0] = "1127ff038621c93b3949b1f08871ba233bfe2537f1b1ecc971d25d6a4380c4ce";
     }
     const { children } = t0;
+    const [sidebarOpen, setSidebarOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     let t1;
-    let t2;
     if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-        t1 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$header$2f$Navloader$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+        t1 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+            href: "#dashboard-content",
+            className: "sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-3 focus:py-2 rounded-md shadow",
+            children: "Skip to content"
+        }, void 0, false, {
             fileName: "[project]/src/app/dashboard/layout.tsx",
-            lineNumber: 26,
-            columnNumber: 10
-        }, this);
-        t2 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-            fileName: "[project]/src/app/dashboard/layout.tsx",
-            lineNumber: 27,
+            lineNumber: 31,
             columnNumber: 10
         }, this);
         $[1] = t1;
-        $[2] = t2;
     } else {
         t1 = $[1];
-        t2 = $[2];
     }
+    const t2 = `fixed inset-0 z-50 md:static md:inset-auto transition-transform duration-200 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`;
     let t3;
-    if ($[3] !== children) {
-        t3 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "min-h-screen flex bg-slate-50",
+    if ($[2] !== sidebarOpen) {
+        t3 = !sidebarOpen && ("TURBOPACK compile-time value", "object") !== "undefined" ? (!sidebarOpen).toString() : undefined;
+        $[2] = sidebarOpen;
+        $[3] = t3;
+    } else {
+        t3 = $[3];
+    }
+    let t4;
+    if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
+        t4 = ({
+            "DashboardLayout[<div>.onClick]": ()=>setSidebarOpen(false)
+        })["DashboardLayout[<div>.onClick]"];
+        $[4] = t4;
+    } else {
+        t4 = $[4];
+    }
+    const t5 = `fixed inset-0 bg-black/40 md:hidden ${sidebarOpen ? "block" : "hidden"}`;
+    let t6;
+    if ($[5] !== t5) {
+        t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            onClick: t4,
+            className: t5
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/layout.tsx",
+            lineNumber: 57,
+            columnNumber: 10
+        }, this);
+        $[5] = t5;
+        $[6] = t6;
+    } else {
+        t6 = $[6];
+    }
+    let t7;
+    if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "relative w-72 h-full bg-white shadow-md",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$sidebar$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                onNavigate: {
+                    "DashboardLayout[<Sidebar>.onNavigate]": ()=>setSidebarOpen(false)
+                }["DashboardLayout[<Sidebar>.onNavigate]"]
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/layout.tsx",
+                lineNumber: 65,
+                columnNumber: 67
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/layout.tsx",
+            lineNumber: 65,
+            columnNumber: 10
+        }, this);
+        $[7] = t7;
+    } else {
+        t7 = $[7];
+    }
+    let t8;
+    if ($[8] !== t2 || $[9] !== t3 || $[10] !== t6) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
+            className: t2,
+            "aria-hidden": t3,
             children: [
-                t1,
-                t2,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex-1 min-h-screen",
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-                        className: "flex-1 overflow-auto",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "max-w-7xl mx-auto px-4 py-6",
-                            children: children
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/layout.tsx",
-                            lineNumber: 36,
-                            columnNumber: 141
-                        }, this)
+                t6,
+                t7
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/dashboard/layout.tsx",
+            lineNumber: 74,
+            columnNumber: 10
+        }, this);
+        $[8] = t2;
+        $[9] = t3;
+        $[10] = t6;
+        $[11] = t8;
+    } else {
+        t8 = $[11];
+    }
+    let t9;
+    if ($[12] === Symbol.for("react.memo_cache_sentinel")) {
+        t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
+            className: "sticky top-0 z-40 bg-slate-50 backdrop-blur-sm",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Header, {
+                    onOpenSidebar: {
+                        "DashboardLayout[<Header>.onOpenSidebar]": ()=>setSidebarOpen(true)
+                    }["DashboardLayout[<Header>.onOpenSidebar]"]
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/layout.tsx",
+                    lineNumber: 84,
+                    columnNumber: 133
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/layout.tsx",
+                lineNumber: 84,
+                columnNumber: 77
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/layout.tsx",
+            lineNumber: 84,
+            columnNumber: 10
+        }, this);
+        $[12] = t9;
+    } else {
+        t9 = $[12];
+    }
+    let t10;
+    if ($[13] !== children) {
+        t10 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "min-h-screen flex flex-col md:pl-0",
+            children: [
+                t9,
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+                    id: "dashboard-content",
+                    className: "flex-1 overflow-auto py-6",
+                    role: "main",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+                        children: children
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/layout.tsx",
-                        lineNumber: 36,
-                        columnNumber: 102
+                        lineNumber: 93,
+                        columnNumber: 146
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/layout.tsx",
-                    lineNumber: 36,
-                    columnNumber: 65
+                    lineNumber: 93,
+                    columnNumber: 67
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/layout.tsx",
-            lineNumber: 36,
-            columnNumber: 10
+            lineNumber: 93,
+            columnNumber: 11
         }, this);
-        $[3] = children;
-        $[4] = t3;
+        $[13] = children;
+        $[14] = t10;
     } else {
-        t3 = $[4];
+        t10 = $[14];
     }
-    return t3;
+    let t11;
+    if ($[15] !== t10 || $[16] !== t8) {
+        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: [
+                t1,
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "min-h-screen bg-slate-50",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "md:grid md:grid-cols-[288px_1fr]",
+                        children: [
+                            t8,
+                            t10
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/layout.tsx",
+                        lineNumber: 101,
+                        columnNumber: 59
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/layout.tsx",
+                    lineNumber: 101,
+                    columnNumber: 17
+                }, this)
+            ]
+        }, void 0, true);
+        $[15] = t10;
+        $[16] = t8;
+        $[17] = t11;
+    } else {
+        t11 = $[17];
+    }
+    return t11;
 }
+_s(DashboardLayout, "5rGDkYpGQ8fHM9RkMWnKOwsxadk=");
 _c = DashboardLayout;
 var _c;
 __turbopack_context__.k.register(_c, "DashboardLayout");
@@ -1722,4 +1737,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=src_cbc4fe7c._.js.map
+//# sourceMappingURL=src_b5edb266._.js.map

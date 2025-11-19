@@ -225,19 +225,20 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
  * GET /api/me
  * PATCH /api/me
  *
- * Behavior preserved:
- *  - Multiple session resolution strategies:
- *    1) getSessionUser(req)
- *    2) Authorization: Bearer <token>
- *    3) server-side 'session' cookie
+ * Preserved behavior:
+ * - Multiple session resolution strategies:
+ *   1) getSessionUser(req)
+ *   2) Authorization: Bearer <token>
+ *   3) server-side 'session' cookie
  *
  * Additions:
- *  - GET returns organization: { id, name } so frontend can render org name on account / overview
- *  - PATCH disallows direct email changes through this endpoint (use dedicated email-change flow)
- *  - Added defensiveness around metadata merges, length checks and Prisma error logging
+ * - GET returns organization: { id, name } so frontend can render org name on account / overview
+ * - PATCH disallows direct email changes through this endpoint (use dedicated email-change flow)
+ * - Added defensiveness around metadata merges, length checks and Prisma error logging
+ * - Consistent Cache-Control: no-store for authenticated responses
  */ const COOKIE_NAME = "session";
 const JWT_SECRET = process.env.JWT_SECRET || "";
-async function jsonSafe(req) {
+/** Safe JSON parse for request bodies */ async function jsonSafe(req) {
     try {
         return await req.json();
     } catch  {
@@ -245,64 +246,67 @@ async function jsonSafe(req) {
     }
 }
 /**
- * Resolve a session user using multiple fallbacks.
- * Returns an object that MAY contain { id, name?, email?, org? } or null.
- * Attempts to preserve your existing getSessionUser behavior.
+ * Resolve a session user using multiple fallbacks:
+ * 1) getSessionUser(req) — your existing helper (preferred)
+ * 2) Authorization: Bearer <token> — verify with JWT_SECRET if available
+ * 3) server-side cookie fallback (next/headers cookies())
+ *
+ * Returns a minimal object { id } or null if no session.
  */ async function resolveSessionUser(req) {
     try {
-        // 1) primary helper (your existing logic)
+        // 1) primary helper (existing logic)
         try {
             const s = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
-            if (s) return s;
+            if (s && s.id) return s;
         } catch (err) {
             // don't fail hard here; fall through to other strategies
-            console.warn("getSessionUser failed:", err);
+            console.warn("[resolveSessionUser] getSessionUser failed:", err);
         }
-        // 2) try Authorization: Bearer <token>
+        // 2) Authorization: Bearer <token>
         try {
-            const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization");
-            if (authHeader?.startsWith("Bearer ")) {
-                const token = authHeader.substring(7).trim();
+            const headerAuth = req.headers.get("authorization") ?? req.headers.get("Authorization");
+            if (headerAuth?.toLowerCase().startsWith("bearer ")) {
+                const token = headerAuth.slice(7).trim();
                 if (JWT_SECRET && token) {
                     const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
                     if (payload?.id) {
-                        // include org if token contains it
-                        const result = {
+                        return {
                             id: payload.id,
                             name: payload.name ?? null,
-                            email: payload.email ?? null
+                            email: payload.email ?? null,
+                            role: payload.role ?? null,
+                            organizationId: payload.organizationId ?? null
                         };
-                        if (payload.org) result.org = payload.org;
-                        return result;
                     }
+                } else {
+                    console.warn("[resolveSessionUser] Bearer token present but JWT_SECRET missing or token empty");
                 }
             }
         } catch (err) {
-            // invalid bearer token — ignore and continue
-            console.warn("Bearer token verification failed:", err);
+            console.warn("[resolveSessionUser] bearer token verification failed:", err);
         }
-        // 3) server-side cookie fallback
+        // 3) cookie fallback (server-side)
         try {
             const cookieStore = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["cookies"])();
             const token = cookieStore.get(COOKIE_NAME)?.value;
             if (token && JWT_SECRET) {
                 const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
                 if (payload?.id) {
-                    const result = {
+                    return {
                         id: payload.id,
                         name: payload.name ?? null,
-                        email: payload.email ?? null
+                        email: payload.email ?? null,
+                        role: payload.role ?? null,
+                        organizationId: payload.organizationId ?? null
                     };
-                    if (payload.org) result.org = payload.org;
-                    return result;
                 }
             }
         } catch (err) {
-            console.warn("Cookie token verification failed:", err);
+            console.warn("[resolveSessionUser] cookie token verification failed:", err);
         }
         return null;
     } catch (err) {
-        console.error("resolveSessionUser unexpected error:", err);
+        console.error("[resolveSessionUser] unexpected error:", err);
         return null;
     }
 }
@@ -321,6 +325,7 @@ async function GET(req) {
                 }
             });
         }
+        // Fetch user and include small organization object
         const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
             where: {
                 id: sessionUser.id
@@ -393,10 +398,9 @@ async function PATCH(req) {
             });
         }
         const body = await jsonSafe(req);
-        console.log("PATCH /api/me payload:", JSON.stringify(body));
-        // Prohibit direct email changes in this endpoint to enforce the global-email rules elsewhere.
+        console.info("PATCH /api/me payload:", typeof body === "object" ? Object.keys(body) : typeof body);
+        // Disallow email changes here — use a dedicated, auditable flow instead
         if (typeof body.email === "string" && body.email.trim().length > 0) {
-            // If you need to allow email changes, implement a dedicated, audited flow (verify current password + email verification + uniqueness checks).
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 error: "Email cannot be changed via this endpoint"
@@ -404,10 +408,10 @@ async function PATCH(req) {
                 status: 400
             });
         }
-        // name is required per original logic
+        // Validate required fields and basic length guards
         const name = typeof body.name === "string" ? body.name.trim() : undefined;
         const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
-        const incomingProfile = typeof body.profile === "object" && body.profile ? body.profile : {};
+        const incomingProfile = body.profile && typeof body.profile === "object" ? body.profile : {};
         if (!name || name.length === 0) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -416,7 +420,6 @@ async function PATCH(req) {
                 status: 400
             });
         }
-        // simple length guards
         if (name.length > 200) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -433,69 +436,78 @@ async function PATCH(req) {
                 status: 400
             });
         }
-        // sanitize incoming profile fields
+        // Sanitize and prepare profile fields
         const profileUpdates = {
             displayName: typeof incomingProfile.displayName === "string" ? incomingProfile.displayName.trim() : undefined,
             avatarUrl: typeof incomingProfile.avatarUrl === "string" ? incomingProfile.avatarUrl.trim() : undefined,
             bio: typeof incomingProfile.bio === "string" ? incomingProfile.bio.trim() : undefined,
             phoneNumber: typeof incomingProfile.phoneNumber === "string" ? incomingProfile.phoneNumber.trim() : phone ?? undefined
         };
-        // Build metadata (extensible)
+        // Build metadata safely (only accept known keys)
         const metadata = {};
-        if (typeof incomingProfile.country === "string") metadata.country = incomingProfile.country;
-        if (typeof incomingProfile.region === "string") metadata.region = incomingProfile.region;
-        if (typeof incomingProfile.district === "string") metadata.district = incomingProfile.district;
-        if (typeof incomingProfile.postalCode === "string") metadata.postalCode = incomingProfile.postalCode;
-        if (typeof incomingProfile.language === "string") metadata.language = incomingProfile.language;
-        // fetch existing profile metadata and merge
-        const existingProfileRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.findUnique({
-            where: {
-                userId: sessionUser.id
-            },
-            select: {
-                metadata: true
-            }
-        });
-        const existingMetadata = existingProfileRow?.metadata ?? {};
+        if (typeof incomingProfile.country === "string") metadata.country = incomingProfile.country.trim();
+        if (typeof incomingProfile.region === "string") metadata.region = incomingProfile.region.trim();
+        if (typeof incomingProfile.district === "string") metadata.district = incomingProfile.district.trim();
+        if (typeof incomingProfile.postalCode === "string") metadata.postalCode = incomingProfile.postalCode.trim();
+        if (typeof incomingProfile.language === "string") metadata.language = incomingProfile.language.trim();
+        // Fetch existing profile metadata to merge
+        let existingMetadata = {};
+        try {
+            const existingProfileRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.findUnique({
+                where: {
+                    userId: sessionUser.id
+                },
+                select: {
+                    metadata: true
+                }
+            });
+            existingMetadata = existingProfileRow?.metadata ?? {};
+        } catch (err) {
+            console.warn("[PATCH /api/me] could not read existing profile metadata:", err);
+            existingMetadata = {};
+        }
         const mergedMetadata = {
             ...existingMetadata,
             ...metadata
         };
-        // upsert profile via nested update on User
+        // Upsert profile via nested update on User. Keep update minimal (only fields present).
+        const dataToUpdate = {
+            name,
+            ...phone !== undefined ? {
+                phone
+            } : {},
+            profile: {
+                upsert: {
+                    create: {
+                        displayName: profileUpdates.displayName ?? null,
+                        avatarUrl: profileUpdates.avatarUrl ?? null,
+                        bio: profileUpdates.bio ?? null,
+                        phoneNumber: profileUpdates.phoneNumber ?? null,
+                        metadata: mergedMetadata
+                    },
+                    update: {
+                        ...profileUpdates.displayName !== undefined ? {
+                            displayName: profileUpdates.displayName
+                        } : {},
+                        ...profileUpdates.avatarUrl !== undefined ? {
+                            avatarUrl: profileUpdates.avatarUrl
+                        } : {},
+                        ...profileUpdates.bio !== undefined ? {
+                            bio: profileUpdates.bio
+                        } : {},
+                        ...profileUpdates.phoneNumber !== undefined ? {
+                            phoneNumber: profileUpdates.phoneNumber
+                        } : {},
+                        metadata: mergedMetadata
+                    }
+                }
+            }
+        };
         const updatedUser = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.update({
             where: {
                 id: sessionUser.id
             },
-            data: {
-                name,
-                phone,
-                profile: {
-                    upsert: {
-                        create: {
-                            displayName: profileUpdates.displayName ?? null,
-                            avatarUrl: profileUpdates.avatarUrl ?? null,
-                            bio: profileUpdates.bio ?? null,
-                            phoneNumber: profileUpdates.phoneNumber ?? null,
-                            metadata: mergedMetadata
-                        },
-                        update: {
-                            ...profileUpdates.displayName !== undefined ? {
-                                displayName: profileUpdates.displayName
-                            } : {},
-                            ...profileUpdates.avatarUrl !== undefined ? {
-                                avatarUrl: profileUpdates.avatarUrl
-                            } : {},
-                            ...profileUpdates.bio !== undefined ? {
-                                bio: profileUpdates.bio
-                            } : {},
-                            ...profileUpdates.phoneNumber !== undefined ? {
-                                phoneNumber: profileUpdates.phoneNumber
-                            } : {},
-                            metadata: mergedMetadata
-                        }
-                    }
-                }
-            },
+            data: dataToUpdate,
             select: {
                 id: true,
                 name: true,
@@ -513,7 +525,7 @@ async function PATCH(req) {
                 }
             }
         });
-        console.log("PATCH /api/me updated user id:", updatedUser.id);
+        console.info("PATCH /api/me updated user id:", updatedUser.id);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             user: updatedUser
@@ -522,7 +534,7 @@ async function PATCH(req) {
         });
     } catch (err) {
         console.error("PATCH /api/me error:", err?.message ?? err, err?.stack ?? "");
-        if (err.code) console.error("Prisma error code:", err.code, "meta:", err.meta ?? null);
+        if (err?.code) console.error("Prisma error code:", err.code, "meta:", err.meta ?? null);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
             error: "Internal server error"
