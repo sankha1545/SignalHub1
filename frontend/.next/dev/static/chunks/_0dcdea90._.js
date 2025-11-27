@@ -10,6 +10,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/render/components/motion/proxy.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/search.js [app-client] (ecmascript) <export default as Search>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/users.js [app-client] (ecmascript) <export default as Users>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/plus.js [app-client] (ecmascript) <export default as Plus>");
@@ -22,6 +23,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/activity.js [app-client] (ecmascript) <export default as Activity>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/award.js [app-client] (ecmascript) <export default as Award>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$target$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Target$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/target.js [app-client] (ecmascript) <export default as Target>");
+(()=>{
+    const e = new Error("Cannot find module '../../../ui/forms/'");
+    e.code = 'MODULE_NOT_FOUND';
+    throw e;
+})();
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
 "use client";
@@ -29,15 +35,18 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
-// Team Card Component
-const TeamCard = (t0)=>{
+;
+/**
+ * Team Card Component
+ * (kept behavior + styling from your original file; small key stability improvement for members)
+ */ const TeamCard = (t0)=>{
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(78);
-    if ($[0] !== "d4d0c21893ebefad296daa78a67cdb36689f8e38708f04b169f77e6abf7f60da") {
+    if ($[0] !== "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb") {
         for(let $i = 0; $i < 78; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "d4d0c21893ebefad296daa78a67cdb36689f8e38708f04b169f77e6abf7f60da";
+        $[0] = "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb";
     }
     const { team, delay } = t0;
     const [isHovered, setIsHovered] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -86,7 +95,7 @@ const TeamCard = (t0)=>{
             className: "absolute inset-0 bg-gradient-to-br from-white/0 to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 63,
+            lineNumber: 67,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = t6;
@@ -118,7 +127,7 @@ const TeamCard = (t0)=>{
             className: "w-7 h-7 text-white"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 89,
+            lineNumber: 93,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[10] = t10;
@@ -136,7 +145,7 @@ const TeamCard = (t0)=>{
             children: t10
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 98,
+            lineNumber: 102,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[12] = t7;
@@ -152,7 +161,7 @@ const TeamCard = (t0)=>{
             children: team.name
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 107,
+            lineNumber: 111,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[15] = team.name;
@@ -167,7 +176,7 @@ const TeamCard = (t0)=>{
             children: team.description
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 115,
+            lineNumber: 119,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[17] = team.description;
@@ -184,7 +193,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 123,
+            lineNumber: 127,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[19] = t12;
@@ -203,7 +212,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 132,
+            lineNumber: 136,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[22] = t11;
@@ -220,12 +229,12 @@ const TeamCard = (t0)=>{
                 className: "w-5 h-5 text-slate-400"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 141,
+                lineNumber: 145,
                 columnNumber: 83
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 141,
+            lineNumber: 145,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[25] = t16;
@@ -242,7 +251,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 148,
+            lineNumber: 152,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[26] = t15;
@@ -259,14 +268,14 @@ const TeamCard = (t0)=>{
                     className: "w-3.5 h-3.5"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 156,
+                    lineNumber: 160,
                     columnNumber: 137
                 }, ("TURBOPACK compile-time value", void 0)),
                 team.lead
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 156,
+            lineNumber: 160,
             columnNumber: 24
         }, ("TURBOPACK compile-time value", void 0));
         $[28] = team.lead;
@@ -283,14 +292,14 @@ const TeamCard = (t0)=>{
                     className: "w-3.5 h-3.5"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 164,
+                    lineNumber: 168,
                     columnNumber: 139
                 }, ("TURBOPACK compile-time value", void 0)),
                 "Featured"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 164,
+            lineNumber: 168,
             columnNumber: 28
         }, ("TURBOPACK compile-time value", void 0));
         $[30] = team.featured;
@@ -308,7 +317,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 172,
+            lineNumber: 176,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[32] = t18;
@@ -335,9 +344,9 @@ const TeamCard = (t0)=>{
                     className: "w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700 shadow-sm",
                     title: member.name,
                     children: member.initials
-                }, idx, false, {
+                }, `${member.name ?? member.initials}-${idx}`, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 183,
+                    lineNumber: 187,
                     columnNumber: 30
                 }, ("TURBOPACK compile-time value", void 0));
             $[38] = delay;
@@ -362,7 +371,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 205,
+            lineNumber: 209,
             columnNumber: 38
         }, ("TURBOPACK compile-time value", void 0));
         $[40] = team.members.length;
@@ -380,7 +389,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 213,
+            lineNumber: 217,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[42] = t21;
@@ -396,7 +405,7 @@ const TeamCard = (t0)=>{
             children: team.members.length
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 222,
+            lineNumber: 226,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[45] = team.members.length;
@@ -411,7 +420,7 @@ const TeamCard = (t0)=>{
             children: "Members"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 230,
+            lineNumber: 234,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[47] = t25;
@@ -427,7 +436,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 237,
+            lineNumber: 241,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[48] = t24;
@@ -442,7 +451,7 @@ const TeamCard = (t0)=>{
             children: team.projects
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 245,
+            lineNumber: 249,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[50] = team.projects;
@@ -457,7 +466,7 @@ const TeamCard = (t0)=>{
             children: "Projects"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 253,
+            lineNumber: 257,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[52] = t28;
@@ -473,7 +482,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 260,
+            lineNumber: 264,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[53] = t27;
@@ -491,7 +500,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 268,
+            lineNumber: 272,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[55] = team.completion;
@@ -506,7 +515,7 @@ const TeamCard = (t0)=>{
             children: "Complete"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 276,
+            lineNumber: 280,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[57] = t31;
@@ -522,7 +531,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 283,
+            lineNumber: 287,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[58] = t30;
@@ -541,7 +550,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 291,
+            lineNumber: 295,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[60] = t26;
@@ -577,14 +586,14 @@ const TeamCard = (t0)=>{
                     className: "w-4 h-4"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 316,
+                    lineNumber: 320,
                     columnNumber: 268
                 }, ("TURBOPACK compile-time value", void 0)),
                 "Message"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 316,
+            lineNumber: 320,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[66] = t36;
@@ -620,18 +629,18 @@ const TeamCard = (t0)=>{
                         className: "w-4 h-4"
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                        lineNumber: 338,
+                        lineNumber: 342,
                         columnNumber: 255
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 338,
+                    lineNumber: 342,
                     columnNumber: 65
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 338,
+            lineNumber: 342,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[69] = t39;
@@ -651,7 +660,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 345,
+            lineNumber: 349,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[70] = t17;
@@ -677,7 +686,7 @@ const TeamCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 356,
+            lineNumber: 360,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[75] = t3;
@@ -693,11 +702,11 @@ _c = TeamCard;
 // Stats Card Component
 const StatCard = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(25);
-    if ($[0] !== "d4d0c21893ebefad296daa78a67cdb36689f8e38708f04b169f77e6abf7f60da") {
+    if ($[0] !== "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb") {
         for(let $i = 0; $i < 25; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "d4d0c21893ebefad296daa78a67cdb36689f8e38708f04b169f77e6abf7f60da";
+        $[0] = "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb";
     }
     const { icon: Icon, label, value, subtitle, gradient, delay } = t0;
     let t1;
@@ -735,7 +744,7 @@ const StatCard = (t0)=>{
             className: "w-6 h-6 text-white"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 414,
+            lineNumber: 418,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[5] = Icon;
@@ -750,7 +759,7 @@ const StatCard = (t0)=>{
             children: t5
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 422,
+            lineNumber: 426,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = t4;
@@ -765,7 +774,7 @@ const StatCard = (t0)=>{
             className: "w-5 h-5 text-emerald-500"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 431,
+            lineNumber: 435,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[10] = t7;
@@ -782,7 +791,7 @@ const StatCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 438,
+            lineNumber: 442,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[11] = t6;
@@ -797,7 +806,7 @@ const StatCard = (t0)=>{
             children: value
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 446,
+            lineNumber: 450,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[13] = value;
@@ -812,7 +821,7 @@ const StatCard = (t0)=>{
             children: label
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 454,
+            lineNumber: 458,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[15] = label;
@@ -827,7 +836,7 @@ const StatCard = (t0)=>{
             children: subtitle
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 462,
+            lineNumber: 466,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[17] = subtitle;
@@ -850,7 +859,7 @@ const StatCard = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 470,
+            lineNumber: 474,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[19] = t10;
@@ -867,9 +876,18 @@ const StatCard = (t0)=>{
 _c1 = StatCard;
 function TeamsPage() {
     _s1();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(83);
+    if ($[0] !== "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb") {
+        for(let $i = 0; $i < 83; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "ef60de0edfbf14c3e8463a1f19aaeec3ef8e3ca472057474866a47f2fcfc9adb";
+    }
     const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const teams = [
-        {
+    const [showCreate, setShowCreate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    let t0;
+    if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
+        t0 = {
             id: 1,
             name: "Product Development",
             description: "Building the next generation platform",
@@ -904,8 +922,14 @@ function TeamsPage() {
                     initials: "AK"
                 }
             ]
-        },
-        {
+        };
+        $[1] = t0;
+    } else {
+        t0 = $[1];
+    }
+    let t1;
+    if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
+        t1 = {
             id: 2,
             name: "Design Team",
             description: "Creating beautiful user experiences",
@@ -932,8 +956,14 @@ function TeamsPage() {
                     initials: "JW"
                 }
             ]
-        },
-        {
+        };
+        $[2] = t1;
+    } else {
+        t1 = $[2];
+    }
+    let t2;
+    if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
+        t2 = {
             id: 3,
             name: "Marketing",
             description: "Growing our brand and reach",
@@ -964,8 +994,14 @@ function TeamsPage() {
                     initials: "TH"
                 }
             ]
-        },
-        {
+        };
+        $[3] = t2;
+    } else {
+        t2 = $[3];
+    }
+    let t3;
+    if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = {
             id: 4,
             name: "Customer Success",
             description: "Ensuring customer satisfaction",
@@ -988,8 +1024,14 @@ function TeamsPage() {
                     initials: "MG"
                 }
             ]
-        },
-        {
+        };
+        $[4] = t3;
+    } else {
+        t3 = $[4];
+    }
+    let t4;
+    if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
+        t4 = {
             id: 5,
             name: "Engineering",
             description: "Building scalable infrastructure",
@@ -1024,279 +1066,707 @@ function TeamsPage() {
                     initials: "QD"
                 }
             ]
-        },
-        {
-            id: 6,
-            name: "Sales",
-            description: "Driving revenue growth",
-            lead: "Daniel Kim",
-            featured: false,
-            gradient: "from-pink-500 to-rose-500",
-            projects: 20,
-            completion: 93,
-            members: [
-                {
-                    name: "Daniel Kim",
-                    initials: "DK"
-                },
-                {
-                    name: "Samantha Cole",
-                    initials: "SC"
-                },
-                {
-                    name: "Tyler Adams",
-                    initials: "TA"
-                },
-                {
-                    name: "Uma Singh",
-                    initials: "US"
-                }
-            ]
+        };
+        $[5] = t4;
+    } else {
+        t4 = $[5];
+    }
+    let t5;
+    if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
+        t5 = [
+            t0,
+            t1,
+            t2,
+            t3,
+            t4,
+            {
+                id: 6,
+                name: "Sales",
+                description: "Driving revenue growth",
+                lead: "Daniel Kim",
+                featured: false,
+                gradient: "from-pink-500 to-rose-500",
+                projects: 20,
+                completion: 93,
+                members: [
+                    {
+                        name: "Daniel Kim",
+                        initials: "DK"
+                    },
+                    {
+                        name: "Samantha Cole",
+                        initials: "SC"
+                    },
+                    {
+                        name: "Tyler Adams",
+                        initials: "TA"
+                    },
+                    {
+                        name: "Uma Singh",
+                        initials: "US"
+                    }
+                ]
+            }
+        ];
+        $[6] = t5;
+    } else {
+        t5 = $[6];
+    }
+    const [teams, setTeams] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(t5);
+    let filteredTeams;
+    let handleCreateTeam;
+    let t10;
+    let t11;
+    let t12;
+    let t6;
+    let t7;
+    let t8;
+    let t9;
+    if ($[7] !== searchQuery || $[8] !== teams) {
+        let t13;
+        if ($[18] !== searchQuery) {
+            t13 = ({
+                "TeamsPage[teams.filter()]": (team)=>team.name.toLowerCase().includes(searchQuery.toLowerCase()) || team.description.toLowerCase().includes(searchQuery.toLowerCase())
+            })["TeamsPage[teams.filter()]"];
+            $[18] = searchQuery;
+            $[19] = t13;
+        } else {
+            t13 = $[19];
         }
-    ];
-    const filteredTeams = teams.filter((team)=>team.name.toLowerCase().includes(searchQuery.toLowerCase()) || team.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    const stats = [
-        {
-            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"],
-            label: "Total Teams",
-            value: teams.length.toString(),
-            subtitle: "+2 this month",
-            gradient: "from-blue-500 to-cyan-500"
-        },
-        {
-            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__["Activity"],
-            label: "Active Members",
-            value: teams.reduce((acc, t)=>acc + t.members.length, 0).toString(),
-            subtitle: "Across all teams",
-            gradient: "from-emerald-500 to-teal-500"
-        },
-        {
-            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$target$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Target$3e$__["Target"],
-            label: "Active Projects",
-            value: teams.reduce((acc_0, t_0)=>acc_0 + t_0.projects, 0).toString(),
-            subtitle: "In progress",
-            gradient: "from-violet-500 to-purple-500"
-        },
-        {
-            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__["Award"],
-            label: "Avg Completion",
-            value: Math.round(teams.reduce((acc_1, t_1)=>acc_1 + t_1.completion, 0) / teams.length) + "%",
-            subtitle: "+5% from last month",
-            gradient: "from-orange-500 to-rose-500"
+        filteredTeams = teams.filter(t13);
+        let t14;
+        if ($[20] !== teams.length) {
+            t14 = teams.length.toString();
+            $[20] = teams.length;
+            $[21] = t14;
+        } else {
+            t14 = $[21];
         }
-    ];
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8",
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-7xl mx-auto",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                    initial: {
-                        opacity: 0,
-                        y: -20
-                    },
-                    animate: {
-                        opacity: 1,
-                        y: 0
-                    },
-                    transition: {
-                        duration: 0.5
-                    },
-                    className: "mb-6",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                            className: "text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2",
-                            children: "Teams"
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 669,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-slate-500 flex items-center gap-2",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
-                                    className: "w-4 h-4"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 673,
-                                    columnNumber: 13
-                                }, this),
-                                "Manage and collaborate with your teams"
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 672,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 660,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8",
-                    children: stats.map((stat, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StatCard, {
-                            ...stat,
-                            delay: index * 0.1
-                        }, stat.label, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 680,
-                            columnNumber: 39
-                        }, this))
-                }, void 0, false, {
-                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 679,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                    initial: {
-                        opacity: 0,
-                        y: 20
-                    },
-                    animate: {
-                        opacity: 1,
-                        y: 0
-                    },
-                    transition: {
-                        duration: 0.4,
-                        delay: 0.2
-                    },
-                    className: "mb-6 flex flex-col sm:flex-row gap-4",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "relative flex-1",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__["Search"], {
-                                    className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 695,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                    type: "text",
-                                    placeholder: "Search teams...",
-                                    value: searchQuery,
-                                    onChange: (e)=>setSearchQuery(e.target.value),
-                                    className: "w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all duration-200"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 696,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 694,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                            whileHover: {
-                                scale: 1.02
-                            },
-                            whileTap: {
-                                scale: 0.98
-                            },
-                            className: "px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
-                                    className: "w-4 h-4"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 704,
-                                    columnNumber: 13
-                                }, this),
-                                "Create Team"
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 699,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 684,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
-                    children: filteredTeams.map((team_0, index_0)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TeamCard, {
-                            team: team_0,
-                            delay: 0.3 + index_0 * 0.1
-                        }, team_0.id, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 711,
-                            columnNumber: 51
-                        }, this))
-                }, void 0, false, {
-                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 710,
-                    columnNumber: 9
-                }, this),
-                filteredTeams.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                    initial: {
-                        opacity: 0,
-                        scale: 0.95
-                    },
-                    animate: {
-                        opacity: 1,
-                        scale: 1
-                    },
-                    className: "py-16 text-center",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
-                                className: "w-8 h-8 text-slate-400"
+        let t15;
+        if ($[22] !== t14) {
+            t15 = {
+                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"],
+                label: "Total Teams",
+                value: t14,
+                subtitle: "+2 this month",
+                gradient: "from-blue-500 to-cyan-500"
+            };
+            $[22] = t14;
+            $[23] = t15;
+        } else {
+            t15 = $[23];
+        }
+        let t16;
+        if ($[24] !== teams) {
+            t16 = teams.reduce(_TeamsPageTeamsReduce, 0).toString();
+            $[24] = teams;
+            $[25] = t16;
+        } else {
+            t16 = $[25];
+        }
+        let t17;
+        if ($[26] !== t16) {
+            t17 = {
+                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__["Activity"],
+                label: "Active Members",
+                value: t16,
+                subtitle: "Across all teams",
+                gradient: "from-emerald-500 to-teal-500"
+            };
+            $[26] = t16;
+            $[27] = t17;
+        } else {
+            t17 = $[27];
+        }
+        let t18;
+        if ($[28] !== teams) {
+            t18 = teams.reduce(_TeamsPageTeamsReduce2, 0).toString();
+            $[28] = teams;
+            $[29] = t18;
+        } else {
+            t18 = $[29];
+        }
+        let t19;
+        if ($[30] !== t18) {
+            t19 = {
+                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$target$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Target$3e$__["Target"],
+                label: "Active Projects",
+                value: t18,
+                subtitle: "In progress",
+                gradient: "from-violet-500 to-purple-500"
+            };
+            $[30] = t18;
+            $[31] = t19;
+        } else {
+            t19 = $[31];
+        }
+        const t20 = Math.round(teams.reduce(_TeamsPageTeamsReduce3, 0) / teams.length) + "%";
+        let t21;
+        if ($[32] !== t20) {
+            t21 = {
+                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__["Award"],
+                label: "Avg Completion",
+                value: t20,
+                subtitle: "+5% from last month",
+                gradient: "from-orange-500 to-rose-500"
+            };
+            $[32] = t20;
+            $[33] = t21;
+        } else {
+            t21 = $[33];
+        }
+        let t22;
+        if ($[34] !== t15 || $[35] !== t17 || $[36] !== t19 || $[37] !== t21) {
+            t22 = [
+                t15,
+                t17,
+                t19,
+                t21
+            ];
+            $[34] = t15;
+            $[35] = t17;
+            $[36] = t19;
+            $[37] = t21;
+            $[38] = t22;
+        } else {
+            t22 = $[38];
+        }
+        const stats = t22;
+        let t23;
+        if ($[39] === Symbol.for("react.memo_cache_sentinel")) {
+            const ensureInitials = function ensureInitials(members) {
+                return members.map(_TeamsPageEnsureInitialsMembersMap);
+            };
+            t23 = function handleCreateTeam(newTeam) {
+                const teamWithInitials = {
+                    ...newTeam,
+                    id: newTeam.id ?? Date.now(),
+                    members: ensureInitials(newTeam.members || [])
+                };
+                setTeams({
+                    "TeamsPage[handleCreateTeam > setTeams()]": (prev)=>[
+                            teamWithInitials,
+                            ...prev
+                        ]
+                }["TeamsPage[handleCreateTeam > setTeams()]"]);
+                setShowCreate(false);
+            };
+            $[39] = t23;
+        } else {
+            t23 = $[39];
+        }
+        handleCreateTeam = t23;
+        t12 = "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8";
+        t8 = "max-w-7xl mx-auto";
+        let t24;
+        let t25;
+        let t26;
+        if ($[40] === Symbol.for("react.memo_cache_sentinel")) {
+            t24 = {
+                opacity: 0,
+                y: -20
+            };
+            t25 = {
+                opacity: 1,
+                y: 0
+            };
+            t26 = {
+                duration: 0.5
+            };
+            $[40] = t24;
+            $[41] = t25;
+            $[42] = t26;
+        } else {
+            t24 = $[40];
+            t25 = $[41];
+            t26 = $[42];
+        }
+        let t27;
+        if ($[43] === Symbol.for("react.memo_cache_sentinel")) {
+            t27 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                className: "text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2",
+                children: "Teams"
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 847,
+                columnNumber: 13
+            }, this);
+            $[43] = t27;
+        } else {
+            t27 = $[43];
+        }
+        if ($[44] === Symbol.for("react.memo_cache_sentinel")) {
+            t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: t24,
+                animate: t25,
+                transition: t26,
+                className: "mb-6",
+                children: [
+                    t27,
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-slate-500 flex items-center gap-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
+                                className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                lineNumber: 723,
-                                columnNumber: 15
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 722,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "text-lg font-semibold text-slate-800 mb-2",
-                            children: "No teams found"
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 725,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-slate-500 mb-4",
-                            children: "Try adjusting your search query"
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 726,
-                            columnNumber: 13
-                        }, this)
-                    ]
-                }, void 0, true, {
+                                lineNumber: 853,
+                                columnNumber: 145
+                            }, this),
+                            "Manage and collaborate with your teams"
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                        lineNumber: 853,
+                        columnNumber: 91
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 853,
+                columnNumber: 12
+            }, this);
+            $[44] = t9;
+        } else {
+            t9 = $[44];
+        }
+        if ($[45] !== stats) {
+            t10 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8",
+                children: stats.map(_TeamsPageStatsMap)
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 859,
+                columnNumber: 13
+            }, this);
+            $[45] = stats;
+            $[46] = t10;
+        } else {
+            t10 = $[46];
+        }
+        let t28;
+        let t29;
+        let t30;
+        if ($[47] === Symbol.for("react.memo_cache_sentinel")) {
+            t28 = {
+                opacity: 0,
+                y: 20
+            };
+            t29 = {
+                opacity: 1,
+                y: 0
+            };
+            t30 = {
+                duration: 0.4,
+                delay: 0.2
+            };
+            $[47] = t28;
+            $[48] = t29;
+            $[49] = t30;
+        } else {
+            t28 = $[47];
+            t29 = $[48];
+            t30 = $[49];
+        }
+        let t31;
+        if ($[50] === Symbol.for("react.memo_cache_sentinel")) {
+            t31 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__["Search"], {
+                className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 891,
+                columnNumber: 13
+            }, this);
+            $[50] = t31;
+        } else {
+            t31 = $[50];
+        }
+        let t32;
+        if ($[51] === Symbol.for("react.memo_cache_sentinel")) {
+            t32 = ({
+                "TeamsPage[<input>.onChange]": (e)=>setSearchQuery(e.target.value)
+            })["TeamsPage[<input>.onChange]"];
+            $[51] = t32;
+        } else {
+            t32 = $[51];
+        }
+        let t33;
+        if ($[52] !== searchQuery) {
+            t33 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "relative flex-1",
+                children: [
+                    t31,
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        type: "text",
+                        placeholder: "Search teams...",
+                        value: searchQuery,
+                        onChange: t32,
+                        className: "w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all duration-200"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                        lineNumber: 907,
+                        columnNumber: 51
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 907,
+                columnNumber: 13
+            }, this);
+            $[52] = searchQuery;
+            $[53] = t33;
+        } else {
+            t33 = $[53];
+        }
+        let t34;
+        let t35;
+        let t36;
+        if ($[54] === Symbol.for("react.memo_cache_sentinel")) {
+            t34 = ({
+                "TeamsPage[<motion.button>.onClick]": ()=>setShowCreate(true)
+            })["TeamsPage[<motion.button>.onClick]"];
+            t35 = {
+                scale: 1.02
+            };
+            t36 = {
+                scale: 0.98
+            };
+            $[54] = t34;
+            $[55] = t35;
+            $[56] = t36;
+        } else {
+            t34 = $[54];
+            t35 = $[55];
+            t36 = $[56];
+        }
+        let t37;
+        if ($[57] === Symbol.for("react.memo_cache_sentinel")) {
+            t37 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                onClick: t34,
+                whileHover: t35,
+                whileTap: t36,
+                className: "px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
+                        className: "w-4 h-4"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                        lineNumber: 936,
+                        columnNumber: 293
+                    }, this),
+                    "Create Team"
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 936,
+                columnNumber: 13
+            }, this);
+            $[57] = t37;
+        } else {
+            t37 = $[57];
+        }
+        if ($[58] !== t33) {
+            t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: t28,
+                animate: t29,
+                transition: t30,
+                className: "mb-6 flex flex-col sm:flex-row gap-4",
+                children: [
+                    t33,
+                    t37
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                lineNumber: 942,
+                columnNumber: 13
+            }, this);
+            $[58] = t33;
+            $[59] = t11;
+        } else {
+            t11 = $[59];
+        }
+        t6 = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+        t7 = filteredTeams.map(_TeamsPageFilteredTeamsMap);
+        $[7] = searchQuery;
+        $[8] = teams;
+        $[9] = filteredTeams;
+        $[10] = handleCreateTeam;
+        $[11] = t10;
+        $[12] = t11;
+        $[13] = t12;
+        $[14] = t6;
+        $[15] = t7;
+        $[16] = t8;
+        $[17] = t9;
+    } else {
+        filteredTeams = $[9];
+        handleCreateTeam = $[10];
+        t10 = $[11];
+        t11 = $[12];
+        t12 = $[13];
+        t6 = $[14];
+        t7 = $[15];
+        t8 = $[16];
+        t9 = $[17];
+    }
+    let t13;
+    if ($[60] !== t6 || $[61] !== t7) {
+        t13 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: t6,
+            children: t7
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+            lineNumber: 974,
+            columnNumber: 11
+        }, this);
+        $[60] = t6;
+        $[61] = t7;
+        $[62] = t13;
+    } else {
+        t13 = $[62];
+    }
+    let t14;
+    if ($[63] !== filteredTeams.length) {
+        t14 = filteredTeams.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+            initial: {
+                opacity: 0,
+                scale: 0.95
+            },
+            animate: {
+                opacity: 1,
+                scale: 1
+            },
+            className: "py-16 text-center",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
+                        className: "w-8 h-8 text-slate-400"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                        lineNumber: 989,
+                        columnNumber: 169
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 715,
-                    columnNumber: 40
+                    lineNumber: 989,
+                    columnNumber: 38
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                    className: "text-lg font-semibold text-slate-800 mb-2",
+                    children: "No teams found"
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                    lineNumber: 989,
+                    columnNumber: 219
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                    className: "text-slate-500 mb-4",
+                    children: "Try adjusting your search query"
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                    lineNumber: 989,
+                    columnNumber: 296
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 658,
-            columnNumber: 7
-        }, this)
-    }, void 0, false, {
+            lineNumber: 983,
+            columnNumber: 41
+        }, this);
+        $[63] = filteredTeams.length;
+        $[64] = t14;
+    } else {
+        t14 = $[64];
+    }
+    let t15;
+    if ($[65] !== t10 || $[66] !== t11 || $[67] !== t13 || $[68] !== t14 || $[69] !== t8 || $[70] !== t9) {
+        t15 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: t8,
+            children: [
+                t9,
+                t10,
+                t11,
+                t13,
+                t14
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+            lineNumber: 997,
+            columnNumber: 11
+        }, this);
+        $[65] = t10;
+        $[66] = t11;
+        $[67] = t13;
+        $[68] = t14;
+        $[69] = t8;
+        $[70] = t9;
+        $[71] = t15;
+    } else {
+        t15 = $[71];
+    }
+    let t16;
+    if ($[72] !== t12 || $[73] !== t15) {
+        t16 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: t12,
+            children: t15
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+            lineNumber: 1010,
+            columnNumber: 11
+        }, this);
+        $[72] = t12;
+        $[73] = t15;
+        $[74] = t16;
+    } else {
+        t16 = $[74];
+    }
+    let t17;
+    if ($[75] !== handleCreateTeam || $[76] !== showCreate) {
+        t17 = showCreate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+            initial: {
+                opacity: 0
+            },
+            animate: {
+                opacity: 1
+            },
+            exit: {
+                opacity: 0
+            },
+            className: "fixed inset-0 z-50 flex items-center justify-center",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                    initial: {
+                        opacity: 0
+                    },
+                    animate: {
+                        opacity: 1
+                    },
+                    exit: {
+                        opacity: 0
+                    },
+                    transition: {
+                        duration: 0.18
+                    },
+                    className: "absolute inset-0 bg-black/20 backdrop-blur-sm",
+                    onClick: {
+                        "TeamsPage[<motion.div>.onClick]": ()=>setShowCreate(false)
+                    }["TeamsPage[<motion.div>.onClick]"]
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                    lineNumber: 1025,
+                    columnNumber: 72
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative z-10 w-full max-w-2xl p-4",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CreateTeamForm, {
+                        onCreate: {
+                            "TeamsPage[<CreateTeamForm>.onCreate]": (team_1)=>handleCreateTeam(team_1)
+                        }["TeamsPage[<CreateTeamForm>.onCreate]"],
+                        onClose: {
+                            "TeamsPage[<CreateTeamForm>.onClose]": ()=>setShowCreate(false)
+                        }["TeamsPage[<CreateTeamForm>.onClose]"]
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                        lineNumber: 1035,
+                        columnNumber: 99
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+                    lineNumber: 1035,
+                    columnNumber: 47
+                }, this)
+            ]
+        }, "create-team-modal", true, {
+            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+            lineNumber: 1019,
+            columnNumber: 25
+        }, this);
+        $[75] = handleCreateTeam;
+        $[76] = showCreate;
+        $[77] = t17;
+    } else {
+        t17 = $[77];
+    }
+    let t18;
+    if ($[78] !== t17) {
+        t18 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
+            children: t17
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+            lineNumber: 1048,
+            columnNumber: 11
+        }, this);
+        $[78] = t17;
+        $[79] = t18;
+    } else {
+        t18 = $[79];
+    }
+    let t19;
+    if ($[80] !== t16 || $[81] !== t18) {
+        t19 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: [
+                t16,
+                t18
+            ]
+        }, void 0, true);
+        $[80] = t16;
+        $[81] = t18;
+        $[82] = t19;
+    } else {
+        t19 = $[82];
+    }
+    return t19;
+}
+_s1(TeamsPage, "uwu1YNaAmS6bKGrAW9W8jK6dBuM=");
+_c2 = TeamsPage;
+function _TeamsPageFilteredTeamsMap(team_0, index_0) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TeamCard, {
+        team: team_0,
+        delay: 0.3 + index_0 * 0.1
+    }, team_0.id, false, {
         fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-        lineNumber: 657,
+        lineNumber: 1066,
         columnNumber: 10
     }, this);
 }
-_s1(TeamsPage, "4/Qdl0R3tQNJqUS4eMrvY/uMU/4=");
-_c2 = TeamsPage;
+function _TeamsPageStatsMap(stat, index) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StatCard, {
+        ...stat,
+        delay: index * 0.1
+    }, stat.label, false, {
+        fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
+        lineNumber: 1069,
+        columnNumber: 10
+    }, this);
+}
+function _TeamsPageEnsureInitialsMembersMap(m) {
+    if (m.initials) {
+        return m;
+    }
+    const name = (m.name || "").trim();
+    if (!name) {
+        return {
+            name: "",
+            initials: ""
+        };
+    }
+    const parts = name.split(/\s+/);
+    const initials = parts.length === 1 ? parts[0].slice(0, 2).toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return {
+        name,
+        initials
+    };
+}
+function _TeamsPageTeamsReduce3(acc_1, t_1) {
+    return acc_1 + t_1.completion;
+}
+function _TeamsPageTeamsReduce2(acc_0, t_0) {
+    return acc_0 + t_0.projects;
+}
+function _TeamsPageTeamsReduce(acc, t) {
+    return acc + t.members.length;
+}
 var _c, _c1, _c2;
 __turbopack_context__.k.register(_c, "TeamCard");
 __turbopack_context__.k.register(_c1, "StatCard");

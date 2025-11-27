@@ -1,7 +1,7 @@
 // src/app/dashboard/admin/overview/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   TrendingUp,
@@ -17,6 +17,8 @@ import {
   Target,
   Award,
   X,
+  Copy,
+  Link as LinkIcon,
 } from "lucide-react";
 
 /* ----------------- Stat Card ----------------- */
@@ -108,41 +110,137 @@ const ActivityItem = ({ icon: Icon, title, description, time, gradient, delay = 
   </motion.div>
 );
 
-/* ----------------- Invite Modal ----------------- */
+/* ----------------- Invite Modal (upgraded) ----------------- */
 function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boolean) => void }) {
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState<"MANAGER" | "EMPLOYEE">("MANAGER");
+  const [teamId, setTeamId] = useState<string | null>(null);
+  const [teams, setTeams] = useState<Array<{ id: string; name: string }>>([]);
+  const [loadingTeams, setLoadingTeams] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [expiresHours, setExpiresHours] = useState<number>(24);
+
+  useEffect(() => {
+    if (!open) return;
+    let mounted = true;
+    setError(null);
+    setInviteLink(null);
+    // load teams for organization to optionally assign the invited manager to a team
+    (async () => {
+      setLoadingTeams(true);
+      try {
+        const r = await fetch("/api/dashboard/teams", { method: "GET", credentials: "same-origin" });
+        if (!r.ok) {
+          // non-fatal: teams may be unavailable
+          console.warn("Could not load teams", r.statusText);
+          if (mounted) setTeams([]);
+          return;
+        }
+        const j = await r.json();
+        // expect j.teams = [{id, name}, ...] or j array
+        const list = Array.isArray(j) ? j : j?.teams ?? [];
+        if (mounted) setTeams(list);
+      } catch (e) {
+        console.warn("Teams fetch failed", e);
+        if (mounted) setTeams([]);
+      } finally {
+        if (mounted) setLoadingTeams(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [open]);
 
   const validateEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
   const handleSend = async () => {
     setError(null);
-    if (!validateEmail(email.trim())) {
+    setInviteLink(null);
+
+    const trimmed = email.trim();
+    if (!validateEmail(trimmed)) {
       setError("Please enter a valid email address.");
       return;
     }
 
     setStatus("sending");
     try {
+      const payload: any = {
+        email: trimmed,
+        role,
+        expiresHours,
+      };
+      if (teamId) payload.teamId = teamId;
+
       const res = await fetch("/api/invites/creates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify(payload),
+        credentials: "same-origin", // ensure cookies are included (auth)
       });
+
       const data = await res.json();
+
       if (!res.ok) {
+        const message = data?.message || data?.error || "Failed to create invite.";
         setStatus("error");
-        setError(data?.message || "Failed to send invite.");
+        setError(message);
         return;
       }
+
+      // Success
       setStatus("success");
-      setTimeout(() => onClose(true), 900);
+      // If backend returns an inviteLink or token, surface it
+      if (data?.inviteLink) {
+        setInviteLink(data.inviteLink);
+      } else if (data?.token) {
+        // construct an invite link based on current origin
+        try {
+          const base = typeof window !== "undefined" ? window.location.origin : "";
+          setInviteLink(`${base}/auth/invite/accept?token=${encodeURIComponent(data.token)}`);
+        } catch {
+          // ignore
+        }
+      }
+
+      // Keep modal open to show link & copy action for a short while
+      setTimeout(() => {
+        onClose(true);
+      }, 1100);
     } catch (err: any) {
       setStatus("error");
       setError(err?.message || "Network error");
     }
   };
+
+  const copyLink = async () => {
+    if (!inviteLink) return;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      // ephemeral confirmation
+      setError(null);
+      setStatus("success");
+    } catch {
+      setError("Unable to copy link — please copy manually.");
+    }
+  };
+
+  // Reset modal state when closed
+  useEffect(() => {
+    if (!open) {
+      setEmail("");
+      setRole("MANAGER");
+      setTeamId(null);
+      setTeams([]);
+      setError(null);
+      setStatus("idle");
+      setInviteLink(null);
+      setExpiresHours(24);
+    }
+  }, [open]);
 
   if (!open) return null;
   return (
@@ -156,23 +254,69 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Invite manager</h3>
-          <button className="p-1 rounded-md hover:bg-slate-100" onClick={() => onClose(false)}>
+          <button className="p-1 rounded-md hover:bg-slate-100" onClick={() => onClose(false)} aria-label="Close invite modal">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <label className="text-xs text-slate-600">To:</label>
+        <label className="text-xs text-slate-600">To (email)</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full mt-2 mb-2 p-2 border rounded-md text-sm"
           placeholder="manager@example.com"
+          aria-label="Invite email"
         />
 
-        {error && <p className="text-xs text-rose-600 mb-2">{error}</p>}
-        {status === "success" && (
-          <p className="text-xs text-emerald-600 mb-2">Invitation sent — link valid 24 hours.</p>
+        <div className="grid grid-cols-2 gap-2 items-end">
+          <div>
+            <label className="text-xs text-slate-600">Role</label>
+            <select value={role} onChange={(e) => setRole(e.target.value as any)} className="w-full mt-1 p-2 border rounded-md text-sm">
+              <option value="MANAGER">Manager</option>
+              <option value="EMPLOYEE">Employee</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-600">Expires</label>
+            <select value={String(expiresHours)} onChange={(e) => setExpiresHours(Number(e.target.value))} className="w-full mt-1 p-2 border rounded-md text-sm">
+              <option value={24}>24 hours</option>
+              <option value={48}>48 hours</option>
+              <option value={72}>72 hours</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <label className="text-xs text-slate-600">Assign to team (optional)</label>
+          {loadingTeams ? (
+            <div className="mt-2 text-xs text-slate-500">Loading teams…</div>
+          ) : teams.length === 0 ? (
+            <div className="mt-2 text-xs text-slate-400">No teams yet — invite will create a user without team assignment.</div>
+          ) : (
+            <select value={teamId ?? ""} onChange={(e) => setTeamId(e.target.value || null)} className="w-full mt-2 p-2 border rounded-md text-sm">
+              <option value="">(No team)</option>
+              {teams.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-rose-600 mt-3">{error}</p>}
+
+        {status === "success" && inviteLink && (
+          <div className="mt-3 p-3 bg-emerald-50 rounded-md border border-emerald-100 text-sm text-emerald-700 flex items-center justify-between gap-2">
+            <div className="truncate mr-2 flex items-center gap-2">
+              <LinkIcon className="w-4 h-4" /> <span className="truncate">{inviteLink}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={copyLink} className="px-2 py-1 rounded bg-white border text-xs">Copy</button>
+            </div>
+          </div>
         )}
 
         <div className="flex items-center justify-end gap-2 mt-4">
@@ -184,7 +328,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
             Cancel
           </button>
           <button
-            className="px-4 py-2 rounded-md bg-slate-900 text-white text-sm"
+            className="px-4 py-2 rounded-md bg-slate-900 text-white text-sm flex items-center gap-2"
             onClick={handleSend}
             disabled={status === "sending" || status === "success"}
           >

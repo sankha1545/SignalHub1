@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Settings,
@@ -22,6 +22,11 @@ import {
   Sun,
   Monitor,
 } from "lucide-react";
+
+/* -----------------------
+   Helper components
+   (kept largely as-is)
+   ----------------------- */
 
 const SettingsSection = ({ title, description, children, delay }: any) => {
   return (
@@ -62,6 +67,7 @@ const Toggle = ({ checked, onChange }: any) => {
       className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
         checked ? "bg-gradient-to-r from-blue-500 to-cyan-500" : "bg-slate-200"
       }`}
+      aria-pressed={checked}
     >
       <motion.div
         className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md"
@@ -81,6 +87,7 @@ const TabButton = ({ active, icon: Icon, label, onClick }: any) => {
           ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg"
           : "text-slate-600 hover:bg-slate-50"
       }`}
+      aria-pressed={active}
     >
       <Icon className="w-5 h-5" />
       <span className="flex-1 text-left">{label}</span>
@@ -88,6 +95,33 @@ const TabButton = ({ active, icon: Icon, label, onClick }: any) => {
     </button>
   );
 };
+
+/* -----------------------
+   Theme handling utils
+   ----------------------- */
+
+type ThemeChoice = "light" | "dark" | "system";
+const STORAGE_KEY = "theme-preference";
+
+function getSystemPrefersDark() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function readStoredTheme(): ThemeChoice {
+  try {
+    if (typeof window === "undefined") return "system";
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === "light" || raw === "dark" || raw === "system") return raw;
+  } catch {
+    /* ignore */
+  }
+  return "system";
+}
+
+/* -----------------------
+   Main SettingsPage
+   ----------------------- */
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -98,7 +132,7 @@ export default function SettingsPage() {
     messages: true,
     updates: false,
   });
-  const [theme, setTheme] = useState("light");
+  const [theme, setThemeState] = useState<ThemeChoice>(() => readStoredTheme());
   const [showPassword, setShowPassword] = useState(false);
 
   const tabs = [
@@ -107,6 +141,89 @@ export default function SettingsPage() {
     { id: "security", label: "Security", icon: Shield },
     { id: "appearance", label: "Appearance", icon: Palette },
     { id: "integrations", label: "Integrations", icon: Zap },
+  ];
+
+  // Apply theme to document.documentElement
+  const applyTheme = useCallback(
+    (t: ThemeChoice) => {
+      const root = typeof window !== "undefined" ? document.documentElement : null;
+      if (!root) return;
+
+      const effectiveDark = t === "system" ? getSystemPrefersDark() : t === "dark";
+
+      if (effectiveDark) {
+        root.classList.add("dark");
+        root.setAttribute("data-theme", "dark");
+      } else {
+        root.classList.remove("dark");
+        root.setAttribute("data-theme", "light");
+      }
+    },
+    []
+  );
+
+  // Public setter that persists preference
+  const setTheme = useCallback(
+    (newTheme: ThemeChoice) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, newTheme);
+      } catch {
+        /* ignore */
+      }
+      setThemeState(newTheme);
+      applyTheme(newTheme);
+    },
+    [applyTheme]
+  );
+
+  useEffect(() => {
+    // apply on mount
+    applyTheme(theme);
+
+    // listen to system changes and re-apply only when in system mode
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (ev: MediaQueryListEvent | MediaQueryList) => {
+      // re-apply only if preference is system (either stored or current state)
+      const stored = (() => {
+        try {
+          return localStorage.getItem(STORAGE_KEY);
+        } catch {
+          return null;
+        }
+      })();
+
+      const currentModeIsSystem = stored === "system" || (!stored && theme === "system");
+      if (currentModeIsSystem) {
+        applyTheme("system");
+      }
+    };
+
+    if (typeof mql.addEventListener === "function") {
+      mql.addEventListener("change", handler);
+    } else if (typeof (mql as any).addListener === "function") {
+      (mql as any).addListener(handler);
+    }
+
+    return () => {
+      if (typeof mql.removeEventListener === "function") {
+        mql.removeEventListener("change", handler);
+      } else if (typeof (mql as any).removeListener === "function") {
+        (mql as any).removeListener(handler);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // mount only
+
+  /* --------------
+     UI rendering
+     -------------- */
+
+  const themeOptions: { id: ThemeChoice; label: string; icon: any }[] = [
+    { id: "light", label: "Light", icon: Sun },
+    { id: "dark", label: "Dark", icon: Moon },
+    { id: "system", label: "System", icon: Monitor },
   ];
 
   return (
@@ -336,12 +453,9 @@ export default function SettingsPage() {
                         <button
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                          {showPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                          ) : (
-                            <Eye className="w-5 h-5" />
-                          )}
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
                     </div>
@@ -404,36 +518,36 @@ export default function SettingsPage() {
                 delay={0.2}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[
-                    { id: "light", label: "Light", icon: Sun },
-                    { id: "dark", label: "Dark", icon: Moon },
-                    { id: "system", label: "System", icon: Monitor },
-                  ].map((option) => (
-                    <motion.button
-                      key={option.id}
-                      onClick={() => setTheme(option.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`p-6 rounded-xl border-2 transition-all duration-200 ${
-                        theme === option.id
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-slate-200 hover:border-slate-300 bg-white"
-                      }`}
-                    >
-                      <option.icon
-                        className={`w-8 h-8 mx-auto mb-3 ${
-                          theme === option.id ? "text-blue-600" : "text-slate-400"
+                  {themeOptions.map((option) => {
+                    const Icon = option.icon;
+                    const active = theme === option.id;
+                    return (
+                      <motion.button
+                        key={option.id}
+                        onClick={() => setTheme(option.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`p-6 rounded-xl border-2 transition-all duration-200 text-center focus:outline-none ${
+                          active ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-slate-300 bg-white"
                         }`}
-                      />
-                      <p
-                        className={`text-sm font-semibold ${
-                          theme === option.id ? "text-blue-700" : "text-slate-700"
-                        }`}
+                        aria-pressed={active}
+                        aria-label={`Set ${option.label} theme`}
                       >
-                        {option.label}
-                      </p>
-                    </motion.button>
-                  ))}
+                        <Icon
+                          className={`w-8 h-8 mx-auto mb-3 ${active ? "text-blue-600" : "text-slate-400"}`}
+                        />
+                        <p className={`text-sm font-semibold ${active ? "text-blue-700" : "text-slate-700"}`}>
+                          {option.label}
+                        </p>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 text-sm text-slate-500">
+                  <p>
+                    Current preference: <span className="font-medium text-slate-700 ml-2">{theme}</span>
+                  </p>
                 </div>
               </SettingsSection>
             )}

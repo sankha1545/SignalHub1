@@ -1,49 +1,79 @@
-// File: app/(auth)/login/page.tsx
+// app/(auth)/login/page.tsx
 "use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * Login page
+ * Login page (refactored + improved)
  *
- * Notes:
- * - Expects /api/auth/login to either set an HttpOnly session cookie (recommended) OR
- *   return { ok: true, sessionToken } where sessionToken is a fallback.
- * - Handles 403 / account_not_active responses and shows resend buttons for verification.
+ * Behavior summary:
+ * - POST /api/auth/login with credentials: include
+ * - Handles these server behaviors:
+ *    1) server sets HttpOnly cookie and returns no JSON -> we call /api/me to find role
+ *    2) server returns { ok: true, role: "MANAGER" | "ADMIN" | "EMPLOYEE", redirect?: "/..." }
+ *    3) server returns { ok: true, sessionToken: "<token>" } -> we persist fallback token (non-HttpOnly) only if present
+ * - Redirect priority:
+ *    server.redirect (if present) -> server.role (if present) -> /api/me role query -> fallback "/"
+ * - Keeps resend email / resend phone UI for inactive accounts
+ *
+ * Important: server should return role if possible (simpler client redirect). If not, client calls /api/me.
  */
 
 type LoginResponse = {
   ok?: boolean;
   sessionToken?: string;
+  role?: string;
+  redirect?: string;
   error?: string;
-  // optional verification details when account inactive:
-  details?: { phoneVerified?: boolean; emailVerified?: boolean };
   message?: string;
+  details?: { phoneVerified?: boolean; emailVerified?: boolean };
   [k: string]: any;
 };
 
-async function postJSON(url: string, body: any): Promise<LoginResponse> {
+async function postJSON(url: string, body: any): Promise<LoginResponse & { status?: number }> {
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      credentials: "include", // allow server-set cookies
+      credentials: "include", // important for server-set cookies
     });
-    let json: any;
+
+    let json: any = {};
     try {
       json = await res.json();
     } catch {
-      // if body is empty but status ok (server set cookie), return ok true
-      if (res.ok) return { ok: true };
-      return { error: res.statusText || "Unexpected response" };
+      // no JSON body — treat as "ok" when status is 200/201 and return empty object
+      if (res.ok) return { ok: true, status: res.status };
+      return { ok: false, status: res.status, error: res.statusText || "Unexpected response" };
     }
-    // attach HTTP status for client logic if needed
-    return { ...json, ok: json.ok ?? res.ok };
+
+    return { ...json, ok: json.ok ?? res.ok, status: res.status };
   } catch (err: any) {
-    return { error: err?.message || String(err) };
+    return { ok: false, error: err?.message || String(err) };
   }
+}
+
+// helper: fetch /api/me to read role (server should return { ok: true, user: { role: "MANAGER", ... } })
+async function fetchCurrentUserRole(): Promise<string | null> {
+  try {
+    const r = await fetch("/api/me", { credentials: "include" });
+    if (!r.ok) return null;
+    const j = await r.json().catch(() => null);
+    const role = j?.role ?? j?.user?.role ?? null;
+    return role ? String(role).toUpperCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+function roleRedirectPath(role?: string): string {
+  const r = (role ?? "").toString().toUpperCase();
+  if (r === "MANAGER") return "/dashboard/manager/overview";
+  if (r === "ADMIN") return "/dashboard/admin/overview";
+  if (r === "EMPLOYEE") return "/dashboard/employee/inbox";
+  return "/";
 }
 
 export default function LoginPage(): JSX.Element {
@@ -70,7 +100,7 @@ export default function LoginPage(): JSX.Element {
     setInfo(null);
     setVerificationDetails(null);
 
-    const trimmedEmail = email.trim();
+    const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail || !password) {
       setError("Please provide both email and password.");
       return;
@@ -80,41 +110,66 @@ export default function LoginPage(): JSX.Element {
     try {
       const res = await postJSON("/api/auth/login", { email: trimmedEmail, password });
 
-      // If server returned ok and likely set cookie (res.ok true), redirect
+      // 1) If server returned ok: proceed to redirect logic
       if (res.ok) {
-        // If server returned a sessionToken in body, we attempt to persist it (fallback)
+        // store fallback token if server returned one (non-HttpOnly fallback)
         if (res.sessionToken) {
-          // Fallback behavior: store token only if server returned it.
-          // Prefer server-set HttpOnly cookie; this fallback is for systems that return token in JSON.
           try {
             const maxAge = remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 1;
-            // store non-HttpOnly cookie (less secure) only if necessary — server-side cookie is preferred.
+            // set cookie (non-httpOnly) as fallback; prefer server-set cookie
             document.cookie = `sessionToken=${res.sessionToken}; path=/; max-age=${maxAge}; Secure; SameSite=Strict`;
             try {
               localStorage.setItem("sessionToken", res.sessionToken);
             } catch {
-              // ignore
+              // ignore storage errors
             }
           } catch {
-            // ignore storage errors
+            // ignore
           }
         }
 
-        setInfo("Signed in — redirecting...");
-        // small delay so info is visible
-        setTimeout(() => router.push("/account"), 250); // <-- redirect to /account (dashboard)
+        // 2) If server gave an explicit redirect, trust it
+        if (res.redirect && typeof res.redirect === "string" && res.redirect.trim()) {
+          setInfo("Signed in — redirecting…");
+          // slight delay so user sees the message
+          setTimeout(() => router.push(res.redirect!), 200);
+          return;
+        }
+
+        // 3) If server provided role in response, use it
+        if (res.role) {
+          const path = roleRedirectPath(res.role);
+          setInfo("Signed in — redirecting…");
+          setTimeout(() => router.push(path), 200);
+          return;
+        }
+
+        // 4) Otherwise, server likely set cookie but did not return role; fetch /api/me
+        const roleFromMe = await fetchCurrentUserRole();
+        if (roleFromMe) {
+          const path = roleRedirectPath(roleFromMe);
+          setInfo("Signed in — redirecting…");
+          setTimeout(() => router.push(path), 200);
+          return;
+        }
+
+        // 5) Fallback: redirect to root
+        setInfo("Signed in — redirecting…");
+        setTimeout(() => router.push("/"), 200);
         return;
       }
 
-      // Not ok: handle specific error shapes
-      if (res.error === "account_not_fully_verified" || res.error === "account_not_active" || res.message?.includes("verify")) {
-        setError("Your account is not active yet. Please verify email and phone to continue.");
-        setVerificationDetails(res.details ?? null);
+      // 6) Not ok: common error shapes
+      const message = res.message || res.error || "Invalid credentials. Please try again.";
+      // server can return verification details
+      if (message.toLowerCase().includes("verify") || res.error === "account_not_active" || res.error === "account_not_fully_verified") {
+        setError("Your account is not active yet. Please verify your email/phone.");
+        if (res.details) setVerificationDetails(res.details);
         return;
       }
 
-      // generic invalid credentials
-      setError(res.error || "Invalid credentials. Please try again.");
+      // generic
+      setError(message);
     } catch (err: any) {
       setError(err?.message || String(err) || "Network error.");
     } finally {
@@ -123,7 +178,7 @@ export default function LoginPage(): JSX.Element {
   }
 
   function startGoogleOAuthLogin() {
-    // redirect to your server oauth start endpoint
+    // redirect to server oauth start endpoint (preserves current query if needed)
     window.location.href = "/api/auth/oauth/google/start?flow=login";
   }
 
@@ -135,6 +190,7 @@ export default function LoginPage(): JSX.Element {
     }
     setResendLoading(true);
     setError(null);
+    setInfo(null);
     try {
       const payload = { email: trimmedEmail, resend: true };
       const res = await fetch("/api/auth/email/send", {
@@ -157,15 +213,13 @@ export default function LoginPage(): JSX.Element {
   }
 
   async function handleResendPhone() {
-    // phone is not part of login form; backend typically requires phone param or tempToken.
-    // We attempt to call a resend endpoint that may accept email to find user's phone.
     setResendLoading(true);
     setError(null);
+    setInfo(null);
     try {
       const res = await fetch("/api/auth/phone/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // try sending email so server can look up phone from the account; backend should support this pattern.
         body: JSON.stringify({ email: email.trim(), resend: true }),
         credentials: "include",
       });
@@ -211,6 +265,7 @@ export default function LoginPage(): JSX.Element {
                 onClick={startGoogleOAuthLogin}
                 className="w-full p-3 border rounded-lg flex items-center justify-center gap-3 hover:shadow-sm transition"
                 aria-label="Continue with Google"
+                type="button"
               >
                 <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden>
                   <path fill="#EA4335" d="M24 9.5c3.6 0 6.5 1.3 8.9 2.9l6.5-6.5C36.7 2.9 30.9 0 24 0 14.3 0 6.2 5.7 2.8 13.8l7.6 5.9C12.2 15.2 17.6 9.5 24 9.5z" />
@@ -288,7 +343,7 @@ export default function LoginPage(): JSX.Element {
                   <span>Remember me</span>
                 </label>
 
-                <a href="/auth/forgot" className="text-indigo-600 hover:underline">Forgot Password?</a>
+                <a href="/forgot" className="text-indigo-600 hover:underline">Forgot Password?</a>
               </div>
 
               <div className="flex gap-3 items-center">

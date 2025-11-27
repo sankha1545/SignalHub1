@@ -24,6 +24,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$target$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Target$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/target.js [app-client] (ecmascript) <export default as Target>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/award.js [app-client] (ecmascript) <export default as Award>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.js [app-client] (ecmascript) <export default as X>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Link$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/link.js [app-client] (ecmascript) <export default as Link>");
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature();
 "use client";
@@ -34,11 +35,11 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 const StatCard = (t0)=>{
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(42);
-    if ($[0] !== "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194") {
+    if ($[0] !== "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c") {
         for(let $i = 0; $i < 42; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194";
+        $[0] = "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c";
     }
     const { title, value, change, trend, icon: Icon, gradient, delay: t1 } = t0;
     const delay = t1 === undefined ? 0 : t1;
@@ -340,11 +341,11 @@ _s(StatCard, "FPQn8a98tPjpohC7NUYORQR8GJE=");
 _c = StatCard;
 const ActivityItem = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(25);
-    if ($[0] !== "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194") {
+    if ($[0] !== "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c") {
         for(let $i = 0; $i < 25; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194";
+        $[0] = "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c";
     }
     const { icon: Icon, title, description, time, gradient, delay: t1 } = t0;
     const delay = t1 === undefined ? 0 : t1;
@@ -515,42 +516,142 @@ const ActivityItem = (t0)=>{
     return t13;
 };
 _c1 = ActivityItem;
-/* ----------------- Invite Modal ----------------- */ function InviteModal({ open, onClose }) {
+/* ----------------- Invite Modal (upgraded) ----------------- */ function InviteModal({ open, onClose }) {
     _s1();
     const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [role, setRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("MANAGER");
+    const [teamId, setTeamId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [teams, setTeams] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [loadingTeams, setLoadingTeams] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [status, setStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("idle");
-    const validateEmail = (e)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    const [inviteLink, setInviteLink] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [expiresHours, setExpiresHours] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(24);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "InviteModal.useEffect": ()=>{
+            if (!open) return;
+            let mounted = true;
+            setError(null);
+            setInviteLink(null);
+            // load teams for organization to optionally assign the invited manager to a team
+            ({
+                "InviteModal.useEffect": async ()=>{
+                    setLoadingTeams(true);
+                    try {
+                        const r = await fetch("/api/dashboard/teams", {
+                            method: "GET",
+                            credentials: "same-origin"
+                        });
+                        if (!r.ok) {
+                            // non-fatal: teams may be unavailable
+                            console.warn("Could not load teams", r.statusText);
+                            if (mounted) setTeams([]);
+                            return;
+                        }
+                        const j = await r.json();
+                        // expect j.teams = [{id, name}, ...] or j array
+                        const list = Array.isArray(j) ? j : j?.teams ?? [];
+                        if (mounted) setTeams(list);
+                    } catch (e) {
+                        console.warn("Teams fetch failed", e);
+                        if (mounted) setTeams([]);
+                    } finally{
+                        if (mounted) setLoadingTeams(false);
+                    }
+                }
+            })["InviteModal.useEffect"]();
+            return ({
+                "InviteModal.useEffect": ()=>{
+                    mounted = false;
+                }
+            })["InviteModal.useEffect"];
+        }
+    }["InviteModal.useEffect"], [
+        open
+    ]);
+    const validateEmail = (e_0)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e_0);
     const handleSend = async ()=>{
         setError(null);
-        if (!validateEmail(email.trim())) {
+        setInviteLink(null);
+        const trimmed = email.trim();
+        if (!validateEmail(trimmed)) {
             setError("Please enter a valid email address.");
             return;
         }
         setStatus("sending");
         try {
+            const payload = {
+                email: trimmed,
+                role,
+                expiresHours
+            };
+            if (teamId) payload.teamId = teamId;
             const res = await fetch("/api/invites/creates", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    email: email.trim()
-                })
+                body: JSON.stringify(payload),
+                credentials: "same-origin" // ensure cookies are included (auth)
             });
             const data = await res.json();
             if (!res.ok) {
+                const message = data?.message || data?.error || "Failed to create invite.";
                 setStatus("error");
-                setError(data?.message || "Failed to send invite.");
+                setError(message);
                 return;
             }
+            // Success
             setStatus("success");
-            setTimeout(()=>onClose(true), 900);
+            // If backend returns an inviteLink or token, surface it
+            if (data?.inviteLink) {
+                setInviteLink(data.inviteLink);
+            } else if (data?.token) {
+                // construct an invite link based on current origin
+                try {
+                    const base = ("TURBOPACK compile-time truthy", 1) ? window.location.origin : "TURBOPACK unreachable";
+                    setInviteLink(`${base}/auth/invite/accept?token=${encodeURIComponent(data.token)}`);
+                } catch  {
+                // ignore
+                }
+            }
+            // Keep modal open to show link & copy action for a short while
+            setTimeout(()=>{
+                onClose(true);
+            }, 1100);
         } catch (err) {
             setStatus("error");
             setError(err?.message || "Network error");
         }
     };
+    const copyLink = async ()=>{
+        if (!inviteLink) return;
+        try {
+            await navigator.clipboard.writeText(inviteLink);
+            // ephemeral confirmation
+            setError(null);
+            setStatus("success");
+        } catch  {
+            setError("Unable to copy link — please copy manually.");
+        }
+    };
+    // Reset modal state when closed
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "InviteModal.useEffect": ()=>{
+            if (!open) {
+                setEmail("");
+                setRole("MANAGER");
+                setTeamId(null);
+                setTeams([]);
+                setError(null);
+                setStatus("idle");
+                setInviteLink(null);
+                setExpiresHours(24);
+            }
+        }
+    }["InviteModal.useEffect"], [
+        open
+    ]);
     if (!open) return null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6",
@@ -560,7 +661,7 @@ _c1 = ActivityItem;
                 onClick: ()=>onClose(false)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 385,
+                lineNumber: 479,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -585,64 +686,269 @@ _c1 = ActivityItem;
                                 children: "Invite manager"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 396,
+                                lineNumber: 490,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 className: "p-1 rounded-md hover:bg-slate-100",
                                 onClick: ()=>onClose(false),
+                                "aria-label": "Close invite modal",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                    lineNumber: 398,
+                                    lineNumber: 492,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 397,
+                                lineNumber: 491,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 395,
+                        lineNumber: 489,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                         className: "text-xs text-slate-600",
-                        children: "To:"
+                        children: "To (email)"
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 402,
+                        lineNumber: 496,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                         type: "email",
                         value: email,
-                        onChange: (e_0)=>setEmail(e_0.target.value),
+                        onChange: (e_1)=>setEmail(e_1.target.value),
                         className: "w-full mt-2 mb-2 p-2 border rounded-md text-sm",
-                        placeholder: "manager@example.com"
+                        placeholder: "manager@example.com",
+                        "aria-label": "Invite email"
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 403,
+                        lineNumber: 497,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-2 gap-2 items-end",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "text-xs text-slate-600",
+                                        children: "Role"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 501,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        value: role,
+                                        onChange: (e_2)=>setRole(e_2.target.value),
+                                        className: "w-full mt-1 p-2 border rounded-md text-sm",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "MANAGER",
+                                                children: "Manager"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                                lineNumber: 503,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "EMPLOYEE",
+                                                children: "Employee"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                                lineNumber: 504,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 502,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 500,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "text-xs text-slate-600",
+                                        children: "Expires"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 509,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        value: String(expiresHours),
+                                        onChange: (e_3)=>setExpiresHours(Number(e_3.target.value)),
+                                        className: "w-full mt-1 p-2 border rounded-md text-sm",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: 24,
+                                                children: "24 hours"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                                lineNumber: 511,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: 48,
+                                                children: "48 hours"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                                lineNumber: 512,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: 72,
+                                                children: "72 hours"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                                lineNumber: 513,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 510,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 508,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                        lineNumber: 499,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mt-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                className: "text-xs text-slate-600",
+                                children: "Assign to team (optional)"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 519,
+                                columnNumber: 11
+                            }, this),
+                            loadingTeams ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-2 text-xs text-slate-500",
+                                children: "Loading teams…"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 520,
+                                columnNumber: 27
+                            }, this) : teams.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-2 text-xs text-slate-400",
+                                children: "No teams yet — invite will create a user without team assignment."
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 520,
+                                columnNumber: 116
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                value: teamId ?? "",
+                                onChange: (e_4)=>setTeamId(e_4.target.value || null),
+                                className: "w-full mt-2 p-2 border rounded-md text-sm",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                        value: "",
+                                        children: "(No team)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 521,
+                                        columnNumber: 15
+                                    }, this),
+                                    teams.map((t)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                            value: t.id,
+                                            children: t.name
+                                        }, t.id, false, {
+                                            fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                            lineNumber: 522,
+                                            columnNumber: 31
+                                        }, this))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 520,
+                                columnNumber: 235
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                        lineNumber: 518,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "text-xs text-rose-600 mb-2",
+                        className: "text-xs text-rose-600 mt-3",
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 405,
+                        lineNumber: 528,
                         columnNumber: 19
                     }, this),
-                    status === "success" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "text-xs text-emerald-600 mb-2",
-                        children: "Invitation sent — link valid 24 hours."
-                    }, void 0, false, {
+                    status === "success" && inviteLink && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mt-3 p-3 bg-emerald-50 rounded-md border border-emerald-100 text-sm text-emerald-700 flex items-center justify-between gap-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "truncate mr-2 flex items-center gap-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Link$3e$__["Link"], {
+                                        className: "w-4 h-4"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 532,
+                                        columnNumber: 15
+                                    }, this),
+                                    " ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "truncate",
+                                        children: inviteLink
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                        lineNumber: 532,
+                                        columnNumber: 48
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 531,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-2",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: copyLink,
+                                    className: "px-2 py-1 rounded bg-white border text-xs",
+                                    children: "Copy"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                    lineNumber: 535,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
+                                lineNumber: 534,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 406,
-                        columnNumber: 34
+                        lineNumber: 530,
+                        columnNumber: 48
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center justify-end gap-2 mt-4",
@@ -654,48 +960,48 @@ _c1 = ActivityItem;
                                 children: "Cancel"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 409,
+                                lineNumber: 540,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "px-4 py-2 rounded-md bg-slate-900 text-white text-sm",
+                                className: "px-4 py-2 rounded-md bg-slate-900 text-white text-sm flex items-center gap-2",
                                 onClick: handleSend,
                                 disabled: status === "sending" || status === "success",
                                 children: status === "sending" ? "Sending..." : "Send invite"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 412,
+                                lineNumber: 543,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 408,
+                        lineNumber: 539,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 386,
+                lineNumber: 480,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-        lineNumber: 384,
+        lineNumber: 478,
         columnNumber: 10
     }, this);
 }
-_s1(InviteModal, "cpIuTbwbUvR26gv+LmdI1dcT7vo=");
+_s1(InviteModal, "z1dzh/h1Jqi+biBxE/RoNTb4N0w=");
 _c2 = InviteModal;
 function OverviewPage() {
     _s2();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(38);
-    if ($[0] !== "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194") {
+    if ($[0] !== "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c") {
         for(let $i = 0; $i < 38; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "25b2967b3f64b432ce899ef1b243d754d8750516cb567c33497e206d25f82194";
+        $[0] = "d80e17ba8296799149f8f466c5423650ab830b7eb9cc0ae524470d5d7d67240c";
     }
     let t0;
     if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
@@ -814,7 +1120,7 @@ function OverviewPage() {
             children: "Overview"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 530,
+            lineNumber: 661,
             columnNumber: 10
         }, this);
         $[6] = t5;
@@ -839,12 +1145,12 @@ function OverviewPage() {
                 className: "w-6 h-6 text-yellow-500"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 542,
+                lineNumber: 673,
                 columnNumber: 8
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 537,
+            lineNumber: 668,
             columnNumber: 10
         }, this);
         $[7] = t6;
@@ -865,20 +1171,20 @@ function OverviewPage() {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                            lineNumber: 549,
+                            lineNumber: 680,
                             columnNumber: 165
                         }, this),
                         " Welcome back! Here's what's happening today."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 549,
+                    lineNumber: 680,
                     columnNumber: 95
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 549,
+            lineNumber: 680,
             columnNumber: 10
         }, this);
         $[8] = t7;
@@ -895,7 +1201,7 @@ function OverviewPage() {
             children: "Invite managers"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 556,
+            lineNumber: 687,
             columnNumber: 10
         }, this);
         $[9] = t8;
@@ -924,30 +1230,30 @@ function OverviewPage() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                        lineNumber: 565,
+                                        lineNumber: 696,
                                         columnNumber: 338
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 565,
+                                lineNumber: 696,
                                 columnNumber: 216
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 565,
+                        lineNumber: 696,
                         columnNumber: 161
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 565,
+                lineNumber: 696,
                 columnNumber: 64
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 565,
+            lineNumber: 696,
             columnNumber: 10
         }, this);
         $[10] = t9;
@@ -961,7 +1267,7 @@ function OverviewPage() {
             children: stats.map(_OverviewPageStatsMap)
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 572,
+            lineNumber: 703,
             columnNumber: 11
         }, this);
         $[11] = t10;
@@ -999,7 +1305,7 @@ function OverviewPage() {
             children: "Recent Activity"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 603,
+            lineNumber: 734,
             columnNumber: 11
         }, this);
         $[15] = t14;
@@ -1020,19 +1326,19 @@ function OverviewPage() {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                            lineNumber: 610,
+                            lineNumber: 741,
                             columnNumber: 196
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 610,
+                    lineNumber: 741,
                     columnNumber: 72
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 610,
+            lineNumber: 741,
             columnNumber: 11
         }, this);
         $[16] = t15;
@@ -1055,18 +1361,18 @@ function OverviewPage() {
                         children: activities.map(_OverviewPageActivitiesMap)
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                        lineNumber: 617,
+                        lineNumber: 748,
                         columnNumber: 175
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 617,
+                lineNumber: 748,
                 columnNumber: 94
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 617,
+            lineNumber: 748,
             columnNumber: 11
         }, this);
         $[17] = t16;
@@ -1107,12 +1413,12 @@ function OverviewPage() {
                 className: "w-6 h-6"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                lineNumber: 650,
+                lineNumber: 781,
                 columnNumber: 116
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 650,
+            lineNumber: 781,
             columnNumber: 11
         }, this);
         t21 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1120,7 +1426,7 @@ function OverviewPage() {
             children: "Performance Goal"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 651,
+            lineNumber: 782,
             columnNumber: 11
         }, this);
         t22 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1128,7 +1434,7 @@ function OverviewPage() {
             children: "You're 94% towards your monthly goal. Keep it up!"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 652,
+            lineNumber: 783,
             columnNumber: 11
         }, this);
         $[21] = t20;
@@ -1166,12 +1472,12 @@ function OverviewPage() {
                                 className: "h-full bg-white rounded-full"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                lineNumber: 663,
+                                lineNumber: 794,
                                 columnNumber: 255
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                            lineNumber: 663,
+                            lineNumber: 794,
                             columnNumber: 180
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1179,26 +1485,26 @@ function OverviewPage() {
                             children: "2,680 / 2,850 messages"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                            lineNumber: 670,
+                            lineNumber: 801,
                             columnNumber: 63
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 663,
+                    lineNumber: 794,
                     columnNumber: 134
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 670,
+                    lineNumber: 801,
                     columnNumber: 132
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 663,
+            lineNumber: 794,
             columnNumber: 11
         }, this);
         $[24] = t23;
@@ -1212,7 +1518,7 @@ function OverviewPage() {
             children: "Quick Stats"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 677,
+            lineNumber: 808,
             columnNumber: 11
         }, this);
         $[25] = t24;
@@ -1229,7 +1535,7 @@ function OverviewPage() {
                     children: "Avg. Response"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 684,
+                    lineNumber: 815,
                     columnNumber: 62
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1237,13 +1543,13 @@ function OverviewPage() {
                     children: "2.4 hours"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 684,
+                    lineNumber: 815,
                     columnNumber: 115
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 684,
+            lineNumber: 815,
             columnNumber: 11
         }, this);
         $[26] = t25;
@@ -1260,7 +1566,7 @@ function OverviewPage() {
                     children: "Success Rate"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 691,
+                    lineNumber: 822,
                     columnNumber: 62
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1268,13 +1574,13 @@ function OverviewPage() {
                     children: "94.2%"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 691,
+                    lineNumber: 822,
                     columnNumber: 114
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 691,
+            lineNumber: 822,
             columnNumber: 11
         }, this);
         $[27] = t26;
@@ -1291,7 +1597,7 @@ function OverviewPage() {
                     children: "Active Teams"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 698,
+                    lineNumber: 829,
                     columnNumber: 62
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1299,13 +1605,13 @@ function OverviewPage() {
                     children: "8"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 698,
+                    lineNumber: 829,
                     columnNumber: 114
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 698,
+            lineNumber: 829,
             columnNumber: 11
         }, this);
         $[28] = t27;
@@ -1348,7 +1654,7 @@ function OverviewPage() {
                                                             children: "Pending Tasks"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                                            lineNumber: 705,
+                                                            lineNumber: 836,
                                                             columnNumber: 391
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1356,43 +1662,43 @@ function OverviewPage() {
                                                             children: "12"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                                            lineNumber: 705,
+                                                            lineNumber: 836,
                                                             columnNumber: 444
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                                    lineNumber: 705,
+                                                    lineNumber: 836,
                                                     columnNumber: 340
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                            lineNumber: 705,
+                                            lineNumber: 836,
                                             columnNumber: 290
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                                    lineNumber: 705,
+                                    lineNumber: 836,
                                     columnNumber: 209
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                            lineNumber: 705,
+                            lineNumber: 836,
                             columnNumber: 125
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-                    lineNumber: 705,
+                    lineNumber: 836,
                     columnNumber: 65
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 705,
+            lineNumber: 836,
             columnNumber: 11
         }, this);
         $[29] = t28;
@@ -1423,7 +1729,7 @@ function OverviewPage() {
             onClose: t29
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 729,
+            lineNumber: 860,
             columnNumber: 11
         }, this);
         $[31] = inviteOpen;
@@ -1438,7 +1744,7 @@ function OverviewPage() {
             children: toast
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 737,
+            lineNumber: 868,
             columnNumber: 20
         }, this);
         $[33] = toast;
@@ -1457,7 +1763,7 @@ function OverviewPage() {
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-            lineNumber: 745,
+            lineNumber: 876,
             columnNumber: 11
         }, this);
         $[35] = t30;
@@ -1476,7 +1782,7 @@ function _OverviewPageActivitiesMap(activity, index_0) {
         delay: 0.5 + index_0 * 0.1
     }, index_0, false, {
         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-        lineNumber: 755,
+        lineNumber: 886,
         columnNumber: 10
     }, this);
 }
@@ -1486,7 +1792,7 @@ function _OverviewPageStatsMap(stat, index) {
         delay: index * 0.1
     }, stat.title, false, {
         fileName: "[project]/src/app/dashboard/admin/overview/page.tsx",
-        lineNumber: 758,
+        lineNumber: 889,
         columnNumber: 10
     }, this);
 }

@@ -5,15 +5,23 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 /**
- * Invite accept page
+ * Invite accept page (refactored + upgraded)
  *
- * Behavior:
- * - POST /api/invites/accept { token } to validate + fetch metadata
- * - Show steps: Email (completed) -> Phone (completed) -> Account completion (active)
- * - Email and organization shown as completed and non-editable (admin verified)
- * - No email/phone verification UI (disabled by design)
- * - Finalize via POST /api/invites/finalize { token, password }
- * - On success redirect to /auth/login?created=1
+ * Preserves existing UI/UX:
+ * - Loads invite metadata via POST /api/invites/accept (token)
+ * - Shows email/org/phone as locked/verified
+ * - Collects password + confirm password
+ * - Calls POST /api/invites/finalize { token, password }
+ *
+ * Upgrades / safety additions:
+ * - Better error handling and user messages
+ * - If server returns a session token, stores it in localStorage (fallback) and attempts to fetch /api/me
+ *   then redirects to server-provided redirect path (or /dashboard/manager).
+ * - If server does NOT return a token, redirects to login with created flag (/auth/login?created=1)
+ * - Avoids exposing phone verification UI (invited users are treated as pre-verified)
+ *
+ * NOTE: If you prefer that the server set an httpOnly cookie for session, adapt /api/invites/finalize
+ * to set the cookie server-side and then the client does not need to store the token.
  */
 
 type InvitePayload = {
@@ -27,7 +35,6 @@ type InvitePayload = {
   expiresAt?: string | null;
   createdAt?: string | null;
   message?: string;
-  // optional: if you stored phone on invite it may be returned
   phone?: string | null;
 };
 
@@ -36,22 +43,20 @@ export default function InviteAcceptPage() {
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
 
-  // state
-  const [loading, setLoading] = useState(true);
+  // data states
   const [invite, setInvite] = useState<InvitePayload | null>(null);
+  const [loadingInvite, setLoadingInvite] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // form states
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordTouched, setPasswordTouched] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
 
-  // auth check
-  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
-
-  // password validation helpers (same rules as signup)
+  // basic password validation (same rules as your signup)
   function validatePassword(pw: string) {
     const errs: string[] = [];
     if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
@@ -64,20 +69,19 @@ export default function InviteAcceptPage() {
   const passwordErrors = validatePassword(password);
   const passwordsMatch = password === confirmPassword || confirmPassword.length === 0;
 
+  // Load invite metadata and check /api/me concurrently
   useEffect(() => {
-    // load invite metadata and check auth
-    if (!token) {
-      setError("Missing invite token.");
-      setLoading(false);
-      setCheckingAuth(false);
-      return;
-    }
-
     let mounted = true;
-    setLoading(true);
-    setError(null);
 
-    (async () => {
+    async function loadInvite() {
+      setLoadingInvite(true);
+      setError(null);
+      if (!token) {
+        setError("Missing invite token.");
+        setLoadingInvite(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/invites/accept", {
           method: "POST",
@@ -86,20 +90,20 @@ export default function InviteAcceptPage() {
         });
         const json = await res.json();
         if (!res.ok || !json?.ok) {
-          throw new Error(json?.message || "Invalid invite token.");
+          const msg = json?.message || json?.error || "Invalid or expired invite link.";
+          throw new Error(msg);
         }
         if (mounted) setInvite(json as InvitePayload);
       } catch (err: any) {
         console.error("Invite accept error:", err);
         if (mounted) setError(err?.message || "Could not validate invite.");
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) setLoadingInvite(false);
       }
-    })();
+    }
 
-    // check /api/me for signed-in user
-    setCheckingAuth(true);
-    (async () => {
+    async function checkAuth() {
+      setCheckingAuth(true);
       try {
         const r = await fetch("/api/me");
         if (!r.ok) {
@@ -108,35 +112,37 @@ export default function InviteAcceptPage() {
           const j = await r.json();
           if (mounted) setCurrentUserEmail(j?.email ?? null);
         }
-      } catch {
+      } catch (e) {
         if (mounted) setCurrentUserEmail(null);
       } finally {
         if (mounted) setCheckingAuth(false);
       }
-    })();
+    }
+
+    loadInvite();
+    checkAuth();
 
     return () => {
       mounted = false;
     };
   }, [token]);
 
-  // finalize invite (create account)
+  // finalize invite: POST /api/invites/finalize { token, password }
   async function handleFinalize(e?: React.FormEvent) {
     e?.preventDefault();
-    setError(null);
     setPasswordTouched(true);
+    setError(null);
 
     if (!invite?.email) {
       setError("Invite data missing.");
       return;
     }
 
-    const errs = validatePassword(password);
-    if (errs.length > 0) {
+    if (passwordErrors.length > 0) {
       setError("Please fix password requirements.");
       return;
     }
-    if (password !== confirmPassword) {
+    if (!passwordsMatch) {
       setError("Passwords do not match.");
       return;
     }
@@ -144,29 +150,57 @@ export default function InviteAcceptPage() {
     setSubmitting(true);
     try {
       const payload: any = { token, password };
-      // we intentionally do not send phone/email verification flags, they are pre-verified by admin
       const res = await fetch("/api/invites/finalize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       const json = await res.json();
+
       if (!res.ok || !json?.ok) {
-        throw new Error(json?.message || "Failed to create account.");
+        // provide granular messages when available
+        const msg = json?.message || json?.error || "Failed to create account.";
+        throw new Error(msg);
       }
 
-      // redirect to login
-      router.push("/login?created=1");
+      // If server returned a session token (some flows sign session and return token),
+      // we persist it client-side as a fallback (note: httpOnly cookie is preferred).
+      if (json.token) {
+        try {
+          // store token in localStorage as fallback (you can change storage policy)
+          localStorage.setItem("sessionToken", json.token);
+        } catch (e) {
+          // ignore storage errors
+        }
+
+        // attempt to fetch user profile to warm the client and validate session
+        try {
+          await fetch("/api/me");
+        } catch {
+          // ignore
+        }
+
+        // redirect to server-provided redirect or manager dashboard
+        const redirectTo = json.redirect ?? "/dashboard/manager";
+        router.push(redirectTo);
+        return;
+      }
+
+      // If no token returned, fall back to redirecting to login page with created flag
+      // (server may expect user to log in).
+     router.push("/login?created=1");
+
     } catch (err: any) {
       console.error("Finalize error:", err);
-      setError(err?.message || "Failed to create account.");
+      setError(err?.message || "Failed to create account. Please try again or contact support.");
     } finally {
       setSubmitting(false);
     }
   }
 
-  // Loading, error, or invite not found states
-  if (loading || checkingAuth) {
+  // UI states
+  if (loadingInvite || checkingAuth) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-6">
         <div className="text-center text-lg text-gray-700">Loading invite…</div>
@@ -180,7 +214,9 @@ export default function InviteAcceptPage() {
         <div className="bg-white shadow rounded-lg p-6 max-w-xl">
           <h2 className="text-xl font-semibold mb-3">Invite issue</h2>
           <p className="text-red-600 mb-4">{error}</p>
-          <p className="text-sm text-gray-600">If this looks wrong, ask the organization to resend the invite or contact support.</p>
+          <p className="text-sm text-gray-600">
+            If this looks wrong, ask the organization to resend the invite or contact support.
+          </p>
         </div>
       </div>
     );
@@ -197,7 +233,7 @@ export default function InviteAcceptPage() {
     );
   }
 
-  // Main UI (matches signup page style)
+  // Main UI (keeps same visual layout as original)
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-7xl bg-white/95 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ring-1 ring-slate-100">
@@ -205,14 +241,18 @@ export default function InviteAcceptPage() {
         <div className="p-6 sm:p-10 flex items-start">
           <div className="w-full max-w-md mx-auto">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-extrabold shadow-xl">U</div>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-extrabold shadow-xl">
+                U
+              </div>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">You're invited</h1>
-                <p className="text-sm text-slate-500 mt-1">Accept the invitation to join <strong>{invite.organizationName}</strong>.</p>
+                <p className="text-sm text-slate-500 mt-1">
+                  Accept the invitation to join <strong>{invite.organizationName ?? invite.organizationId}</strong>.
+                </p>
               </div>
             </div>
 
-            {/* Steps: Email (done) -> Phone (done) -> Account completion (active) */}
+            {/* Steps: Email (done) -> Phone (done) -> Account completion */}
             <div className="mb-5">
               <div className="relative">
                 <div className="absolute left-4 right-4 top-6 h-0.5 bg-slate-100 rounded" />
@@ -229,7 +269,11 @@ export default function InviteAcceptPage() {
                       <div key={n} className="flex-1 flex flex-col items-center text-center px-1">
                         <div
                           className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-sm font-semibold transition ${
-                            isCompleted ? "bg-indigo-600 text-white shadow-lg scale-105" : isActive ? "bg-indigo-600 text-white ring-4 ring-indigo-100 animate-pulse" : "bg-white border border-slate-200 text-slate-600"
+                            isCompleted
+                              ? "bg-indigo-600 text-white shadow-lg scale-105"
+                              : isActive
+                              ? "bg-indigo-600 text-white ring-4 ring-indigo-100 animate-pulse"
+                              : "bg-white border border-slate-200 text-slate-600"
                           }`}
                         >
                           {n}
@@ -245,8 +289,8 @@ export default function InviteAcceptPage() {
             {/* Signed-in warning */}
             {currentUserEmail && (
               <div className="mb-4 rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm text-yellow-800">
-                You are signed in as <strong>{currentUserEmail}</strong>. To accept this invite as a different user, sign out
-                or open this link in a private/incognito window.
+                You are signed in as <strong>{currentUserEmail}</strong>. To accept this invite as a different user,
+                sign out or open this link in a private/incognito window.
               </div>
             )}
 
@@ -254,7 +298,11 @@ export default function InviteAcceptPage() {
               {/* Email locked */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-700">Email (locked)</label>
-                <input readOnly value={invite.email} className="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm" />
+                <input
+                  readOnly
+                  value={invite.email ?? ""}
+                  className="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                />
                 <p className="text-xs text-slate-400 mt-2">This email was invited by the organization and is already verified.</p>
               </div>
 
@@ -331,12 +379,13 @@ export default function InviteAcceptPage() {
                   </button>
 
                   <button
-                    type="button"
-                    onClick={() => router.push("/auth/login")}
-                    className="inline-flex items-center gap-2 rounded-md border border-gray-200 px-4 py-2 text-sm"
-                  >
-                    Already have an account? Log in
-                  </button>
+  type="button"
+  onClick={() => router.push("/login")}
+  className="inline-flex items-center gap-2 rounded-md border border-gray-200 px-4 py-2 text-sm"
+>
+  Already have an account? Log in
+</button>
+
                 </div>
               </form>
             </div>

@@ -33,13 +33,16 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-const SettingsSection = (t0)=>{
+/* -----------------------
+   Helper components
+   (kept largely as-is)
+   ----------------------- */ const SettingsSection = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(16);
-    if ($[0] !== "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5") {
+    if ($[0] !== "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24") {
         for(let $i = 0; $i < 16; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5";
+        $[0] = "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24";
     }
     const { title, description, children, delay } = t0;
     let t1;
@@ -77,7 +80,7 @@ const SettingsSection = (t0)=>{
             children: title
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 51,
+            lineNumber: 57,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[5] = title;
@@ -92,7 +95,7 @@ const SettingsSection = (t0)=>{
             children: description
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 59,
+            lineNumber: 65,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = description;
@@ -110,7 +113,7 @@ const SettingsSection = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 67,
+            lineNumber: 73,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[9] = t4;
@@ -132,7 +135,7 @@ const SettingsSection = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 76,
+            lineNumber: 82,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[12] = children;
@@ -147,11 +150,11 @@ const SettingsSection = (t0)=>{
 _c = SettingsSection;
 const SettingRow = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(16);
-    if ($[0] !== "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5") {
+    if ($[0] !== "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24") {
         for(let $i = 0; $i < 16; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5";
+        $[0] = "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24";
     }
     const { icon: Icon, title, description, children } = t0;
     let t1;
@@ -162,12 +165,12 @@ const SettingRow = (t0)=>{
                 className: "w-5 h-5 text-slate-600"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 102,
+                lineNumber: 108,
                 columnNumber: 108
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 102,
+            lineNumber: 108,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[1] = Icon;
@@ -182,7 +185,7 @@ const SettingRow = (t0)=>{
             children: title
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 110,
+            lineNumber: 116,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[3] = title;
@@ -197,7 +200,7 @@ const SettingRow = (t0)=>{
             children: description
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 118,
+            lineNumber: 124,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[5] = description;
@@ -215,7 +218,7 @@ const SettingRow = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 126,
+            lineNumber: 132,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = t2;
@@ -231,7 +234,7 @@ const SettingRow = (t0)=>{
             children: children
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 135,
+            lineNumber: 141,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[10] = children;
@@ -250,7 +253,7 @@ const SettingRow = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 143,
+            lineNumber: 149,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[12] = t1;
@@ -264,12 +267,12 @@ const SettingRow = (t0)=>{
 };
 _c1 = SettingRow;
 const Toggle = (t0)=>{
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(13);
-    if ($[0] !== "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5") {
-        for(let $i = 0; $i < 13; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(14);
+    if ($[0] !== "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24") {
+        for(let $i = 0; $i < 14; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5";
+        $[0] = "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24";
     }
     const { checked, onChange } = t0;
     let t1;
@@ -312,7 +315,7 @@ const Toggle = (t0)=>{
             transition: t5
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 199,
+            lineNumber: 205,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = t4;
@@ -321,33 +324,35 @@ const Toggle = (t0)=>{
         t6 = $[8];
     }
     let t7;
-    if ($[9] !== t1 || $[10] !== t2 || $[11] !== t6) {
+    if ($[9] !== checked || $[10] !== t1 || $[11] !== t2 || $[12] !== t6) {
         t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
             onClick: t1,
             className: t2,
+            "aria-pressed": checked,
             children: t6
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 207,
+            lineNumber: 213,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
-        $[9] = t1;
-        $[10] = t2;
-        $[11] = t6;
-        $[12] = t7;
+        $[9] = checked;
+        $[10] = t1;
+        $[11] = t2;
+        $[12] = t6;
+        $[13] = t7;
     } else {
-        t7 = $[12];
+        t7 = $[13];
     }
     return t7;
 };
 _c2 = Toggle;
 const TabButton = (t0)=>{
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(13);
-    if ($[0] !== "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5") {
-        for(let $i = 0; $i < 13; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(14);
+    if ($[0] !== "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24") {
+        for(let $i = 0; $i < 14; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5";
+        $[0] = "af8229e69f1fe80b274456121101a9a0272bce7c5d17fb4bf7afc25ba37bea24";
     }
     const { active, icon: Icon, label, onClick } = t0;
     const t1 = `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 w-full ${active ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg" : "text-slate-600 hover:bg-slate-50"}`;
@@ -357,7 +362,7 @@ const TabButton = (t0)=>{
             className: "w-5 h-5"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 234,
+            lineNumber: 241,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[1] = Icon;
@@ -372,7 +377,7 @@ const TabButton = (t0)=>{
             children: label
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 242,
+            lineNumber: 249,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[3] = label;
@@ -386,7 +391,7 @@ const TabButton = (t0)=>{
             className: "w-4 h-4"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 250,
+            lineNumber: 257,
             columnNumber: 20
         }, ("TURBOPACK compile-time value", void 0));
         $[5] = active;
@@ -395,10 +400,11 @@ const TabButton = (t0)=>{
         t4 = $[6];
     }
     let t5;
-    if ($[7] !== onClick || $[8] !== t1 || $[9] !== t2 || $[10] !== t3 || $[11] !== t4) {
+    if ($[7] !== active || $[8] !== onClick || $[9] !== t1 || $[10] !== t2 || $[11] !== t3 || $[12] !== t4) {
         t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
             onClick: onClick,
             className: t1,
+            "aria-pressed": active,
             children: [
                 t2,
                 t3,
@@ -406,1085 +412,1050 @@ const TabButton = (t0)=>{
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 258,
+            lineNumber: 265,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
-        $[7] = onClick;
-        $[8] = t1;
-        $[9] = t2;
-        $[10] = t3;
-        $[11] = t4;
-        $[12] = t5;
+        $[7] = active;
+        $[8] = onClick;
+        $[9] = t1;
+        $[10] = t2;
+        $[11] = t3;
+        $[12] = t4;
+        $[13] = t5;
     } else {
-        t5 = $[12];
+        t5 = $[13];
     }
     return t5;
 };
 _c3 = TabButton;
+const STORAGE_KEY = "theme-preference";
+function getSystemPrefersDark() {
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function readStoredTheme() {
+    try {
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === "light" || raw === "dark" || raw === "system") return raw;
+    } catch  {
+    /* ignore */ }
+    return "system";
+}
 function SettingsPage() {
     _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(35);
-    if ($[0] !== "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5") {
-        for(let $i = 0; $i < 35; $i += 1){
-            $[$i] = Symbol.for("react.memo_cache_sentinel");
-        }
-        $[0] = "baeb5ec9b1f8e2e8f3ade273131cb1c7aad1d7dfcbd64a78586cfca900c14cb5";
-    }
     const [activeTab, setActiveTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("profile");
-    let t0;
-    if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-        t0 = {
-            email: true,
-            push: true,
-            desktop: false,
-            messages: true,
-            updates: false
-        };
-        $[1] = t0;
-    } else {
-        t0 = $[1];
-    }
-    const [notifications, setNotifications] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(t0);
-    const [theme, setTheme] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("light");
+    const [notifications, setNotifications] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        email: true,
+        push: true,
+        desktop: false,
+        messages: true,
+        updates: false
+    });
+    const [theme, setThemeState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        "SettingsPage.useState": ()=>readStoredTheme()
+    }["SettingsPage.useState"]);
     const [showPassword, setShowPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    let t1;
-    if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-        t1 = [
-            {
-                id: "profile",
-                label: "Profile",
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"]
-            },
-            {
-                id: "notifications",
-                label: "Notifications",
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__["Bell"]
-            },
-            {
-                id: "security",
-                label: "Security",
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"]
-            },
-            {
-                id: "appearance",
-                label: "Appearance",
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$palette$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Palette$3e$__["Palette"]
-            },
-            {
-                id: "integrations",
-                label: "Integrations",
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"]
+    const tabs = [
+        {
+            id: "profile",
+            label: "Profile",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"]
+        },
+        {
+            id: "notifications",
+            label: "Notifications",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__["Bell"]
+        },
+        {
+            id: "security",
+            label: "Security",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"]
+        },
+        {
+            id: "appearance",
+            label: "Appearance",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$palette$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Palette$3e$__["Palette"]
+        },
+        {
+            id: "integrations",
+            label: "Integrations",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"]
+        }
+    ];
+    // Apply theme to document.documentElement
+    const applyTheme = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "SettingsPage.useCallback[applyTheme]": (t)=>{
+            const root = ("TURBOPACK compile-time truthy", 1) ? document.documentElement : "TURBOPACK unreachable";
+            if (!root) return;
+            const effectiveDark = t === "system" ? getSystemPrefersDark() : t === "dark";
+            if (effectiveDark) {
+                root.classList.add("dark");
+                root.setAttribute("data-theme", "dark");
+            } else {
+                root.classList.remove("dark");
+                root.setAttribute("data-theme", "light");
             }
-        ];
-        $[2] = t1;
-    } else {
-        t1 = $[2];
-    }
-    const tabs = t1;
-    let t2;
-    let t3;
-    let t4;
-    if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
-        t2 = {
-            opacity: 0,
-            y: -20
-        };
-        t3 = {
-            opacity: 1,
-            y: 0
-        };
-        t4 = {
-            duration: 0.5
-        };
-        $[3] = t2;
-        $[4] = t3;
-        $[5] = t4;
-    } else {
-        t2 = $[3];
-        t3 = $[4];
-        t4 = $[5];
-    }
-    let t5;
-    if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
-        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "flex items-center gap-3 mb-2",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                className: "text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent",
-                children: "Settings"
-            }, void 0, false, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 348,
-                columnNumber: 56
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 348,
-            columnNumber: 10
-        }, this);
-        $[6] = t5;
-    } else {
-        t5 = $[6];
-    }
-    let t6;
-    if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-        t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-            initial: t2,
-            animate: t3,
-            transition: t4,
-            className: "mb-6",
+        }
+    }["SettingsPage.useCallback[applyTheme]"], []);
+    // Public setter that persists preference
+    const setTheme = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "SettingsPage.useCallback[setTheme]": (newTheme)=>{
+            try {
+                localStorage.setItem(STORAGE_KEY, newTheme);
+            } catch  {
+            /* ignore */ }
+            setThemeState(newTheme);
+            applyTheme(newTheme);
+        }
+    }["SettingsPage.useCallback[setTheme]"], [
+        applyTheme
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "SettingsPage.useEffect": ()=>{
+            // apply on mount
+            applyTheme(theme);
+            // listen to system changes and re-apply only when in system mode
+            if (("TURBOPACK compile-time value", "object") === "undefined" || !window.matchMedia) return;
+            const mql = window.matchMedia("(prefers-color-scheme: dark)");
+            const handler = {
+                "SettingsPage.useEffect.handler": (ev)=>{
+                    // re-apply only if preference is system (either stored or current state)
+                    const stored = ({
+                        "SettingsPage.useEffect.handler.stored": ()=>{
+                            try {
+                                return localStorage.getItem(STORAGE_KEY);
+                            } catch  {
+                                return null;
+                            }
+                        }
+                    })["SettingsPage.useEffect.handler.stored"]();
+                    const currentModeIsSystem = stored === "system" || !stored && theme === "system";
+                    if (currentModeIsSystem) {
+                        applyTheme("system");
+                    }
+                }
+            }["SettingsPage.useEffect.handler"];
+            if (typeof mql.addEventListener === "function") {
+                mql.addEventListener("change", handler);
+            } else if (typeof mql.addListener === "function") {
+                mql.addListener(handler);
+            }
+            return ({
+                "SettingsPage.useEffect": ()=>{
+                    if (typeof mql.removeEventListener === "function") {
+                        mql.removeEventListener("change", handler);
+                    } else if (typeof mql.removeListener === "function") {
+                        mql.removeListener(handler);
+                    }
+                }
+            })["SettingsPage.useEffect"];
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }
+    }["SettingsPage.useEffect"], []); // mount only
+    /* --------------
+     UI rendering
+     -------------- */ const themeOptions = [
+        {
+            id: "light",
+            label: "Light",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sun$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sun$3e$__["Sun"]
+        },
+        {
+            id: "dark",
+            label: "Dark",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$moon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Moon$3e$__["Moon"]
+        },
+        {
+            id: "system",
+            label: "System",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$monitor$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Monitor$3e$__["Monitor"]
+        }
+    ];
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "max-w-7xl mx-auto",
             children: [
-                t5,
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                    className: "text-slate-500 flex items-center gap-2",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$settings$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Settings$3e$__["Settings"], {
-                            className: "w-4 h-4"
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 355,
-                            columnNumber: 139
-                        }, this),
-                        "Manage your account and preferences"
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 355,
-                    columnNumber: 85
-                }, this)
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 355,
-            columnNumber: 10
-        }, this);
-        $[7] = t6;
-    } else {
-        t6 = $[7];
-    }
-    let t7;
-    let t8;
-    let t9;
-    if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-        t7 = {
-            opacity: 0,
-            x: -20
-        };
-        t8 = {
-            opacity: 1,
-            x: 0
-        };
-        t9 = {
-            duration: 0.4,
-            delay: 0.1
-        };
-        $[8] = t7;
-        $[9] = t8;
-        $[10] = t9;
-    } else {
-        t7 = $[8];
-        t8 = $[9];
-        t9 = $[10];
-    }
-    let t10;
-    if ($[11] !== activeTab) {
-        t10 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-            initial: t7,
-            animate: t8,
-            transition: t9,
-            className: "lg:col-span-1",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "bg-white rounded-2xl border border-slate-200 p-4 shadow-sm sticky top-6",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "space-y-2",
-                    children: tabs.map({
-                        "SettingsPage[tabs.map()]": (tab, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                                initial: {
-                                    opacity: 0,
-                                    x: -10
-                                },
-                                animate: {
-                                    opacity: 1,
-                                    x: 0
-                                },
-                                transition: {
-                                    duration: 0.3,
-                                    delay: 0.2 + index * 0.05
-                                },
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TabButton, {
-                                    active: activeTab === tab.id,
-                                    icon: tab.icon,
-                                    label: tab.label,
-                                    onClick: {
-                                        "SettingsPage[tabs.map() > <TabButton>.onClick]": ()=>setActiveTab(tab.id)
-                                    }["SettingsPage[tabs.map() > <TabButton>.onClick]"]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 396,
-                                    columnNumber: 16
-                                }, this)
-                            }, tab.id, false, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 387,
-                                columnNumber: 57
-                            }, this)
-                    }["SettingsPage[tabs.map()]"])
-                }, void 0, false, {
-                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 386,
-                    columnNumber: 180
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 386,
-                columnNumber: 91
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 386,
-            columnNumber: 11
-        }, this);
-        $[11] = activeTab;
-        $[12] = t10;
-    } else {
-        t10 = $[12];
-    }
-    let t11;
-    if ($[13] !== activeTab) {
-        t11 = activeTab === "profile" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-                    title: "Personal Information",
-                    description: "Update your personal details and contact information",
-                    delay: 0.2,
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                    initial: {
+                        opacity: 0,
+                        y: -20
+                    },
+                    animate: {
+                        opacity: 1,
+                        y: 0
+                    },
+                    transition: {
+                        duration: 0.5
+                    },
+                    className: "mb-6",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "space-y-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "grid grid-cols-1 sm:grid-cols-2 gap-4",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                    className: "block text-sm font-medium text-slate-700 mb-2",
-                                                    children: "First Name"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 407,
-                                                    columnNumber: 252
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                    type: "text",
-                                                    defaultValue: "John",
-                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 407,
-                                                    columnNumber: 335
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 247
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                    className: "block text-sm font-medium text-slate-700 mb-2",
-                                                    children: "Last Name"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 407,
-                                                    columnNumber: 593
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                    type: "text",
-                                                    defaultValue: "Doe",
-                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 407,
-                                                    columnNumber: 675
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 588
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 407,
-                                    columnNumber: 192
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-slate-700 mb-2",
-                                            children: "Email Address"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 938
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "email",
-                                            defaultValue: "john.doe@example.com",
-                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 1024
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 407,
-                                    columnNumber: 933
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-slate-700 mb-2",
-                                            children: "Phone Number"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 1299
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "tel",
-                                            defaultValue: "+1 (555) 123-4567",
-                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 407,
-                                            columnNumber: 1384
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 407,
-                                    columnNumber: 1294
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 407,
-                            columnNumber: 165
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                            whileHover: {
-                                scale: 1.02
-                            },
-                            whileTap: {
-                                scale: 0.98
-                            },
-                            className: "mt-6 px-6 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
-                                    className: "w-4 h-4"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 411,
-                                    columnNumber: 205
-                                }, this),
-                                "Save Changes"
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 407,
-                            columnNumber: 1655
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 407,
-                    columnNumber: 40
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-                    title: "Profile Photo",
-                    description: "Update your profile picture",
-                    delay: 0.3,
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center gap-6",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg",
-                                children: "JD"
+                            className: "flex items-center gap-3 mb-2",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                className: "text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent",
+                                children: "Settings"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 411,
-                                columnNumber: 414
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex gap-3",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                                        whileHover: {
-                                            scale: 1.02
-                                        },
-                                        whileTap: {
-                                            scale: 0.98
-                                        },
-                                        className: "px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors",
-                                        children: "Upload New"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                        lineNumber: 411,
-                                        columnNumber: 605
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        className: "px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-sm font-medium transition-colors",
-                                        children: "Remove"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                        lineNumber: 415,
-                                        columnNumber: 160
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 411,
-                                columnNumber: 577
+                                lineNumber: 430,
+                                columnNumber: 13
                             }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 411,
-                        columnNumber: 373
-                    }, this)
-                }, void 0, false, {
-                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 411,
-                    columnNumber: 280
-                }, this)
-            ]
-        }, void 0, true);
-        $[13] = activeTab;
-        $[14] = t11;
-    } else {
-        t11 = $[14];
-    }
-    let t12;
-    if ($[15] !== activeTab || $[16] !== notifications) {
-        t12 = activeTab === "notifications" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-            title: "Notification Preferences",
-            description: "Choose how you want to be notified",
-            delay: 0.2,
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "space-y-1",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"],
-                        title: "Email Notifications",
-                        description: "Receive updates and alerts via email",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
-                            checked: notifications.email,
-                            onChange: {
-                                "SettingsPage[<Toggle>.onChange]": (val)=>setNotifications({
-                                        ...notifications,
-                                        email: val
-                                    })
-                            }["SettingsPage[<Toggle>.onChange]"]
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 423,
-                            columnNumber: 285
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 423,
-                        columnNumber: 182
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$smartphone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Smartphone$3e$__["Smartphone"],
-                        title: "Push Notifications",
-                        description: "Get notifications on your mobile device",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
-                            checked: notifications.push,
-                            onChange: {
-                                "SettingsPage[<Toggle>.onChange]": (val_0)=>setNotifications({
-                                        ...notifications,
-                                        push: val_0
-                                    })
-                            }["SettingsPage[<Toggle>.onChange]"]
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 428,
-                            columnNumber: 175
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 428,
-                        columnNumber: 64
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$monitor$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Monitor$3e$__["Monitor"],
-                        title: "Desktop Notifications",
-                        description: "Show notifications on your desktop",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
-                            checked: notifications.desktop,
-                            onChange: {
-                                "SettingsPage[<Toggle>.onChange]": (val_1)=>setNotifications({
-                                        ...notifications,
-                                        desktop: val_1
-                                    })
-                            }["SettingsPage[<Toggle>.onChange]"]
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 433,
-                            columnNumber: 170
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 433,
-                        columnNumber: 64
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__["Bell"],
-                        title: "Message Notifications",
-                        description: "Notify me about new messages",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
-                            checked: notifications.messages,
-                            onChange: {
-                                "SettingsPage[<Toggle>.onChange]": (val_2)=>setNotifications({
-                                        ...notifications,
-                                        messages: val_2
-                                    })
-                            }["SettingsPage[<Toggle>.onChange]"]
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 438,
-                            columnNumber: 161
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 438,
-                        columnNumber: 64
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"],
-                        title: "Product Updates",
-                        description: "Get notified about new features",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
-                            checked: notifications.updates,
-                            onChange: {
-                                "SettingsPage[<Toggle>.onChange]": (val_3)=>setNotifications({
-                                        ...notifications,
-                                        updates: val_3
-                                    })
-                            }["SettingsPage[<Toggle>.onChange]"]
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 443,
-                            columnNumber: 157
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 443,
-                        columnNumber: 64
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 423,
-                columnNumber: 155
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 423,
-            columnNumber: 44
-        }, this);
-        $[15] = activeTab;
-        $[16] = notifications;
-        $[17] = t12;
-    } else {
-        t12 = $[17];
-    }
-    let t13;
-    if ($[18] !== activeTab || $[19] !== showPassword) {
-        t13 = activeTab === "security" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-                    title: "Password",
-                    description: "Update your password to keep your account secure",
-                    delay: 0.2,
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "space-y-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-slate-700 mb-2",
-                                            children: "Current Password"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 457,
-                                            columnNumber: 182
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "relative",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                    type: showPassword ? "text" : "password",
-                                                    className: "w-full px-4 py-2.5 pr-12 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 457,
-                                                    columnNumber: 297
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    onClick: {
-                                                        "SettingsPage[<button>.onClick]": ()=>setShowPassword(!showPassword)
-                                                    }["SettingsPage[<button>.onClick]"],
-                                                    className: "absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600",
-                                                    children: showPassword ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2d$off$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__EyeOff$3e$__["EyeOff"], {
-                                                        className: "w-5 h-5"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                        lineNumber: 459,
-                                                        columnNumber: 158
-                                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
-                                                        className: "w-5 h-5"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                        lineNumber: 459,
-                                                        columnNumber: 191
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                    lineNumber: 457,
-                                                    columnNumber: 560
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 457,
-                                            columnNumber: 271
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 457,
-                                    columnNumber: 177
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-slate-700 mb-2",
-                                            children: "New Password"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 459,
-                                            columnNumber: 245
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "password",
-                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 459,
-                                            columnNumber: 330
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 459,
-                                    columnNumber: 240
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-sm font-medium text-slate-700 mb-2",
-                                            children: "Confirm New Password"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 459,
-                                            columnNumber: 572
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "password",
-                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 459,
-                                            columnNumber: 665
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 459,
-                                    columnNumber: 567
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 457,
-                            columnNumber: 150
+                            lineNumber: 429,
+                            columnNumber: 11
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                            whileHover: {
-                                scale: 1.02
-                            },
-                            whileTap: {
-                                scale: 0.98
-                            },
-                            className: "mt-6 px-6 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: "text-slate-500 flex items-center gap-2",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"], {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$settings$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Settings$3e$__["Settings"], {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 463,
-                                    columnNumber: 205
+                                    lineNumber: 435,
+                                    columnNumber: 13
                                 }, this),
-                                "Update Password"
+                                "Manage your account and preferences"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 459,
-                            columnNumber: 908
+                            lineNumber: 434,
+                            columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 457,
-                    columnNumber: 41
+                    lineNumber: 420,
+                    columnNumber: 9
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-                    title: "Two-Factor Authentication",
-                    description: "Add an extra layer of security to your account",
-                    delay: 0.3,
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center gap-3",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"], {
-                                            className: "w-5 h-5 text-emerald-600"
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "grid grid-cols-1 lg:grid-cols-4 gap-6",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                            initial: {
+                                opacity: 0,
+                                x: -20
+                            },
+                            animate: {
+                                opacity: 1,
+                                x: 0
+                            },
+                            transition: {
+                                duration: 0.4,
+                                delay: 0.1
+                            },
+                            className: "lg:col-span-1",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white rounded-2xl border border-slate-200 p-4 shadow-sm sticky top-6",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "space-y-2",
+                                    children: tabs.map((tab, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                                            initial: {
+                                                opacity: 0,
+                                                x: -10
+                                            },
+                                            animate: {
+                                                opacity: 1,
+                                                x: 0
+                                            },
+                                            transition: {
+                                                duration: 0.3,
+                                                delay: 0.2 + index * 0.05
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TabButton, {
+                                                active: activeTab === tab.id,
+                                                icon: tab.icon,
+                                                label: tab.label,
+                                                onClick: ()=>setActiveTab(tab.id)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 463,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, tab.id, false, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 453,
+                                            columnNumber: 43
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                    lineNumber: 452,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                lineNumber: 451,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                            lineNumber: 441,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "lg:col-span-3 space-y-6",
+                            children: [
+                                activeTab === "profile" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                            title: "Personal Information",
+                                            description: "Update your personal details and contact information",
+                                            delay: 0.2,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "space-y-4",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "grid grid-cols-1 sm:grid-cols-2 gap-4",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                            children: "First Name"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 475,
+                                                                            columnNumber: 25
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "text",
+                                                                            defaultValue: "John",
+                                                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 478,
+                                                                            columnNumber: 25
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 474,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                            children: "Last Name"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 481,
+                                                                            columnNumber: 25
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "text",
+                                                                            defaultValue: "Doe",
+                                                                            className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 484,
+                                                                            columnNumber: 25
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 480,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 473,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                    children: "Email Address"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 488,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "email",
+                                                                    defaultValue: "john.doe@example.com",
+                                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 491,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 487,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                    children: "Phone Number"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 494,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "tel",
+                                                                    defaultValue: "+1 (555) 123-4567",
+                                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 497,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 493,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 472,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                                    whileHover: {
+                                                        scale: 1.02
+                                                    },
+                                                    whileTap: {
+                                                        scale: 0.98
+                                                    },
+                                                    className: "mt-6 px-6 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
+                                                            className: "w-4 h-4"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 505,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        "Save Changes"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 500,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 471,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                            title: "Profile Photo",
+                                            description: "Update your profile picture",
+                                            delay: 0.3,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-center gap-6",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg",
+                                                        children: "JD"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 512,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex gap-3",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                                                whileHover: {
+                                                                    scale: 1.02
+                                                                },
+                                                                whileTap: {
+                                                                    scale: 0.98
+                                                                },
+                                                                className: "px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors",
+                                                                children: "Upload New"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 516,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                className: "px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-sm font-medium transition-colors",
+                                                                children: "Remove"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 523,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 515,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 511,
+                                                columnNumber: 19
+                                            }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                            lineNumber: 463,
-                                            columnNumber: 639
+                                            lineNumber: 510,
+                                            columnNumber: 17
                                         }, this)
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                        lineNumber: 463,
-                                        columnNumber: 553
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    ]
+                                }, void 0, true),
+                                activeTab === "notifications" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                    title: "Notification Preferences",
+                                    description: "Choose how you want to be notified",
+                                    delay: 0.2,
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "space-y-1",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "text-sm font-semibold text-emerald-800",
-                                                children: "2FA Enabled"
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
+                                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"],
+                                                title: "Email Notifications",
+                                                description: "Receive updates and alerts via email",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
+                                                    checked: notifications.email,
+                                                    onChange: (val)=>setNotifications({
+                                                            ...notifications,
+                                                            email: val
+                                                        })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 534,
+                                                    columnNumber: 21
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                lineNumber: 463,
-                                                columnNumber: 697
+                                                lineNumber: 533,
+                                                columnNumber: 19
                                             }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "text-xs text-emerald-600",
-                                                children: "Your account is protected"
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
+                                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$smartphone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Smartphone$3e$__["Smartphone"],
+                                                title: "Push Notifications",
+                                                description: "Get notifications on your mobile device",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
+                                                    checked: notifications.push,
+                                                    onChange: (val)=>setNotifications({
+                                                            ...notifications,
+                                                            push: val
+                                                        })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 540,
+                                                    columnNumber: 21
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                                lineNumber: 463,
-                                                columnNumber: 766
+                                                lineNumber: 539,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
+                                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$monitor$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Monitor$3e$__["Monitor"],
+                                                title: "Desktop Notifications",
+                                                description: "Show notifications on your desktop",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
+                                                    checked: notifications.desktop,
+                                                    onChange: (val)=>setNotifications({
+                                                            ...notifications,
+                                                            desktop: val
+                                                        })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 546,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 545,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
+                                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__["Bell"],
+                                                title: "Message Notifications",
+                                                description: "Notify me about new messages",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
+                                                    checked: notifications.messages,
+                                                    onChange: (val)=>setNotifications({
+                                                            ...notifications,
+                                                            messages: val
+                                                        })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 552,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 551,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingRow, {
+                                                icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"],
+                                                title: "Product Updates",
+                                                description: "Get notified about new features",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Toggle, {
+                                                    checked: notifications.updates,
+                                                    onChange: (val)=>setNotifications({
+                                                            ...notifications,
+                                                            updates: val
+                                                        })
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 558,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 557,
+                                                columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                        lineNumber: 463,
-                                        columnNumber: 692
+                                        lineNumber: 532,
+                                        columnNumber: 17
                                     }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 463,
-                                columnNumber: 512
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "px-4 py-2 bg-white border border-emerald-200 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors",
-                                children: "Manage"
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 463,
-                                columnNumber: 847
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 463,
-                        columnNumber: 406
-                    }, this)
-                }, void 0, false, {
-                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                    lineNumber: 463,
-                    columnNumber: 282
-                }, this)
-            ]
-        }, void 0, true);
-        $[18] = activeTab;
-        $[19] = showPassword;
-        $[20] = t13;
-    } else {
-        t13 = $[20];
-    }
-    let t14;
-    if ($[21] !== activeTab || $[22] !== theme) {
-        t14 = activeTab === "appearance" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-            title: "Theme",
-            description: "Choose your preferred color scheme",
-            delay: 0.2,
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
-                children: [
-                    {
-                        id: "light",
-                        label: "Light",
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sun$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sun$3e$__["Sun"]
-                    },
-                    {
-                        id: "dark",
-                        label: "Dark",
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$moon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Moon$3e$__["Moon"]
-                    },
-                    {
-                        id: "system",
-                        label: "System",
-                        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$monitor$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Monitor$3e$__["Monitor"]
-                    }
-                ].map({
-                    "SettingsPage[(anonymous)()]": (option)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
-                            onClick: {
-                                "SettingsPage[(anonymous)() > <motion.button>.onClick]": ()=>setTheme(option.id)
-                            }["SettingsPage[(anonymous)() > <motion.button>.onClick]"],
-                            whileHover: {
-                                scale: 1.02
-                            },
-                            whileTap: {
-                                scale: 0.98
-                            },
-                            className: `p-6 rounded-xl border-2 transition-all duration-200 ${theme === option.id ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-slate-300 bg-white"}`,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(option.icon, {
-                                    className: `w-8 h-8 mx-auto mb-3 ${theme === option.id ? "text-blue-600" : "text-slate-400"}`
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 491,
-                                    columnNumber: 187
+                                    lineNumber: 531,
+                                    columnNumber: 47
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: `text-sm font-semibold ${theme === option.id ? "text-blue-700" : "text-slate-700"}`,
-                                    children: option.label
+                                activeTab === "security" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                            title: "Password",
+                                            description: "Update your password to keep your account secure",
+                                            delay: 0.2,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "space-y-4",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                    children: "Current Password"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 570,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "relative",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: showPassword ? "text" : "password",
+                                                                            className: "w-full px-4 py-2.5 pr-12 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 574,
+                                                                            columnNumber: 25
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                            onClick: ()=>setShowPassword(!showPassword),
+                                                                            className: "absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600",
+                                                                            "aria-label": showPassword ? "Hide password" : "Show password",
+                                                                            children: showPassword ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2d$off$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__EyeOff$3e$__["EyeOff"], {
+                                                                                className: "w-5 h-5"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                                lineNumber: 576,
+                                                                                columnNumber: 43
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
+                                                                                className: "w-5 h-5"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                                lineNumber: 576,
+                                                                                columnNumber: 76
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                            lineNumber: 575,
+                                                                            columnNumber: 25
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 573,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 569,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                    children: "New Password"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 581,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "password",
+                                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 584,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 580,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-sm font-medium text-slate-700 mb-2",
+                                                                    children: "Confirm New Password"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 587,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "password",
+                                                                    className: "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 590,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 586,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 568,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                                    whileHover: {
+                                                        scale: 1.02
+                                                    },
+                                                    whileTap: {
+                                                        scale: 0.98
+                                                    },
+                                                    className: "mt-6 px-6 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"], {
+                                                            className: "w-4 h-4"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 598,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        "Update Password"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 593,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 567,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                            title: "Two-Factor Authentication",
+                                            description: "Add an extra layer of security to your account",
+                                            delay: 0.3,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center gap-3",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"], {
+                                                                    className: "w-5 h-5 text-emerald-600"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 607,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 606,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                        className: "text-sm font-semibold text-emerald-800",
+                                                                        children: "2FA Enabled"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                        lineNumber: 610,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                        className: "text-xs text-emerald-600",
+                                                                        children: "Your account is protected"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                        lineNumber: 611,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 609,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 605,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        className: "px-4 py-2 bg-white border border-emerald-200 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors",
+                                                        children: "Manage"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 614,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 604,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 603,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true),
+                                activeTab === "appearance" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                    title: "Theme",
+                                    description: "Choose your preferred color scheme",
+                                    delay: 0.2,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "grid grid-cols-1 sm:grid-cols-3 gap-4",
+                                            children: themeOptions.map((option)=>{
+                                                const Icon = option.icon;
+                                                const active = theme === option.id;
+                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
+                                                    onClick: ()=>setTheme(option.id),
+                                                    whileHover: {
+                                                        scale: 1.02
+                                                    },
+                                                    whileTap: {
+                                                        scale: 0.98
+                                                    },
+                                                    className: `p-6 rounded-xl border-2 transition-all duration-200 text-center focus:outline-none ${active ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-slate-300 bg-white"}`,
+                                                    "aria-pressed": active,
+                                                    "aria-label": `Set ${option.label} theme`,
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Icon, {
+                                                            className: `w-8 h-8 mx-auto mb-3 ${active ? "text-blue-600" : "text-slate-400"}`
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 631,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: `text-sm font-semibold ${active ? "text-blue-700" : "text-slate-700"}`,
+                                                            children: option.label
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                            lineNumber: 632,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, option.id, true, {
+                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                    lineNumber: 626,
+                                                    columnNumber: 24
+                                                }, this);
+                                            })
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 622,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "mt-4 text-sm text-slate-500",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                children: [
+                                                    "Current preference: ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "font-medium text-slate-700 ml-2",
+                                                        children: theme
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 641,
+                                                        columnNumber: 41
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 640,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                            lineNumber: 639,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                    lineNumber: 621,
+                                    columnNumber: 44
+                                }, this),
+                                activeTab === "integrations" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
+                                    title: "Connected Apps",
+                                    description: "Manage your third-party integrations",
+                                    delay: 0.2,
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "space-y-4",
+                                        children: [
+                                            {
+                                                name: "Slack",
+                                                description: "Connect your workspace",
+                                                connected: true,
+                                                gradient: "from-purple-500 to-pink-500"
+                                            },
+                                            {
+                                                name: "Google Calendar",
+                                                description: "Sync your events",
+                                                connected: true,
+                                                gradient: "from-blue-500 to-cyan-500"
+                                            },
+                                            {
+                                                name: "Microsoft Teams",
+                                                description: "Enable team collaboration",
+                                                connected: false,
+                                                gradient: "from-indigo-500 to-blue-500"
+                                            }
+                                        ].map((app)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 transition-colors",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center gap-4",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: `w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center shadow-md`,
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"], {
+                                                                    className: "w-6 h-6 text-white"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                    lineNumber: 666,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 665,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                                        className: "text-sm font-semibold text-slate-800",
+                                                                        children: app.name
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                        lineNumber: 669,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                        className: "text-xs text-slate-500",
+                                                                        children: app.description
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                        lineNumber: 670,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                                lineNumber: 668,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 664,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        className: `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${app.connected ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "bg-blue-50 text-blue-700 hover:bg-blue-100"}`,
+                                                        children: app.connected ? "Connected" : "Connect"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                        lineNumber: 673,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, app.name, true, {
+                                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                                lineNumber: 663,
+                                                columnNumber: 29
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                                        lineNumber: 647,
+                                        columnNumber: 17
+                                    }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                    lineNumber: 491,
-                                    columnNumber: 297
+                                    lineNumber: 646,
+                                    columnNumber: 46
                                 }, this)
                             ]
-                        }, option.id, true, {
+                        }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 485,
-                            columnNumber: 52
+                            lineNumber: 469,
+                            columnNumber: 11
                         }, this)
-                }["SettingsPage[(anonymous)()]"])
-            }, void 0, false, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 472,
-                columnNumber: 133
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 472,
-            columnNumber: 41
-        }, this);
-        $[21] = activeTab;
-        $[22] = theme;
-        $[23] = t14;
-    } else {
-        t14 = $[23];
-    }
-    let t15;
-    if ($[24] !== activeTab) {
-        t15 = activeTab === "integrations" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsSection, {
-            title: "Connected Apps",
-            description: "Manage your third-party integrations",
-            delay: 0.2,
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "space-y-4",
-                children: [
-                    {
-                        name: "Slack",
-                        description: "Connect your workspace",
-                        connected: true,
-                        gradient: "from-purple-500 to-pink-500"
-                    },
-                    {
-                        name: "Google Calendar",
-                        description: "Sync your events",
-                        connected: true,
-                        gradient: "from-blue-500 to-cyan-500"
-                    },
-                    {
-                        name: "Microsoft Teams",
-                        description: "Enable team collaboration",
-                        connected: false,
-                        gradient: "from-indigo-500 to-blue-500"
-                    }
-                ].map(_SettingsPageAnonymous)
-            }, void 0, false, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 501,
-                columnNumber: 146
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 501,
-            columnNumber: 43
-        }, this);
-        $[24] = activeTab;
-        $[25] = t15;
-    } else {
-        t15 = $[25];
-    }
-    let t16;
-    if ($[26] !== t11 || $[27] !== t12 || $[28] !== t13 || $[29] !== t14 || $[30] !== t15) {
-        t16 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "lg:col-span-3 space-y-6",
-            children: [
-                t11,
-                t12,
-                t13,
-                t14,
-                t15
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
+                    lineNumber: 440,
+                    columnNumber: 9
+                }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 524,
-            columnNumber: 11
-        }, this);
-        $[26] = t11;
-        $[27] = t12;
-        $[28] = t13;
-        $[29] = t14;
-        $[30] = t15;
-        $[31] = t16;
-    } else {
-        t16 = $[31];
-    }
-    let t17;
-    if ($[32] !== t10 || $[33] !== t16) {
-        t17 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "max-w-7xl mx-auto",
-                children: [
-                    t6,
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "grid grid-cols-1 lg:grid-cols-4 gap-6",
-                        children: [
-                            t10,
-                            t16
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 536,
-                        columnNumber: 152
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 536,
-                columnNumber: 113
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-            lineNumber: 536,
-            columnNumber: 11
-        }, this);
-        $[32] = t10;
-        $[33] = t16;
-        $[34] = t17;
-    } else {
-        t17 = $[34];
-    }
-    return t17;
-}
-_s(SettingsPage, "eP3DRfP5/mXMYuO7kN/2+kSlwUA=");
-_c4 = SettingsPage;
-function _SettingsPageAnonymous(app) {
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 transition-colors",
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex items-center gap-4",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: `w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center shadow-md`,
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"], {
-                            className: "w-6 h-6 text-white"
-                        }, void 0, false, {
-                            fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                            lineNumber: 546,
-                            columnNumber: 314
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 546,
-                        columnNumber: 197
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                className: "text-sm font-semibold text-slate-800",
-                                children: app.name
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 546,
-                                columnNumber: 363
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "text-xs text-slate-500",
-                                children: app.description
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                                lineNumber: 546,
-                                columnNumber: 431
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                        lineNumber: 546,
-                        columnNumber: 358
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 546,
-                columnNumber: 156
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                className: `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${app.connected ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "bg-blue-50 text-blue-700 hover:bg-blue-100"}`,
-                children: app.connected ? "Connected" : "Connect"
-            }, void 0, false, {
-                fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-                lineNumber: 546,
-                columnNumber: 502
-            }, this)
-        ]
-    }, app.name, true, {
+            lineNumber: 419,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
         fileName: "[project]/src/app/dashboard/admin/settings/page.tsx",
-        lineNumber: 546,
+        lineNumber: 418,
         columnNumber: 10
     }, this);
 }
+_s(SettingsPage, "Ng3ZIcyvrAUn7whCbqHVjoGxn+I=");
+_c4 = SettingsPage;
 var _c, _c1, _c2, _c3, _c4;
 __turbopack_context__.k.register(_c, "SettingsSection");
 __turbopack_context__.k.register(_c1, "SettingRow");

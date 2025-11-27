@@ -1,26 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Users,
   Plus,
   MoreVertical,
   Mail,
-  MessageSquare,
   Crown,
   Star,
-  UserPlus,
   Settings,
   TrendingUp,
   Activity,
   Award,
   Target,
 } from "lucide-react";
+import CreateTeamForm from "../../../ui/forms/create-team/page"; // adjust path if needed
+import ScheduleMeetingForm from "../../../ui/forms/Schedule-meeting/page"; // new schedule meeting form
 
-// Team Card Component
-const TeamCard = ({ team, delay }: any) => {
+/**
+ * Team Card Component
+ * Replaced Message button with Schedule Meeting button.
+ */
+const TeamCard = ({ team, delay, onOpenSchedule }: any) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -77,7 +80,7 @@ const TeamCard = ({ team, delay }: any) => {
         <div className="flex -space-x-2 mb-4 flex-wrap">
           {team.members.slice(0, 5).map((member: any, idx: number) => (
             <motion.div
-              key={idx}
+              key={`${member.name ?? member.initials}-${idx}`}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.2, delay: delay + idx * 0.05 }}
@@ -112,14 +115,18 @@ const TeamCard = ({ team, delay }: any) => {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-2">
+          {/* SCHEDULE MEETING button replaces previous Message button */}
           <motion.button
+            onClick={() => onOpenSchedule(team)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="flex-1 px-4 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+            title="Schedule meeting with this team"
           >
-            <MessageSquare className="w-4 h-4" />
-            Message
+            <Mail className="w-4 h-4" />
+            Schedule Meeting
           </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -133,7 +140,7 @@ const TeamCard = ({ team, delay }: any) => {
   );
 };
 
-// Stats Card Component
+/* StatCard component kept as-is */
 const StatCard = ({ icon: Icon, label, value, subtitle, gradient, delay }: any) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.95 }}
@@ -153,11 +160,17 @@ const StatCard = ({ icon: Icon, label, value, subtitle, gradient, delay }: any) 
   </motion.div>
 );
 
-// Main Page
+// ---------------- Main Page ----------------
 export default function TeamsPage() {
+  // Convert static array to state so we can add teams
   const [searchQuery, setSearchQuery] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
 
-  const teams = [
+  // schedule modal state
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [selectedTeamForSchedule, setSelectedTeamForSchedule] = useState<any | null>(null);
+
+  const [teams, setTeams] = useState<any[]>([
     {
       id: 1,
       name: "Product Development",
@@ -258,14 +271,16 @@ export default function TeamsPage() {
         { name: "Uma Singh", initials: "US" },
       ],
     },
-  ];
+  ]);
 
+  // filter logic preserved
   const filteredTeams = teams.filter(
     (team) =>
       team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       team.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // stats recalculated from state
   const stats = [
     {
       icon: Users,
@@ -298,82 +313,205 @@ export default function TeamsPage() {
     },
   ];
 
+  // helper: ensure new team members have initials
+  function ensureInitials(members: any[]) {
+    return members.map((m) => {
+      if (m.initials) return m;
+      const name = (m.name || "").trim();
+      if (!name) return { name: "", initials: "" };
+      const parts = name.split(/\s+/);
+      const initials =
+        parts.length === 1
+          ? parts[0].slice(0, 2).toUpperCase()
+          : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      return { name, initials };
+    });
+  }
+
+  // create handler called by CreateTeamForm
+  function handleCreateTeam(newTeam: any) {
+    const teamWithInitials = {
+      ...newTeam,
+      id: newTeam.id ?? Date.now(),
+      members: ensureInitials(newTeam.members || []),
+    };
+    // prepend new team so it appears first
+    setTeams((prev) => [teamWithInitials, ...prev]);
+    setShowCreate(false);
+  }
+
+  // schedule handler invoked when schedule form submits
+  // For now, we add to an in-memory "scheduledMeetings" list and log; replace with API call to persist.
+  const [scheduledMeetings, setScheduledMeetings] = useState<any[]>([]);
+
+  function handleScheduleMeeting(meeting: any) {
+    // meeting object contains: organizer, meetingTime (ISO), reminderBefore (minutes), inviteTime (Date), team
+    const toSave = { ...meeting, id: Date.now() };
+    setScheduledMeetings((prev) => [toSave, ...prev]);
+    console.log("Scheduled meeting:", toSave);
+    // Close modal
+    setShowSchedule(false);
+    setSelectedTeamForSchedule(null);
+    // Optionally: show a UI confirmation — for now console logs and state.
+  }
+
+  // open schedule modal for a team
+  function openScheduleForTeam(team: any) {
+    setSelectedTeamForSchedule(team);
+    setShowSchedule(true);
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-6"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
-            Teams
-          </h1>
-          <p className="text-slate-500 flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Manage and collaborate with your teams
-          </p>
-        </motion.div>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
+              Teams
+            </h1>
+            <p className="text-slate-500 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Manage and collaborate with your teams
+            </p>
+          </motion.div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <StatCard key={stat.label} {...stat} delay={index * 0.1} />
-          ))}
-        </div>
-
-        {/* Search & Create */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mb-6 flex flex-col sm:flex-row gap-4"
-        >
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search teams..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all duration-200"
-            />
+          {/* Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            {stats.map((stat, index) => (
+              <StatCard key={stat.label} {...stat} delay={index * 0.1} />
+            ))}
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            Create Team
-          </motion.button>
-        </motion.div>
-
-        {/* Teams Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTeams.map((team, index) => (
-            <TeamCard key={team.id} team={team} delay={0.3 + index * 0.1} />
-          ))}
-        </div>
-
-        {/* No Teams Found */}
-        {filteredTeams.length === 0 && (
+          {/* Search & Create */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="py-16 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mb-6 flex flex-col sm:flex-row gap-4"
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-              <Users className="w-8 h-8 text-slate-400" />
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search teams..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all duration-200"
+              />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">No teams found</h3>
-            <p className="text-slate-500 mb-4">Try adjusting your search query</p>
+
+            <motion.button
+              onClick={() => setShowCreate(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Create Team
+            </motion.button>
+          </motion.div>
+
+          {/* Teams Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTeams.map((team, index) => (
+              <TeamCard
+                key={team.id}
+                team={team}
+                delay={0.3 + index * 0.1}
+                onOpenSchedule={openScheduleForTeam}
+              />
+            ))}
+          </div>
+
+          {/* No Teams Found */}
+          {filteredTeams.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="py-16 text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                <Users className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">No teams found</h3>
+              <p className="text-slate-500 mb-4">Try adjusting your search query</p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Create Team modal + overlay with slight blur of background */}
+      <AnimatePresence>
+        {showCreate && (
+          <motion.div
+            key="create-team-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+          >
+            {/* Backdrop - clicking closes modal */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+              onClick={() => setShowCreate(false)}
+            />
+
+            {/* Modal container */}
+            <div className="relative z-10 w-full max-w-2xl p-4">
+              <CreateTeamForm
+                onCreate={(team) => handleCreateTeam(team)}
+                onClose={() => setShowCreate(false)}
+              />
+            </div>
           </motion.div>
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+
+      {/* Schedule Meeting modal */}
+      <AnimatePresence>
+        {showSchedule && selectedTeamForSchedule && (
+          <motion.div
+            key="schedule-meeting-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+              onClick={() => {
+                setShowSchedule(false);
+                setSelectedTeamForSchedule(null);
+              }}
+            />
+
+            <div className="relative z-10 w-full max-w-2xl p-4">
+              <ScheduleMeetingForm
+                team={selectedTeamForSchedule}
+                onClose={() => {
+                  setShowSchedule(false);
+                  setSelectedTeamForSchedule(null);
+                }}
+                onSchedule={(meeting) => handleScheduleMeeting(meeting)}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
