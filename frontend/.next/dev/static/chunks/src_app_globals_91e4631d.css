@@ -1005,16 +1005,8 @@
     height: 1px;
   }
 
-  .max-h-36 {
-    max-height: calc(var(--spacing) * 36);
-  }
-
   .max-h-40 {
     max-height: calc(var(--spacing) * 40);
-  }
-
-  .max-h-48 {
-    max-height: calc(var(--spacing) * 48);
   }
 
   .max-h-56 {
@@ -2692,11 +2684,6 @@
     --tw-ring-color: var(--color-slate-100);
   }
 
-  .blur {
-    --tw-blur: blur(8px);
-    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
-  }
-
   .blur-3xl {
     --tw-blur: blur(var(--blur-3xl));
     filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
@@ -3083,16 +3070,6 @@
 
   .focus\:ring-slate-300:focus {
     --tw-ring-color: var(--color-slate-300);
-  }
-
-  .focus\:ring-slate-500\/10:focus {
-    --tw-ring-color: #62748e1a;
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .focus\:ring-slate-500\/10:focus {
-      --tw-ring-color: color-mix(in oklab, var(--color-slate-500) 10%, transparent);
-    }
   }
 
   .focus\:ring-offset-2:focus {

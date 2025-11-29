@@ -17,15 +17,19 @@ function jsonError(message: string, status = 400) {
   return NextResponse.json({ ok: false, message }, { status });
 }
 
+/**
+ * Try to extract organizationId from a session helper if present.
+ * Returns string or null.
+ */
 async function tryGetSessionOrganizationId(req: Request): Promise<string | null> {
   try {
     if (typeof getSessionUser === "function") {
       const session = await getSessionUser(req).catch(() => null);
       if (session?.organizationId) return String(session.organizationId);
     }
-  } catch (e) {
-    // swallow session errors; caller will handle missing orgId
-    console.warn("[api/teams] getSessionUser error:", (e as any)?.message || e);
+  } catch (e: any) {
+    // Do not fail hard if session helper throws
+    console.warn("[api/teams] getSessionUser error:", e?.message ?? e);
   }
   return null;
 }
@@ -60,18 +64,23 @@ export async function GET(req: Request) {
             user: { select: { id: true, name: true, email: true } },
           },
         },
+        // include optional UI metadata fields if they exist in schema
+        // Prisma will ignore unknown fields at runtime; including them here is safe.
       },
     });
 
-    // normalize shape for frontend convenience
+    // normalize shape for frontend convenience and include optional UI metadata
     const normalized = teams.map((t) => ({
       id: t.id,
       name: t.name,
-      description: t.description,
-      managerId: t.managerId ?? null,
+      description: t.description ?? null,
+      managerId: (t as any).managerId ?? null,
       manager: t.manager ? { id: t.manager.id, name: t.manager.name, email: t.manager.email } : null,
-      // if you store UI fields like featured/gradient/projects/completion on team, include them here
-      // (kept flexible — include only if your schema actually contains them)
+      // include metadata fields if present on the object (Prisma includes them when in schema)
+      featured: (t as any).featured ?? false,
+      gradient: (t as any).gradient ?? null,
+      projects: typeof (t as any).projects !== "undefined" ? Number((t as any).projects ?? 0) : null,
+      completion: typeof (t as any).completion !== "undefined" ? Number((t as any).completion ?? 0) : null,
       members: (t.members || []).map((m) => ({
         teamMemberId: m.id,
         userId: m.user?.id ?? null,
@@ -105,6 +114,12 @@ export async function POST(req: Request) {
       description = null,
       managerId = null, // optional manager user id
       memberUserIds = [], // optional array of existing user ids to add as members
+      adhocMembers = [], // optional array of { name } objects for ad-hoc members (frontend synthetic)
+      // UI metadata fields from client
+      featured = false,
+      gradient = null,
+      projects = 0,
+      completion = 0,
       organizationId: orgFromBody = null, // prefer explicit org in body
     } = body;
 
@@ -161,6 +176,7 @@ export async function POST(req: Request) {
 
     // create team and team members in transaction
     const created = await prisma.$transaction(async (tx) => {
+      // Build team data (include the optional UI metadata if present)
       const teamData: any = {
         name: name.trim(),
         description: description ? String(description).trim() : null,
@@ -172,6 +188,12 @@ export async function POST(req: Request) {
         teamData.manager = { connect: { id: managerId } };
       }
 
+      // safe assignment of optional metadata fields (only set when provided)
+      if (typeof featured === "boolean") teamData.featured = featured;
+      if (typeof gradient === "string") teamData.gradient = gradient;
+      if (typeof projects !== "undefined") teamData.projects = Number(projects ?? 0);
+      if (typeof completion !== "undefined") teamData.completion = Number(completion ?? 0);
+
       const team = await tx.team.create({
         data: teamData,
         select: { id: true, name: true, description: true, organizationId: true, managerId: true, createdAt: true },
@@ -180,36 +202,56 @@ export async function POST(req: Request) {
       // create many TeamMember rows if any memberIds provided
       let membersCreated = [];
       if (memberIds.length > 0) {
-        // createMany expects raw fields; using teamId & userId (assumes TeamMember model has those columns)
         const createManyData = memberIds.map((uid) => ({ teamId: team.id, userId: uid, role: "EMPLOYEE" }));
-        // skipDuplicates true prevents unique constraint failures if user already member
+        // createMany with skipDuplicates helps avoid constraint errors if some already exist
         await tx.teamMember.createMany({ data: createManyData, skipDuplicates: true });
-        // fetch the created members (with user details) for response
+        // fetch created/updated member rows with user details
         membersCreated = await tx.teamMember.findMany({
           where: { teamId: team.id },
           select: { id: true, role: true, user: { select: { id: true, name: true, email: true } } },
         });
       }
 
+      // adhocMembers: frontend-only synthetic members — if you have a table to store them, insert here.
+      // For now we don't persist adhocMembers as users; you can extend schema to store them if required.
+      // Example logic (commented):
+      // if (Array.isArray(adhocMembers) && adhocMembers.length > 0) { ... }
+
       return { team, members: membersCreated };
     });
 
-    // load the fresh team with includes for response
+    // load the fresh team with includes and metadata fields for response
     const teamFull = await prisma.team.findUnique({
       where: { id: created.team.id },
       include: {
         manager: { select: { id: true, name: true, email: true } },
-        members: {
-          select: {
-            id: true,
-            role: true,
-            user: { select: { id: true, name: true, email: true } },
-          },
-        },
+        members: { select: { id: true, role: true, user: { select: { id: true, name: true, email: true } } } },
       },
     });
 
-    return NextResponse.json({ ok: true, team: teamFull ?? created.team }, { status: 201 });
+    // Normalize returned team shape to include optional metadata for UI
+    const responseTeam = {
+      id: teamFull?.id ?? created.team.id,
+      name: teamFull?.name ?? created.team.name,
+      description: teamFull?.description ?? created.team.description ?? null,
+      manager: teamFull?.manager ? { id: teamFull.manager.id, name: teamFull.manager.name, email: teamFull.manager.email } : null,
+      featured: (teamFull as any)?.featured ?? false,
+      gradient: (teamFull as any)?.gradient ?? null,
+      projects: typeof (teamFull as any)?.projects !== "undefined" ? Number((teamFull as any).projects ?? 0) : null,
+      completion: typeof (teamFull as any)?.completion !== "undefined" ? Number((teamFull as any).completion ?? 0) : null,
+      members: (teamFull?.members ?? []).map((m) => ({
+        teamMemberId: m.id,
+        userId: m.user?.id ?? null,
+        name: m.user?.name ?? null,
+        email: m.user?.email ?? null,
+        role: m.role ?? null,
+      })),
+      organizationId: teamFull?.organizationId ?? created.team.organizationId,
+      createdAt: teamFull?.createdAt?.toISOString?.() ?? created.team.createdAt?.toISOString?.() ?? null,
+      updatedAt: (teamFull as any)?.updatedAt?.toISOString?.() ?? null,
+    };
+
+    return NextResponse.json({ ok: true, team: responseTeam }, { status: 201 });
   } catch (err: any) {
     console.error("[api/teams][POST] error:", err);
     const isDev = process.env.NODE_ENV !== "production";

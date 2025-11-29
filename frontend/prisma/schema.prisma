@@ -379,6 +379,10 @@ model Team {
   members        TeamMember[]
   threads        Thread[]
   invites        Invite[] // opposite for Invite.team
+   featured       Boolean?     @default(false)
+  gradient       String?      // e.g. "from-blue-500 to-cyan-500"
+  projects       Int?         @default(0)
+  completion     Int?         @default(0)
 
   // opposite for Task.team
   tasks Task[]

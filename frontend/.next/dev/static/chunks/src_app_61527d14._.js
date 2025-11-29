@@ -27,7 +27,10 @@ var _s = __turbopack_context__.k.signature();
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
-async function fetchJsonList(url) {
+/**
+ * Fetches a URL expecting a list or wrapper object { users: [...] } etc.
+ * Returns array or throws on HTTP error.
+ */ async function fetchJsonList(url) {
     const res = await fetch(url, {
         credentials: "same-origin"
     });
@@ -49,6 +52,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
     const [managerId, setManagerId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialTeam?.manager?.id ?? initialTeam?.managerId ?? "");
     const [featured, setFeatured] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialTeam?.featured ?? false);
     const [gradient, setGradient] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialTeam?.gradient ?? "from-blue-500 to-cyan-500");
+    // Use number | "" pattern so empty field stays empty
     const [projects, setProjects] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialTeam?.projects ?? "");
     const [completion, setCompletion] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(initialTeam?.completion ?? "");
     const [memberIds, setMemberIds] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
@@ -229,14 +233,17 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
         setMembersInput("");
     }
     function buildPayload() {
+        // clamp completion to 0..100
+        const comp = typeof completion === "number" ? Math.max(0, Math.min(100, completion)) : 0;
+        const proj = typeof projects === "number" ? Math.max(0, projects) : 0;
         return {
             name: name.trim(),
             description: description?.trim() || null,
             managerId: managerId || null,
             featured: !!featured,
             gradient,
-            projects: Number(projects || 0),
-            completion: Number(completion || 0),
+            projects: proj,
+            completion: comp,
             memberUserIds: memberIds.filter((id_1)=>!id_1.startsWith("adhoc-")),
             adhocMembers: memberIds.filter((id_2)=>id_2.startsWith("adhoc-")).map((id_3)=>{
                 const u_1 = employees.find((x_0)=>x_0.id === id_3);
@@ -270,6 +277,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
         const payload_0 = buildPayload();
         try {
             if (isEdit && initialTeam?.id) {
+                // update
                 if (onUpdate) {
                     await Promise.resolve(onUpdate(initialTeam.id, payload_0));
                 } else {
@@ -285,9 +293,38 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                     if (!res_0.ok) throw new Error(j_0?.message || `Update failed (${res_0.status})`);
                 }
             } else {
-                const created = onCreate ? await Promise.resolve(onCreate(await createTeamServer(payload_0))) : await createTeamServer(payload_0);
-                // parent will handle UI update if onCreate was given; otherwise caller already created
-                void created;
+                // create
+                if (onCreate) {
+                    // call server and pass the server response (or optimistic) to parent
+                    try {
+                        const created = await createTeamServer(payload_0);
+                        await Promise.resolve(onCreate(created));
+                    } catch (err_2) {
+                        // server create failed — still return optimistic object to parent so UI reflects inputs
+                        const optimistic = {
+                            id: `tmp-${Date.now()}`,
+                            ...payload_0,
+                            manager: managers.find((m_1)=>m_1.id === payload_0.managerId) ?? null,
+                            members: memberIds.map((id_4)=>{
+                                const u_2 = employees.find((e_2)=>e_2.id === id_4);
+                                return {
+                                    id: id_4,
+                                    user: u_2 ? {
+                                        id: u_2.id,
+                                        name: u_2.name,
+                                        email: u_2.email
+                                    } : undefined,
+                                    initials: u_2 ? getInitialsFromName(u_2.name ?? "") : undefined
+                                };
+                            })
+                        };
+                        console.warn("Create failed, returning optimistic:", err_2);
+                        await Promise.resolve(onCreate(optimistic));
+                    }
+                } else {
+                    // no parent handler — attempt server create and ignore response except errors
+                    await createTeamServer(payload_0);
+                }
             }
             onClose();
         } catch (err_1) {
@@ -315,9 +352,9 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                 if (!res_1.ok) throw new Error(j_1?.message || `Delete failed (${res_1.status})`);
             }
             onClose();
-        } catch (err_2) {
-            console.error("Delete team failed:", err_2);
-            setErrorMsg(err_2?.message || "Failed to delete team");
+        } catch (err_3) {
+            console.error("Delete team failed:", err_3);
+            setErrorMsg(err_3?.message || "Failed to delete team");
         } finally{
             setDeleting(false);
         }
@@ -356,14 +393,14 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 323,
+                                        lineNumber: 362,
                                         columnNumber: 13
                                     }, this),
                                     isEdit ? "Edit Team" : "Create Team"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 322,
+                                lineNumber: 361,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -371,13 +408,13 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 children: isEdit ? "Update team details" : "Add a new team to your workspace"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 326,
+                                lineNumber: 365,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 321,
+                        lineNumber: 360,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -393,14 +430,14 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 331,
+                                        lineNumber: 370,
                                         columnNumber: 15
                                     }, this),
                                     deleting ? "Deleting…" : "Delete"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 330,
+                                lineNumber: 369,
                                 columnNumber: 22
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -411,24 +448,24 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                     className: "w-5 h-5 text-slate-600"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                    lineNumber: 336,
+                                    lineNumber: 375,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 335,
+                                lineNumber: 374,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 329,
+                        lineNumber: 368,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                lineNumber: 320,
+                lineNumber: 359,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -446,24 +483,25 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         children: "Team name"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 345,
+                                        lineNumber: 384,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                         required: true,
                                         value: name,
-                                        onChange: (e_2)=>setName(e_2.target.value),
+                                        onChange: (e_3)=>setName(e_3.target.value),
                                         className: "px-3 py-3 rounded-xl border border-slate-200 focus:outline-none",
-                                        placeholder: "Product Development"
+                                        placeholder: "Product Development",
+                                        "aria-label": "Team name"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 346,
+                                        lineNumber: 385,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 344,
+                                lineNumber: 383,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -474,7 +512,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         children: "Team lead (manager)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 350,
+                                        lineNumber: 389,
                                         columnNumber: 13
                                     }, this),
                                     loadingManagers ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -482,57 +520,59 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         children: "Loading managers…"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 351,
+                                        lineNumber: 390,
                                         columnNumber: 32
                                     }, this) : managers.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                         value: managerId,
-                                        onChange: (e_3)=>setManagerId(e_3.target.value),
+                                        onChange: (e_4)=>setManagerId(e_4.target.value),
                                         placeholder: "No managers found — type manager id",
-                                        className: "px-3 py-3 rounded-xl border border-slate-200"
+                                        className: "px-3 py-3 rounded-xl border border-slate-200",
+                                        "aria-label": "Manager id"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 351,
+                                        lineNumber: 390,
                                         columnNumber: 167
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                         value: managerId,
-                                        onChange: (e_4)=>setManagerId(e_4.target.value),
+                                        onChange: (e_5)=>setManagerId(e_5.target.value),
                                         className: "px-3 py-3 rounded-xl border border-slate-200",
+                                        "aria-label": "Manager select",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                 value: "",
                                                 children: "— Select manager —"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 352,
+                                                lineNumber: 391,
                                                 columnNumber: 17
                                             }, this),
-                                            managers.map((m_1)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: m_1.id,
+                                            managers.map((m_2)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                    value: m_2.id,
                                                     children: [
-                                                        m_1.name ?? m_1.email ?? m_1.id,
-                                                        m_1.email ? ` — ${m_1.email}` : ""
+                                                        m_2.name ?? m_2.email ?? m_2.id,
+                                                        m_2.email ? ` — ${m_2.email}` : ""
                                                     ]
-                                                }, m_1.id, true, {
+                                                }, m_2.id, true, {
                                                     fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                    lineNumber: 353,
+                                                    lineNumber: 392,
                                                     columnNumber: 38
                                                 }, this))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 351,
-                                        columnNumber: 353
+                                        lineNumber: 390,
+                                        columnNumber: 377
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 349,
+                                lineNumber: 388,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 343,
+                        lineNumber: 382,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -543,24 +583,25 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 children: "Description"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 363,
+                                lineNumber: 402,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
                                 value: description ?? "",
-                                onChange: (e_5)=>setDescription(e_5.target.value),
+                                onChange: (e_6)=>setDescription(e_6.target.value),
                                 rows: 3,
                                 placeholder: "Short description...",
-                                className: "px-3 py-3 rounded-xl border border-slate-200"
+                                className: "px-3 py-3 rounded-xl border border-slate-200",
+                                "aria-label": "Description"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 364,
+                                lineNumber: 403,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 362,
+                        lineNumber: 401,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -574,25 +615,29 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         children: "Projects"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 370,
+                                        lineNumber: 409,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                         type: "number",
                                         min: 0,
                                         value: projects,
-                                        onChange: (e_6)=>setProjects(e_6.target.value === "" ? "" : Number(e_6.target.value)),
+                                        onChange: (e_7)=>{
+                                            const v = e_7.target.value;
+                                            setProjects(v === "" ? "" : Math.max(0, Number(v)));
+                                        },
                                         className: "px-3 py-3 rounded-xl border border-slate-200",
-                                        placeholder: "0"
+                                        placeholder: "0",
+                                        "aria-label": "Projects count"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 371,
+                                        lineNumber: 410,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 369,
+                                lineNumber: 408,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -603,7 +648,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         children: "Completion (%)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 375,
+                                        lineNumber: 417,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -611,18 +656,24 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         min: 0,
                                         max: 100,
                                         value: completion,
-                                        onChange: (e_7)=>setCompletion(e_7.target.value === "" ? "" : Number(e_7.target.value)),
+                                        onChange: (e_8)=>{
+                                            const v_0 = e_8.target.value;
+                                            if (v_0 === "") return setCompletion("");
+                                            const n = Math.max(0, Math.min(100, Number(v_0)));
+                                            setCompletion(Number.isNaN(n) ? 0 : n);
+                                        },
                                         className: "px-3 py-3 rounded-xl border border-slate-200",
-                                        placeholder: "0"
+                                        placeholder: "0",
+                                        "aria-label": "Completion percent"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 376,
+                                        lineNumber: 418,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 374,
+                                lineNumber: 416,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -633,10 +684,11 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         type: "checkbox",
                                         checked: featured,
                                         onChange: ()=>setFeatured((f)=>!f),
-                                        className: "w-4 h-4 rounded"
+                                        className: "w-4 h-4 rounded",
+                                        "aria-label": "Featured"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 380,
+                                        lineNumber: 427,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -647,7 +699,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                                 children: "Featured"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 382,
+                                                lineNumber: 429,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -657,32 +709,32 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                        lineNumber: 384,
+                                                        lineNumber: 431,
                                                         columnNumber: 17
                                                     }, this),
                                                     "Highlight in the UI"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 383,
+                                                lineNumber: 430,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 381,
+                                        lineNumber: 428,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 379,
+                                lineNumber: 426,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 368,
+                        lineNumber: 407,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -692,21 +744,24 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 children: "Accent gradient"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 393,
+                                lineNumber: 440,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex flex-wrap gap-2",
+                                role: "radiogroup",
+                                "aria-label": "Accent gradient",
                                 children: gradientOptions.map((g)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: ()=>setGradient(g.value),
                                         className: `flex items-center gap-2 px-3 py-2 rounded-xl border ${g.value === gradient ? "border-blue-500 ring-2 ring-blue-200" : "border-slate-200"}`,
+                                        "aria-pressed": g.value === gradient,
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: `w-8 h-8 rounded-lg bg-gradient-to-br ${g.value}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 396,
+                                                lineNumber: 443,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -714,24 +769,24 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                                 children: g.label
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 397,
+                                                lineNumber: 444,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, g.id, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 395,
+                                        lineNumber: 442,
                                         columnNumber: 39
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 394,
+                                lineNumber: 441,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 392,
+                        lineNumber: 439,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -746,7 +801,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                                 children: "Members"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 406,
+                                                lineNumber: 453,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -754,13 +809,13 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                                 children: "Select existing employees or add a name"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 407,
+                                                lineNumber: 454,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 405,
+                                        lineNumber: 452,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -771,13 +826,13 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 409,
+                                        lineNumber: 456,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 404,
+                                lineNumber: 451,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -787,48 +842,48 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                     children: "Loading employees…"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                    lineNumber: 413,
+                                    lineNumber: 460,
                                     columnNumber: 33
                                 }, this) : employees.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-sm text-slate-500",
                                     children: "No employees found"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                    lineNumber: 413,
+                                    lineNumber: 460,
                                     columnNumber: 125
-                                }, this) : employees.map((u_2)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                }, this) : employees.map((u_3)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                         className: "flex items-center gap-2 py-1 px-2 rounded hover:bg-slate-50",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                 type: "checkbox",
-                                                checked: memberIds.includes(u_2.id),
-                                                onChange: ()=>toggleMember(u_2.id),
+                                                checked: memberIds.includes(u_3.id),
+                                                onChange: ()=>toggleMember(u_3.id),
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 414,
+                                                lineNumber: 461,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-sm text-slate-700",
                                                 children: [
-                                                    u_2.name ?? u_2.email ?? u_2.id,
-                                                    u_2.email ? ` — ${u_2.email}` : ""
+                                                    u_3.name ?? u_3.email ?? u_3.id,
+                                                    u_3.email ? ` — ${u_3.email}` : ""
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 415,
+                                                lineNumber: 462,
                                                 columnNumber: 19
                                             }, this)
                                         ]
-                                    }, u_2.id, true, {
+                                    }, u_3.id, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 413,
+                                        lineNumber: 460,
                                         columnNumber: 213
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 412,
+                                lineNumber: 459,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -836,97 +891,100 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                         value: membersInput,
-                                        onChange: (e_8)=>setMembersInput(e_8.target.value),
-                                        onKeyDown: (e_9)=>{
-                                            if (e_9.key === "Enter") {
-                                                e_9.preventDefault();
+                                        onChange: (e_9)=>setMembersInput(e_9.target.value),
+                                        onKeyDown: (e_10)=>{
+                                            if (e_10.key === "Enter") {
+                                                e_10.preventDefault();
                                                 addAdhocMember(membersInput);
                                             }
                                         },
                                         placeholder: "Type a name and press Enter to add someone not in directory",
-                                        className: "flex-1 px-3 py-3 rounded-xl border border-slate-200"
+                                        className: "flex-1 px-3 py-3 rounded-xl border border-slate-200",
+                                        "aria-label": "Add ad-hoc member"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 420,
+                                        lineNumber: 467,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: ()=>addAdhocMember(membersInput),
                                         className: "px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200",
+                                        "aria-label": "Add member",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                            lineNumber: 427,
+                                            lineNumber: 474,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 426,
+                                        lineNumber: 473,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 419,
+                                lineNumber: 466,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "mt-3 flex flex-wrap gap-2",
-                                children: selectedMembers.map((m_2)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: selectedMembers.map((m_3)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "w-8 h-8 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-xs font-semibold text-slate-700",
-                                                children: m_2.initials
+                                                children: m_3.initials
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 433,
+                                                lineNumber: 480,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-sm text-slate-700",
-                                                children: m_2.name
+                                                children: m_3.name
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 436,
+                                                lineNumber: 483,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 type: "button",
-                                                onClick: ()=>toggleMember(m_2.id),
+                                                onClick: ()=>toggleMember(m_3.id),
                                                 className: "ml-2 p-1 rounded-md hover:bg-slate-100",
-                                                "aria-label": `Remove ${m_2.name}`,
+                                                "aria-label": `Remove ${m_3.name}`,
                                                 children: "✕"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                                lineNumber: 437,
+                                                lineNumber: 484,
                                                 columnNumber: 17
                                             }, this)
                                         ]
-                                    }, m_2.id, true, {
+                                    }, m_3.id, true, {
                                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                        lineNumber: 432,
+                                        lineNumber: 479,
                                         columnNumber: 41
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 431,
+                                lineNumber: 478,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 403,
+                        lineNumber: 450,
                         columnNumber: 9
                     }, this),
                     errorMsg && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "text-sm text-rose-600",
+                        role: "alert",
                         children: errorMsg
                     }, void 0, false, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 444,
+                        lineNumber: 491,
                         columnNumber: 22
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -939,7 +997,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 children: "Cancel"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 447,
+                                lineNumber: 494,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
@@ -952,6 +1010,7 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                 type: "submit",
                                 disabled: submitting,
                                 className: "px-5 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl font-medium shadow-md disabled:opacity-60",
+                                "aria-disabled": submitting,
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center gap-2",
                                     children: [
@@ -959,37 +1018,37 @@ function CreateTeamForm({ managers: managersProp, employees: employeesProp, load
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                            lineNumber: 457,
+                                            lineNumber: 504,
                                             columnNumber: 15
                                         }, this),
                                         submitting ? isEdit ? "Updating…" : "Creating…" : isEdit ? "Update Team" : "Create Team"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                    lineNumber: 456,
+                                    lineNumber: 503,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                                lineNumber: 451,
+                                lineNumber: 498,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                        lineNumber: 446,
+                        lineNumber: 493,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-                lineNumber: 341,
+                lineNumber: 380,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/ui/forms/create-team/page.tsx",
-        lineNumber: 306,
+        lineNumber: 345,
         columnNumber: 10
     }, this);
 }
@@ -1910,6 +1969,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/src/app/dashboard/admin/teams/page.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/app/dashboard/admin/teams/page.tsx
 __turbopack_context__.s([
     "default",
     ()=>TeamsPage
@@ -1933,7 +1993,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$target$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Target$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/target.js [app-client] (ecmascript) <export default as Target>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$square$2d$pen$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/square-pen.js [app-client] (ecmascript) <export default as Edit>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.js [app-client] (ecmascript) <export default as Trash2>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$ui$2f$forms$2f$create$2d$team$2f$page$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/ui/forms/create-team/page.tsx [app-client] (ecmascript)"); // path per your structure
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$ui$2f$forms$2f$create$2d$team$2f$page$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/ui/forms/create-team/page.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$ui$2f$forms$2f$Schedule$2d$meeting$2f$page$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/ui/forms/Schedule-meeting/page.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
@@ -1944,16 +2004,26 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
-/**
- * TeamCard - renders a single team and exposes an actions menu (Edit/Delete)
- */ const TeamCard = (t0)=>{
+/* ----------------- Helpers ----------------- */ function safeParseListResponse(j) {
+    if (!j) return [];
+    if (Array.isArray(j)) return j;
+    if (Array.isArray(j.teams)) return j.teams;
+    if (Array.isArray(j.users)) return j.users;
+    if (Array.isArray(j.data)) return j.data;
+    return [];
+}
+function uidFromTeam(team, idx) {
+    // ensure stable keys even if missing id
+    return team?.id ?? `team_tmp_${idx}_${(team?.name ?? "unknown").slice(0, 6)}`;
+}
+/* ----------------- TeamCard ----------------- */ const TeamCard = (t0)=>{
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(94);
-    if ($[0] !== "e033e3d8dab07a77e1a95f2fd797b81592d0ce610280508692a5cf7587d3a7a6") {
+    if ($[0] !== "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0") {
         for(let $i = 0; $i < 94; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "e033e3d8dab07a77e1a95f2fd797b81592d0ce610280508692a5cf7587d3a7a6";
+        $[0] = "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0";
     }
     const { team, delay, onOpenSchedule, onEdit, onDelete } = t0;
     const [isHovered, setIsHovered] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -2002,7 +2072,10 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
     }
     let t6;
     if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-        t6 = ()=>setMenuOpen(_temp);
+        t6 = (e)=>{
+            e.stopPropagation();
+            setMenuOpen(_temp);
+        };
         $[7] = t6;
     } else {
         t6 = $[7];
@@ -2013,16 +2086,17 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             onClick: t6,
             className: "p-2 rounded-md hover:bg-slate-100",
             "aria-label": "Open team actions",
+            type: "button",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$ellipsis$2d$vertical$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MoreVertical$3e$__["MoreVertical"], {
                 className: "w-5 h-5 text-slate-600"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 81,
-                columnNumber: 108
+                lineNumber: 97,
+                columnNumber: 122
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 81,
+            lineNumber: 97,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[8] = t7;
@@ -2050,51 +2124,55 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             className: "absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-30",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                    onClick: ()=>{
+                    onClick: (e_0)=>{
+                        e_0.stopPropagation();
                         setMenuOpen(false);
                         onEdit(team);
                     },
                     className: "w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2",
+                    type: "button",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$square$2d$pen$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit$3e$__["Edit"], {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 102,
-                            columnNumber: 91
+                            lineNumber: 119,
+                            columnNumber: 105
                         }, ("TURBOPACK compile-time value", void 0)),
                         " Edit"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 99,
+                    lineNumber: 115,
                     columnNumber: 89
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                    onClick: ()=>{
+                    onClick: (e_1)=>{
+                        e_1.stopPropagation();
                         setMenuOpen(false);
                         onDelete(team);
                     },
                     className: "w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-rose-600",
+                    type: "button",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 105,
-                            columnNumber: 105
+                            lineNumber: 123,
+                            columnNumber: 119
                         }, ("TURBOPACK compile-time value", void 0)),
                         " Delete"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 102,
-                    columnNumber: 133
+                    lineNumber: 119,
+                    columnNumber: 147
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 88,
+            lineNumber: 104,
             columnNumber: 22
         }, ("TURBOPACK compile-time value", void 0));
         $[9] = menuOpen;
@@ -2117,12 +2195,12 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 116,
+                lineNumber: 134,
                 columnNumber: 50
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 116,
+            lineNumber: 134,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[14] = t8;
@@ -2155,7 +2233,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             className: "w-7 h-7 text-white"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 143,
+            lineNumber: 161,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[18] = t12;
@@ -2173,7 +2251,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: t13
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 152,
+            lineNumber: 170,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[20] = t10;
@@ -2189,7 +2267,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: team.name
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 161,
+            lineNumber: 179,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[23] = team.name;
@@ -2205,7 +2283,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: t16
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 170,
+            lineNumber: 188,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[25] = t16;
@@ -2223,7 +2301,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 178,
+            lineNumber: 196,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[27] = t15;
@@ -2244,12 +2322,12 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 187,
+                lineNumber: 205,
                 columnNumber: 72
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 187,
+            lineNumber: 205,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[30] = t14;
@@ -2267,14 +2345,14 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
                     className: "w-3.5 h-3.5"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 196,
+                    lineNumber: 214,
                     columnNumber: 146
                 }, ("TURBOPACK compile-time value", void 0)),
                 team.manager.name
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 196,
+            lineNumber: 214,
             columnNumber: 33
         }, ("TURBOPACK compile-time value", void 0));
         $[33] = team.manager;
@@ -2291,14 +2369,14 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
                     className: "w-3.5 h-3.5"
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 204,
+                    lineNumber: 222,
                     columnNumber: 139
                 }, ("TURBOPACK compile-time value", void 0)),
                 "Featured"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 204,
+            lineNumber: 222,
             columnNumber: 28
         }, ("TURBOPACK compile-time value", void 0));
         $[35] = team.featured;
@@ -2316,7 +2394,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 212,
+            lineNumber: 230,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[37] = t20;
@@ -2343,7 +2421,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 229,
+            lineNumber: 247,
             columnNumber: 46
         }, ("TURBOPACK compile-time value", void 0));
         $[42] = team.members;
@@ -2361,7 +2439,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 237,
+            lineNumber: 255,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[44] = t23;
@@ -2378,7 +2456,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: t26
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 247,
+            lineNumber: 265,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[47] = t26;
@@ -2393,7 +2471,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: "Members"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 255,
+            lineNumber: 273,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[49] = t28;
@@ -2409,7 +2487,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 262,
+            lineNumber: 280,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[50] = t27;
@@ -2425,7 +2503,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: t30
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 271,
+            lineNumber: 289,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[52] = t30;
@@ -2440,7 +2518,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: "Projects"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 279,
+            lineNumber: 297,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[54] = t32;
@@ -2456,7 +2534,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 286,
+            lineNumber: 304,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[55] = t31;
@@ -2475,7 +2553,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 295,
+            lineNumber: 313,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[57] = t34;
@@ -2490,7 +2568,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: "Complete"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 303,
+            lineNumber: 321,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[59] = t36;
@@ -2506,7 +2584,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 310,
+            lineNumber: 328,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[60] = t35;
@@ -2525,7 +2603,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 318,
+            lineNumber: 336,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[62] = t29;
@@ -2565,7 +2643,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             className: "w-4 h-4"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 352,
+            lineNumber: 370,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[71] = t42;
@@ -2579,13 +2657,14 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             whileHover: t40,
             whileTap: t41,
             className: "flex-1 px-4 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition flex items-center justify-center gap-2",
+            type: "button",
             children: [
                 t42,
-                "Schedule Meeting"
+                " Schedule Meeting"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 359,
+            lineNumber: 377,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[72] = t39;
@@ -2624,7 +2703,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             className: "w-4 h-4"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 392,
+            lineNumber: 410,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[78] = t47;
@@ -2638,13 +2717,14 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             whileTap: t45,
             className: "px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition flex items-center justify-center gap-2",
             onClick: t46,
+            type: "button",
             children: [
                 t47,
-                "Manage"
+                " Manage"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 399,
+            lineNumber: 417,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[79] = t46;
@@ -2662,7 +2742,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 407,
+            lineNumber: 425,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[81] = t43;
@@ -2684,7 +2764,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 416,
+            lineNumber: 434,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[84] = t19;
@@ -2711,7 +2791,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 428,
+            lineNumber: 446,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[90] = t3;
@@ -2725,13 +2805,13 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 };
 _s(TeamCard, "ci96+gdGLmvtZ7A0ZNbPJPkAK8E=");
 _c = TeamCard;
-/* StatCard kept similar to previous */ const StatCard = (t0)=>{
+/* ----------------- StatCard ----------------- */ const StatCard = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(25);
-    if ($[0] !== "e033e3d8dab07a77e1a95f2fd797b81592d0ce610280508692a5cf7587d3a7a6") {
+    if ($[0] !== "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0") {
         for(let $i = 0; $i < 25; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "e033e3d8dab07a77e1a95f2fd797b81592d0ce610280508692a5cf7587d3a7a6";
+        $[0] = "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0";
     }
     const { icon: Icon, label, value, subtitle, gradient, delay } = t0;
     let t1;
@@ -2769,7 +2849,7 @@ _c = TeamCard;
             className: "w-6 h-6 text-white"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 487,
+            lineNumber: 505,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[5] = Icon;
@@ -2784,7 +2864,7 @@ _c = TeamCard;
             children: t5
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 495,
+            lineNumber: 513,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[7] = t4;
@@ -2799,7 +2879,7 @@ _c = TeamCard;
             className: "w-5 h-5 text-emerald-500"
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 504,
+            lineNumber: 522,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[10] = t7;
@@ -2816,7 +2896,7 @@ _c = TeamCard;
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 511,
+            lineNumber: 529,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[11] = t6;
@@ -2831,7 +2911,7 @@ _c = TeamCard;
             children: value
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 519,
+            lineNumber: 537,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[13] = value;
@@ -2846,7 +2926,7 @@ _c = TeamCard;
             children: label
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 527,
+            lineNumber: 545,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[15] = label;
@@ -2861,7 +2941,7 @@ _c = TeamCard;
             children: subtitle
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 535,
+            lineNumber: 553,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[17] = subtitle;
@@ -2884,7 +2964,7 @@ _c = TeamCard;
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-            lineNumber: 543,
+            lineNumber: 561,
             columnNumber: 11
         }, ("TURBOPACK compile-time value", void 0));
         $[19] = t10;
@@ -2905,7 +2985,7 @@ function TeamsPage() {
     const [showCreate, setShowCreate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [editTeam, setEditTeam] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [confirmDelete, setConfirmDelete] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    // schedule modal
+    // schedule modal state
     const [showSchedule, setShowSchedule] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [selectedTeamForSchedule, setSelectedTeamForSchedule] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     // data
@@ -2915,8 +2995,7 @@ function TeamsPage() {
     const [managers, setManagers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [employees, setEmployees] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [usersLoading, setUsersLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    // fetch teams
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+    /* -- fetch teams -- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TeamsPage.useEffect": ()=>{
             let mounted = true;
             ({
@@ -2928,21 +3007,25 @@ function TeamsPage() {
                             credentials: "same-origin"
                         });
                         if (!res.ok) {
-                            // try alternative
                             const alt = await fetch("/api/dashboard/teams", {
                                 credentials: "same-origin"
                             });
                             if (!alt.ok) throw new Error("Failed to load teams");
-                            const altJson = await alt.json();
-                            const list = Array.isArray(altJson) ? altJson : altJson?.teams ?? [];
+                            const altJson = await alt.json().catch({
+                                "TeamsPage.useEffect": ()=>null
+                            }["TeamsPage.useEffect"]);
+                            const list = safeParseListResponse(altJson);
                             if (mounted) setTeams(list);
                         } else {
-                            const j = await res.json();
-                            const list_0 = Array.isArray(j) ? j : j?.teams ?? [];
+                            const j = await res.json().catch({
+                                "TeamsPage.useEffect": ()=>null
+                            }["TeamsPage.useEffect"]);
+                            const list_0 = safeParseListResponse(j);
                             if (mounted) setTeams(list_0);
                         }
                     } catch (err) {
                         if (mounted) setTeamsError(err?.message || "Could not fetch teams");
+                        console.error("[teams] fetch error:", err);
                     } finally{
                         if (mounted) setTeamsLoading(false);
                     }
@@ -2955,8 +3038,7 @@ function TeamsPage() {
             })["TeamsPage.useEffect"];
         }
     }["TeamsPage.useEffect"], []);
-    // fetch users for selects
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+    /* -- fetch users for selectors -- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TeamsPage.useEffect": ()=>{
             let mounted_0 = true;
             ({
@@ -2972,20 +3054,25 @@ function TeamsPage() {
                             })
                         ]);
                         if (mRes.ok) {
-                            const j_0 = await mRes.json();
-                            const list_1 = Array.isArray(j_0) ? j_0 : j_0?.users ?? [];
+                            const j_0 = await mRes.json().catch({
+                                "TeamsPage.useEffect": ()=>null
+                            }["TeamsPage.useEffect"]);
+                            const list_1 = safeParseListResponse(j_0);
                             if (mounted_0) setManagers(list_1);
                         } else {
                             if (mounted_0) setManagers([]);
                         }
                         if (eRes.ok) {
-                            const j_1 = await eRes.json();
-                            const list_2 = Array.isArray(j_1) ? j_1 : j_1?.users ?? [];
+                            const j_1 = await eRes.json().catch({
+                                "TeamsPage.useEffect": ()=>null
+                            }["TeamsPage.useEffect"]);
+                            const list_2 = safeParseListResponse(j_1);
                             if (mounted_0) setEmployees(list_2);
                         } else {
                             if (mounted_0) setEmployees([]);
                         }
                     } catch (err_0) {
+                        console.warn("[users] fetch failed:", err_0);
                         if (mounted_0) {
                             setManagers([]);
                             setEmployees([]);
@@ -3002,7 +3089,7 @@ function TeamsPage() {
             })["TeamsPage.useEffect"];
         }
     }["TeamsPage.useEffect"], []);
-    const filteredTeams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+    /* -- filtering -- */ const filteredTeams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "TeamsPage.useMemo[filteredTeams]": ()=>{
             const q = searchQuery.trim().toLowerCase();
             if (!q) return teams;
@@ -3014,18 +3101,17 @@ function TeamsPage() {
         teams,
         searchQuery
     ]);
-    // create or update team (CreateTeamForm uses onCreate for both create & update)
-    async function handleCreateOrUpdateTeam(payload, opts) {
+    /* -- create / update handler: accepts either server object (with id) or payload -- */ async function handleCreateOrUpdateTeam(payloadOrCreated, opts) {
         try {
+            // UPDATE path (opts supplied) — prefer server call to update endpoint
             if (opts?.isEdit && opts.id) {
-                // update
                 const res_0 = await fetch(`/api/teams/${encodeURIComponent(opts.id)}`, {
                     method: "PUT",
                     credentials: "same-origin",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payloadOrCreated)
                 });
                 if (!res_0.ok) {
                     const err_2 = await res_0.json().catch(()=>({}));
@@ -3033,55 +3119,85 @@ function TeamsPage() {
                 }
                 const json = await res_0.json().catch(()=>null);
                 const updated = json?.team ?? json;
-                // update in-place
-                setTeams((prev)=>prev.map((t)=>t.id === opts.id ? updated || {
+                // Merge updated into existing list; fallback to merging payload
+                setTeams((prev)=>prev.map((t)=>t.id === opts.id ? updated ? {
                             ...t,
-                            ...payload
+                            ...updated
+                        } : {
+                            ...t,
+                            ...payloadOrCreated
                         } : t));
                 setEditTeam(null);
                 setShowCreate(false);
-            } else {
-                // create
-                const res_1 = await fetch("/api/teams", {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-                if (!res_1.ok) {
-                    const err_3 = await res_1.json().catch(()=>({}));
-                    throw new Error(err_3?.message || `Failed to create team (${res_1.status})`);
-                }
-                const json_0 = await res_1.json().catch(()=>null);
-                const created = json_0?.team ?? json_0;
+                return;
+            }
+            // CREATE path:
+            // if payloadOrCreated already has an id, treat it as created team object (server response or optimistic)
+            if (payloadOrCreated && payloadOrCreated.id) {
                 setTeams((prev_0)=>[
-                        created || {
-                            id: Date.now(),
-                            ...payload
-                        },
+                        payloadOrCreated,
                         ...prev_0
                     ]);
                 setShowCreate(false);
+                return;
             }
+            // otherwise assume payload without id: send to server
+            const res_1 = await fetch("/api/teams", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payloadOrCreated)
+            });
+            if (!res_1.ok) {
+                const err_3 = await res_1.json().catch(()=>({}));
+                throw new Error(err_3?.message || `Failed to create team (${res_1.status})`);
+            }
+            const json_0 = await res_1.json().catch(()=>null);
+            const created = json_0?.team ?? json_0;
+            // if server returned created object use it; otherwise create optimistic object using payload
+            if (created && created.id) {
+                setTeams((prev_1)=>[
+                        created,
+                        ...prev_1
+                    ]);
+            } else {
+                setTeams((prev_2)=>[
+                        {
+                            id: `tmp_${Date.now()}`,
+                            ...payloadOrCreated,
+                            manager: managers.find((m)=>m.id === payloadOrCreated.managerId) ?? null,
+                            members: (payloadOrCreated.memberUserIds ?? []).map((id)=>{
+                                const u = employees.find((e)=>e.id === id);
+                                return {
+                                    id,
+                                    user: u ? {
+                                        id: u.id,
+                                        name: u.name,
+                                        email: u.email
+                                    } : undefined
+                                };
+                            })
+                        },
+                        ...prev_2
+                    ]);
+            }
+            setShowCreate(false);
         } catch (err_1) {
             console.error("Create/update team error:", err_1);
             alert("Error: " + (err_1?.message || "Unknown error"));
         }
     }
-    // open create modal (new)
-    function openCreate() {
+    /* -- open create / edit -- */ function openCreate() {
         setEditTeam(null);
         setShowCreate(true);
     }
-    // open edit modal (prefill)
     function handleEdit(team_0) {
         setEditTeam(team_0);
         setShowCreate(true);
     }
-    // handle delete
-    async function handleDeleteRequest(team_1) {
+    /* -- delete flow -- */ function handleDeleteRequest(team_1) {
         setConfirmDelete(team_1);
     }
     async function confirmDeleteNow(team_2) {
@@ -3094,22 +3210,21 @@ function TeamsPage() {
                 const err_5 = await res_2.json().catch(()=>({}));
                 throw new Error(err_5?.message || `Delete failed (${res_2.status})`);
             }
-            setTeams((prev_1)=>prev_1.filter((t_0)=>t_0.id !== team_2.id));
+            setTeams((prev_3)=>prev_3.filter((t_0)=>t_0.id !== team_2.id));
             setConfirmDelete(null);
         } catch (err_4) {
             console.error("Delete team error:", err_4);
             alert("Failed to delete team: " + (err_4?.message || "unknown"));
         }
     }
-    function openScheduleForTeam(team_3) {
+    /* -- schedule modal handlers -- */ function openScheduleForTeam(team_3) {
         setSelectedTeamForSchedule(team_3);
         setShowSchedule(true);
     }
     function handleScheduleMeeting(meeting) {
-        // For now local only
         setSelectedTeamForSchedule(null);
         setShowSchedule(false);
-    // Could call API to persist
+    // optionally persist meeting via API; left local for now
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
@@ -3137,7 +3252,7 @@ function TeamsPage() {
                                     children: "Teams"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 767,
+                                    lineNumber: 816,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3147,20 +3262,20 @@ function TeamsPage() {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 768,
+                                            lineNumber: 817,
                                             columnNumber: 67
                                         }, this),
                                         " Manage and collaborate with your teams"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 768,
+                                    lineNumber: 817,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 758,
+                            lineNumber: 807,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3175,7 +3290,7 @@ function TeamsPage() {
                                     delay: 0
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 773,
+                                    lineNumber: 822,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StatCard, {
@@ -3187,7 +3302,7 @@ function TeamsPage() {
                                     delay: 0.05
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 774,
+                                    lineNumber: 823,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StatCard, {
@@ -3199,7 +3314,7 @@ function TeamsPage() {
                                     delay: 0.1
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 775,
+                                    lineNumber: 824,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StatCard, {
@@ -3211,13 +3326,13 @@ function TeamsPage() {
                                     delay: 0.15
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 776,
+                                    lineNumber: 825,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 772,
+                            lineNumber: 821,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3230,24 +3345,24 @@ function TeamsPage() {
                                             className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 782,
+                                            lineNumber: 831,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                             type: "text",
                                             placeholder: "Search teams...",
                                             value: searchQuery,
-                                            onChange: (e)=>setSearchQuery(e.target.value),
+                                            onChange: (e_0)=>setSearchQuery(e_0.target.value),
                                             className: "w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 783,
+                                            lineNumber: 832,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 781,
+                                    lineNumber: 830,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].button, {
@@ -3264,20 +3379,20 @@ function TeamsPage() {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 791,
+                                            lineNumber: 840,
                                             columnNumber: 15
                                         }, this),
                                         " Create Team"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 786,
+                                    lineNumber: 835,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 780,
+                            lineNumber: 829,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3287,14 +3402,14 @@ function TeamsPage() {
                                 children: "Loading teams…"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                lineNumber: 797,
+                                lineNumber: 846,
                                 columnNumber: 29
                             }, this) : filteredTeams.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "col-span-full p-6 bg-white rounded-2xl border border-slate-200 text-center",
                                 children: "No teams found"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                lineNumber: 797,
+                                lineNumber: 846,
                                 columnNumber: 161
                             }, this) : filteredTeams.map((team_4, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TeamCard, {
                                     team: team_4,
@@ -3302,14 +3417,14 @@ function TeamsPage() {
                                     onOpenSchedule: openScheduleForTeam,
                                     onEdit: handleEdit,
                                     onDelete: handleDeleteRequest
-                                }, team_4.id, false, {
+                                }, uidFromTeam(team_4, i), false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 797,
+                                    lineNumber: 846,
                                     columnNumber: 309
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 796,
+                            lineNumber: 845,
                             columnNumber: 11
                         }, this),
                         teamsError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3317,18 +3432,18 @@ function TeamsPage() {
                             children: teamsError
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 800,
+                            lineNumber: 849,
                             columnNumber: 26
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 756,
+                    lineNumber: 805,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 755,
+                lineNumber: 804,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -3364,7 +3479,7 @@ function TeamsPage() {
                             }
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 813,
+                            lineNumber: 862,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3374,34 +3489,38 @@ function TeamsPage() {
                                 employees: employees,
                                 loadingUsers: usersLoading,
                                 initialTeam: editTeam ?? undefined,
-                                onCreate: (payload_0)=>handleCreateOrUpdateTeam(payload_0),
-                                onUpdate: (id, payload_1)=>handleCreateOrUpdateTeam(payload_1, {
+                                onCreate: (payloadOrCreated_0)=>handleCreateOrUpdateTeam(payloadOrCreated_0),
+                                onUpdate: (id_0, payload)=>handleCreateOrUpdateTeam(payload, {
                                         isEdit: true,
-                                        id
+                                        id: id_0
                                     }),
+                                onDelete: (id_1)=>{
+                                    // optional: parent-level deletion callback (not used here)
+                                    setTeams((prev_4)=>prev_4.filter((t_4)=>t_4.id !== id_1));
+                                },
                                 onClose: ()=>{
                                     setShowCreate(false);
                                     setEditTeam(null);
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                lineNumber: 826,
+                                lineNumber: 875,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 825,
+                            lineNumber: 874,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 806,
+                    lineNumber: 855,
                     columnNumber: 38
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 805,
+                lineNumber: 854,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -3434,7 +3553,7 @@ function TeamsPage() {
                             onClick: ()=>setConfirmDelete(null)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 846,
+                            lineNumber: 898,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -3457,7 +3576,7 @@ function TeamsPage() {
                                     children: "Delete team?"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 864,
+                                    lineNumber: 916,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3465,7 +3584,7 @@ function TeamsPage() {
                                     children: "This will remove the team and its membership associations. This action cannot be undone."
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 865,
+                                    lineNumber: 917,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3474,42 +3593,44 @@ function TeamsPage() {
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             className: "px-4 py-2 rounded-md",
                                             onClick: ()=>setConfirmDelete(null),
+                                            type: "button",
                                             children: "Cancel"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 867,
+                                            lineNumber: 919,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             className: "px-4 py-2 rounded-md bg-rose-600 text-white",
                                             onClick: ()=>confirmDeleteNow(confirmDelete),
+                                            type: "button",
                                             children: "Delete"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                            lineNumber: 868,
+                                            lineNumber: 920,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                    lineNumber: 866,
+                                    lineNumber: 918,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 855,
+                            lineNumber: 907,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 839,
+                    lineNumber: 891,
                     columnNumber: 27
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 838,
+                lineNumber: 890,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -3545,7 +3666,7 @@ function TeamsPage() {
                             }
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 883,
+                            lineNumber: 935,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3556,26 +3677,26 @@ function TeamsPage() {
                                     setShowSchedule(false);
                                     setSelectedTeamForSchedule(null);
                                 },
-                                onSchedule: (m)=>handleScheduleMeeting(m)
+                                onSchedule: (m_0)=>handleScheduleMeeting(m_0)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                                lineNumber: 896,
+                                lineNumber: 948,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                            lineNumber: 895,
+                            lineNumber: 947,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                    lineNumber: 876,
+                    lineNumber: 928,
                     columnNumber: 53
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-                lineNumber: 875,
+                lineNumber: 927,
                 columnNumber: 7
             }, this)
         ]
@@ -3590,13 +3711,16 @@ function _temp2(p) {
     return p[0];
 }
 function _temp3(member, idx) {
+    const key = member?.user?.id ?? member?.id ?? `m_${idx}`;
+    const title = member?.user?.name ?? member?.name ?? "";
+    const initials = member?.user?.name ? member.user.name.split(" ").map(_temp2).slice(0, 2).join("") : member.initials ?? (title ? title.slice(0, 2).toUpperCase() : "U");
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700 shadow-sm",
-        title: member.user?.name ?? member.name,
-        children: member.user?.name ? member.user.name.split(" ").map(_temp2).slice(0, 2).join("") : member.initials ?? "U"
-    }, `${member.user?.id ?? member.id ?? idx}`, false, {
+        title: title,
+        children: initials
+    }, key, false, {
         fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
-        lineNumber: 912,
+        lineNumber: 967,
         columnNumber: 10
     }, this);
 }

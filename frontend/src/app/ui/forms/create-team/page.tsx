@@ -40,6 +40,10 @@ function getInitialsFromName(name = "") {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Fetches a URL expecting a list or wrapper object { users: [...] } etc.
+ * Returns array or throws on HTTP error.
+ */
 async function fetchJsonList(url: string) {
   const res = await fetch(url, { credentials: "same-origin" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -71,6 +75,7 @@ export default function CreateTeamForm({
   const [managerId, setManagerId] = useState<string | "">(initialTeam?.manager?.id ?? initialTeam?.managerId ?? "");
   const [featured, setFeatured] = useState<boolean>(initialTeam?.featured ?? false);
   const [gradient, setGradient] = useState<string>(initialTeam?.gradient ?? "from-blue-500 to-cyan-500");
+  // Use number | "" pattern so empty field stays empty
   const [projects, setProjects] = useState<number | "">(initialTeam?.projects ?? "");
   const [completion, setCompletion] = useState<number | "">(initialTeam?.completion ?? "");
   const [memberIds, setMemberIds] = useState<string[]>(
@@ -183,14 +188,18 @@ export default function CreateTeamForm({
   }
 
   function buildPayload() {
+    // clamp completion to 0..100
+    const comp = typeof completion === "number" ? Math.max(0, Math.min(100, completion)) : 0;
+    const proj = typeof projects === "number" ? Math.max(0, projects) : 0;
+
     return {
       name: name.trim(),
       description: description?.trim() || null,
       managerId: managerId || null,
       featured: !!featured,
       gradient,
-      projects: Number(projects || 0),
-      completion: Number(completion || 0),
+      projects: proj,
+      completion: comp,
       memberUserIds: memberIds.filter((id) => !id.startsWith("adhoc-")),
       adhocMembers: memberIds
         .filter((id) => id.startsWith("adhoc-"))
@@ -224,6 +233,7 @@ export default function CreateTeamForm({
     const payload = buildPayload();
     try {
       if (isEdit && initialTeam?.id) {
+        // update
         if (onUpdate) {
           await Promise.resolve(onUpdate(initialTeam.id as string, payload));
         } else {
@@ -237,10 +247,32 @@ export default function CreateTeamForm({
           if (!res.ok) throw new Error(j?.message || `Update failed (${res.status})`);
         }
       } else {
-        const created = onCreate ? await Promise.resolve(onCreate(await createTeamServer(payload))) : await createTeamServer(payload);
-        // parent will handle UI update if onCreate was given; otherwise caller already created
-        void created;
+        // create
+        if (onCreate) {
+          // call server and pass the server response (or optimistic) to parent
+          try {
+            const created = await createTeamServer(payload);
+            await Promise.resolve(onCreate(created));
+          } catch (err) {
+            // server create failed — still return optimistic object to parent so UI reflects inputs
+            const optimistic = {
+              id: `tmp-${Date.now()}`,
+              ...payload,
+              manager: managers.find((m) => m.id === payload.managerId) ?? null,
+              members: memberIds.map((id) => {
+                const u = employees.find((e) => e.id === id);
+                return { id, user: u ? { id: u.id, name: u.name, email: u.email } : undefined, initials: u ? getInitialsFromName(u.name ?? "") : undefined };
+              }),
+            };
+            console.warn("Create failed, returning optimistic:", err);
+            await Promise.resolve(onCreate(optimistic));
+          }
+        } else {
+          // no parent handler — attempt server create and ignore response except errors
+          await createTeamServer(payload);
+        }
       }
+
       onClose();
     } catch (err: any) {
       console.error("Create/Update team error:", err);
@@ -325,6 +357,7 @@ export default function CreateTeamForm({
               onChange={(e) => setName(e.target.value)}
               className="px-3 py-3 rounded-xl border border-slate-200 focus:outline-none"
               placeholder="Product Development"
+              aria-label="Team name"
             />
           </label>
 
@@ -338,9 +371,10 @@ export default function CreateTeamForm({
                 onChange={(e) => setManagerId(e.target.value)}
                 placeholder="No managers found — type manager id"
                 className="px-3 py-3 rounded-xl border border-slate-200"
+                aria-label="Manager id"
               />
             ) : (
-              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} className="px-3 py-3 rounded-xl border border-slate-200">
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} className="px-3 py-3 rounded-xl border border-slate-200" aria-label="Manager select">
                 <option value="">— Select manager —</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -356,7 +390,7 @@ export default function CreateTeamForm({
         {/* Description */}
         <label className="flex flex-col">
           <span className="text-xs font-medium text-slate-600 mb-1">Description</span>
-          <textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Short description..." className="px-3 py-3 rounded-xl border border-slate-200" />
+          <textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Short description..." className="px-3 py-3 rounded-xl border border-slate-200" aria-label="Description" />
         </label>
 
         {/* Projects, completion, featured */}
@@ -367,9 +401,13 @@ export default function CreateTeamForm({
               type="number"
               min={0}
               value={projects}
-              onChange={(e) => setProjects(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) => {
+                const v = e.target.value;
+                setProjects(v === "" ? "" : Math.max(0, Number(v)));
+              }}
               className="px-3 py-3 rounded-xl border border-slate-200"
               placeholder="0"
+              aria-label="Projects count"
             />
           </label>
 
@@ -380,14 +418,20 @@ export default function CreateTeamForm({
               min={0}
               max={100}
               value={completion}
-              onChange={(e) => setCompletion(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "") return setCompletion("");
+                const n = Math.max(0, Math.min(100, Number(v)));
+                setCompletion(Number.isNaN(n) ? 0 : n);
+              }}
               className="px-3 py-3 rounded-xl border border-slate-200"
               placeholder="0"
+              aria-label="Completion percent"
             />
           </label>
 
           <label className="flex items-center gap-3">
-            <input id="featured" type="checkbox" checked={featured} onChange={() => setFeatured((f) => !f)} className="w-4 h-4 rounded" />
+            <input id="featured" type="checkbox" checked={featured} onChange={() => setFeatured((f) => !f)} className="w-4 h-4 rounded" aria-label="Featured" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-slate-700">Featured</span>
               <span className="text-xs text-slate-500 flex items-center gap-1">
@@ -401,15 +445,14 @@ export default function CreateTeamForm({
         {/* Gradient selector */}
         <div>
           <span className="text-xs font-medium text-slate-600 mb-2 block">Accent gradient</span>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Accent gradient">
             {gradientOptions.map((g) => (
               <button
                 key={g.id}
                 type="button"
                 onClick={() => setGradient(g.value)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${
-                  g.value === gradient ? "border-blue-500 ring-2 ring-blue-200" : "border-slate-200"
-                }`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${g.value === gradient ? "border-blue-500 ring-2 ring-blue-200" : "border-slate-200"}`}
+                aria-pressed={g.value === gradient}
               >
                 <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${g.value}`} />
                 <span className="text-sm text-slate-700">{g.label}</span>
@@ -455,8 +498,9 @@ export default function CreateTeamForm({
               }}
               placeholder="Type a name and press Enter to add someone not in directory"
               className="flex-1 px-3 py-3 rounded-xl border border-slate-200"
+              aria-label="Add ad-hoc member"
             />
-            <button type="button" onClick={() => addAdhocMember(membersInput)} className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">
+            <button type="button" onClick={() => addAdhocMember(membersInput)} className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200" aria-label="Add member">
               <Plus className="w-4 h-4" />
             </button>
           </div>
@@ -476,7 +520,7 @@ export default function CreateTeamForm({
           </div>
         </div>
 
-        {errorMsg && <div className="text-sm text-rose-600">{errorMsg}</div>}
+        {errorMsg && <div className="text-sm text-rose-600" role="alert">{errorMsg}</div>}
 
         <div className="flex items-center gap-3 justify-end pt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">
@@ -489,6 +533,7 @@ export default function CreateTeamForm({
             type="submit"
             disabled={submitting}
             className="px-5 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl font-medium shadow-md disabled:opacity-60"
+            aria-disabled={submitting}
           >
             <div className="flex items-center gap-2">
               <Plus className="w-4 h-4" />

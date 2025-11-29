@@ -233,15 +233,18 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5
         status
     });
 }
-async function tryGetSessionOrganizationId(req) {
+/**
+ * Try to extract organizationId from a session helper if present.
+ * Returns string or null.
+ */ async function tryGetSessionOrganizationId(req) {
     try {
         if (typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"] === "function") {
             const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req).catch(()=>null);
             if (session?.organizationId) return String(session.organizationId);
         }
     } catch (e) {
-        // swallow session errors; caller will handle missing orgId
-        console.warn("[api/teams] getSessionUser error:", e?.message || e);
+        // Do not fail hard if session helper throws
+        console.warn("[api/teams] getSessionUser error:", e?.message ?? e);
     }
     return null;
 }
@@ -290,19 +293,22 @@ async function GET(req) {
                 }
             }
         });
-        // normalize shape for frontend convenience
+        // normalize shape for frontend convenience and include optional UI metadata
         const normalized = teams.map((t)=>({
                 id: t.id,
                 name: t.name,
-                description: t.description,
+                description: t.description ?? null,
                 managerId: t.managerId ?? null,
                 manager: t.manager ? {
                     id: t.manager.id,
                     name: t.manager.name,
                     email: t.manager.email
                 } : null,
-                // if you store UI fields like featured/gradient/projects/completion on team, include them here
-                // (kept flexible — include only if your schema actually contains them)
+                // include metadata fields if present on the object (Prisma includes them when in schema)
+                featured: t.featured ?? false,
+                gradient: t.gradient ?? null,
+                projects: typeof t.projects !== "undefined" ? Number(t.projects ?? 0) : null,
+                completion: typeof t.completion !== "undefined" ? Number(t.completion ?? 0) : null,
                 members: (t.members || []).map((m)=>({
                         teamMemberId: m.id,
                         userId: m.user?.id ?? null,
@@ -334,7 +340,8 @@ async function GET(req) {
 async function POST(req) {
     try {
         const body = await req.json().catch(()=>({})) ?? {};
-        const { name, description = null, managerId = null, memberUserIds = [], organizationId: orgFromBody = null } = body;
+        const { name, description = null, managerId = null, memberUserIds = [], adhocMembers = [], // UI metadata fields from client
+        featured = false, gradient = null, projects = 0, completion = 0, organizationId: orgFromBody = null } = body;
         // basic validations
         if (!name || typeof name !== "string" || !name.trim()) {
             return jsonError("Team name is required", 400);
@@ -402,6 +409,7 @@ async function POST(req) {
         }
         // create team and team members in transaction
         const created = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].$transaction(async (tx)=>{
+            // Build team data (include the optional UI metadata if present)
             const teamData = {
                 name: name.trim(),
                 description: description ? String(description).trim() : null,
@@ -419,6 +427,11 @@ async function POST(req) {
                     }
                 };
             }
+            // safe assignment of optional metadata fields (only set when provided)
+            if (typeof featured === "boolean") teamData.featured = featured;
+            if (typeof gradient === "string") teamData.gradient = gradient;
+            if (typeof projects !== "undefined") teamData.projects = Number(projects ?? 0);
+            if (typeof completion !== "undefined") teamData.completion = Number(completion ?? 0);
             const team = await tx.team.create({
                 data: teamData,
                 select: {
@@ -433,18 +446,17 @@ async function POST(req) {
             // create many TeamMember rows if any memberIds provided
             let membersCreated = [];
             if (memberIds.length > 0) {
-                // createMany expects raw fields; using teamId & userId (assumes TeamMember model has those columns)
                 const createManyData = memberIds.map((uid)=>({
                         teamId: team.id,
                         userId: uid,
                         role: "EMPLOYEE"
                     }));
-                // skipDuplicates true prevents unique constraint failures if user already member
+                // createMany with skipDuplicates helps avoid constraint errors if some already exist
                 await tx.teamMember.createMany({
                     data: createManyData,
                     skipDuplicates: true
                 });
-                // fetch the created members (with user details) for response
+                // fetch created/updated member rows with user details
                 membersCreated = await tx.teamMember.findMany({
                     where: {
                         teamId: team.id
@@ -462,12 +474,16 @@ async function POST(req) {
                     }
                 });
             }
+            // adhocMembers: frontend-only synthetic members — if you have a table to store them, insert here.
+            // For now we don't persist adhocMembers as users; you can extend schema to store them if required.
+            // Example logic (commented):
+            // if (Array.isArray(adhocMembers) && adhocMembers.length > 0) { ... }
             return {
                 team,
                 members: membersCreated
             };
         });
-        // load the fresh team with includes for response
+        // load the fresh team with includes and metadata fields for response
         const teamFull = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].team.findUnique({
             where: {
                 id: created.team.id
@@ -495,9 +511,34 @@ async function POST(req) {
                 }
             }
         });
+        // Normalize returned team shape to include optional metadata for UI
+        const responseTeam = {
+            id: teamFull?.id ?? created.team.id,
+            name: teamFull?.name ?? created.team.name,
+            description: teamFull?.description ?? created.team.description ?? null,
+            manager: teamFull?.manager ? {
+                id: teamFull.manager.id,
+                name: teamFull.manager.name,
+                email: teamFull.manager.email
+            } : null,
+            featured: teamFull?.featured ?? false,
+            gradient: teamFull?.gradient ?? null,
+            projects: typeof teamFull?.projects !== "undefined" ? Number(teamFull.projects ?? 0) : null,
+            completion: typeof teamFull?.completion !== "undefined" ? Number(teamFull.completion ?? 0) : null,
+            members: (teamFull?.members ?? []).map((m)=>({
+                    teamMemberId: m.id,
+                    userId: m.user?.id ?? null,
+                    name: m.user?.name ?? null,
+                    email: m.user?.email ?? null,
+                    role: m.role ?? null
+                })),
+            organizationId: teamFull?.organizationId ?? created.team.organizationId,
+            createdAt: teamFull?.createdAt?.toISOString?.() ?? created.team.createdAt?.toISOString?.() ?? null,
+            updatedAt: teamFull?.updatedAt?.toISOString?.() ?? null
+        };
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            team: teamFull ?? created.team
+            team: responseTeam
         }, {
             status: 201
         });
