@@ -1014,21 +1014,21 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
         {
             id: "tasks",
             label: "Tasks",
-            href: "/dashboard/manager/tasks",
+            href: "/dashboard/manager/Tasks",
             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$clipboard$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Clipboard$3e$__["Clipboard"],
             gradient: "from-pink-500 to-rose-500"
         },
         {
             id: "people",
             label: "People",
-            href: "/dashboard/manager/people",
+            href: "/dashboard/manager/People",
             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"],
             gradient: "from-teal-500 to-emerald-500"
         },
         {
             id: "analytics",
             label: "Analytics",
-            href: "/dashboard/manager/analytics",
+            href: "/dashboard/manager/Analytics",
             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chart$2d$column$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BarChart3$3e$__["BarChart3"],
             gradient: "from-pink-500 to-rose-500"
         },

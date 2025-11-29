@@ -19,30 +19,23 @@ import {
   Link as LinkIcon,
   MoreHorizontal,
   MessageCircle,
+  X,
+  UserPlus,
 } from "lucide-react";
 
 /**
- * Manager Overview page
+ * Manager Overview page (rewritten with Invite Employee modal)
  *
- * Client-side interactive page for managers:
- * - shows team-level metrics
- * - team member list + presence
- * - open tasks
- * - upcoming meetings
- * - quick actions (schedule meeting, create task)
+ * - Adds "Invite employee" button which opens a modal
+ * - Modal collects email (+ optional team) and POSTs to /api/invites/creates
+ * - Uses role: "EMPLOYEE" for invites (managers cannot invite managers)
  *
- * Expected API endpoints (defensive parsing):
- * - GET /api/dashboard/manager/metrics -> { ok: true, metrics: { conversations, avgResponseHours, openTasks, utilization } }
- * - GET /api/dashboard/teams -> { teams: [{ id, name, membersCount, managerId, ... }] } OR array
- * - GET /api/dashboard/teams/:id/members -> { members: [...] } OR array
- * - GET /api/dashboard/tasks?teamId=... -> { tasks: [...] }
- * - GET /api/dashboard/schedule/upcoming?teamId=... -> { meetings: [...] }
- * - POST /api/schedule/create -> schedule meeting
- *
- * The page is resilient to missing endpoints and shows friendly fallbacks.
+ * Notes:
+ * - The server route /api/invites/creates should derive organizationId from session (recommended).
+ * - If server does not derive organizationId, you may pass organizationId in the body (less secure).
  */
 
-/* ---------------- StatCard Component (reused pattern) ---------------- */
+/* ---------------- StatCard Component ---------------- */
 type StatCardProps = {
   title: string;
   value: string;
@@ -129,7 +122,7 @@ function MemberRow({ member }: { member: TeamMember }) {
   );
 }
 
-/* ---------------- Schedule Modal (manager copy) ---------------- */
+/* ---------------- Schedule Modal ---------------- */
 function ScheduleModal({
   open,
   defaultOrganizer,
@@ -238,6 +231,140 @@ function ScheduleModal({
   );
 }
 
+/* ---------------- Invite Modal ---------------- */
+function InviteModal({
+  open,
+  defaultTeamId,
+  teams,
+  onClose,
+  onSent,
+}: {
+  open: boolean;
+  defaultTeamId?: string | null;
+  teams: Array<{ id: string; name: string }>;
+  onClose: (sent?: boolean) => void;
+  onSent?: (resp?: any) => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [teamId, setTeamId] = useState<string | null>(defaultTeamId ?? null);
+  const [message, setMessage] = useState<string>("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setEmail("");
+      setTeamId(defaultTeamId ?? null);
+      setMessage("");
+      setSending(false);
+      setError(null);
+      setSuccessMsg(null);
+    }
+  }, [open, defaultTeamId]);
+
+  function isValidEmail(e?: string) {
+    if (!e) return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+
+  const handleSend = async (ev?: React.FormEvent) => {
+    ev?.preventDefault();
+    setError(null);
+    setSuccessMsg(null);
+
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setSending(true);
+    try {
+      const body: any = { email: email.trim().toLowerCase(), role: "EMPLOYEE" };
+      if (teamId) body.teamId = teamId;
+      if (message) body.message = message;
+
+      const res = await fetch("/api/invites/creates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        credentials: "same-origin",
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json?.ok) {
+        // surface server message where available
+        const msg = json?.message || json?.error || "Failed to send invite.";
+        throw new Error(msg);
+      }
+
+      setSuccessMsg("Invite sent — the employee will receive an email with the signup link.");
+      onSent?.(json);
+      // keep modal open briefly to show success, then close
+      setTimeout(() => {
+        onClose(true);
+      }, 900);
+    } catch (err: any) {
+      setError(err?.message || "Network error");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 sm:p-6">
+      <div className="absolute inset-0 bg-black/40" onClick={() => onClose(false)} />
+      <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.12 }} className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl z-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 text-white rounded-md p-2"><UserPlus className="w-4 h-4" /></div>
+            <h3 className="text-lg font-semibold">Invite employee</h3>
+          </div>
+          <button className="p-1 rounded-md hover:bg-slate-100" onClick={() => onClose(false)} aria-label="Close">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSend} className="space-y-3">
+          <div>
+            <label className="text-xs text-slate-600">Employee email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="employee@example.com"
+              className="w-full mt-1 p-2 border rounded-md text-sm"
+              type="email"
+              autoComplete="email"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-600">Team (optional)</label>
+            <select value={teamId ?? ""} onChange={(e) => setTeamId(e.target.value || null)} className="w-full mt-1 p-2 border rounded-md text-sm">
+              <option value="">(No team — general invite)</option>
+              {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+            </select>
+            <p className="text-xs text-slate-400 mt-1">Assign the employee to a team upon signup.</p>
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-600">Message (optional)</label>
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="w-full mt-1 p-2 border rounded-md text-sm" rows={3} placeholder="Short message that appears in the invite email (optional)" />
+          </div>
+
+          {error && <div className="text-sm text-rose-600">{error}</div>}
+          {successMsg && <div className="text-sm text-emerald-600">{successMsg}</div>}
+
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <button type="button" onClick={() => onClose(false)} className="px-3 py-1 rounded-md">Cancel</button>
+            <button type="submit" disabled={sending} className="px-4 py-2 rounded-md bg-indigo-600 text-white">{sending ? "Sending…" : "Send invite"}</button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ---------------- Manager Overview Page (main) ---------------- */
 export default function ManagerOverviewPage(): JSX.Element {
   const [teams, setTeams] = useState<Array<{ id: string; name: string }>>([]);
@@ -264,6 +391,9 @@ export default function ManagerOverviewPage(): JSX.Element {
   const [meetingsLoading, setMeetingsLoading] = useState(false);
 
   const [scheduleOpen, setScheduleOpen] = useState(false);
+
+  // Invite modal state
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   /* -- load teams -- */
@@ -277,7 +407,7 @@ export default function ManagerOverviewPage(): JSX.Element {
         if (!res.ok) {
           throw new Error("Failed to load teams");
         }
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         const list = Array.isArray(j) ? j : j?.teams ?? [];
         if (mounted) {
           setTeams(list);
@@ -295,16 +425,18 @@ export default function ManagerOverviewPage(): JSX.Element {
   /* -- load metrics when selectedTeamId changes -- */
   useEffect(() => {
     let mounted = true;
-    if (!selectedTeamId) return;
+    if (!selectedTeamId) {
+      setMetrics(null);
+      return;
+    }
     setMetricsLoading(true);
     (async () => {
       try {
         const res = await fetch(`/api/dashboard/manager/metrics?teamId=${encodeURIComponent(selectedTeamId)}`, { credentials: "same-origin" });
         if (!res.ok) {
-          // fallback: allow partial metrics using local calculations or show placeholders
           throw new Error("Metrics unavailable");
         }
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         const m = j?.metrics ?? {
           conversations: j?.conversations,
           avgResponseHours: j?.avgResponseHours,
@@ -336,12 +468,12 @@ export default function ManagerOverviewPage(): JSX.Element {
           // try alternative endpoint
           const alt = await fetch(`/api/dashboard/teams/members?teamId=${encodeURIComponent(selectedTeamId)}`, { credentials: "same-origin" });
           if (!alt.ok) throw new Error("Members endpoint failed");
-          const aj = await alt.json();
+          const aj = await alt.json().catch(() => ({}));
           const altList = Array.isArray(aj) ? aj : aj?.members ?? [];
           if (mounted) setMembers(altList);
           return;
         }
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         const list = Array.isArray(j) ? j : j?.members ?? [];
         if (mounted) setMembers(list);
       } catch {
@@ -365,7 +497,7 @@ export default function ManagerOverviewPage(): JSX.Element {
       try {
         const res = await fetch(`/api/dashboard/tasks?teamId=${encodeURIComponent(selectedTeamId)}&status=open`, { credentials: "same-origin" });
         if (!res.ok) throw new Error("Tasks failed");
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         const list = Array.isArray(j) ? j : j?.tasks ?? [];
         if (mounted) setTasks(list);
       } catch {
@@ -389,7 +521,7 @@ export default function ManagerOverviewPage(): JSX.Element {
       try {
         const res = await fetch(`/api/dashboard/schedule/upcoming?teamId=${encodeURIComponent(selectedTeamId)}`, { credentials: "same-origin" });
         if (!res.ok) throw new Error("Meetings failed");
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         const list = Array.isArray(j) ? j : j?.meetings ?? [];
         if (mounted) setMeetings(list);
       } catch {
@@ -401,7 +533,7 @@ export default function ManagerOverviewPage(): JSX.Element {
     return () => { mounted = false; };
   }, [selectedTeamId]);
 
-  /* -- derived -- */
+  /* -- derived stats -- */
   const stats = useMemo(() => {
     return [
       {
@@ -468,6 +600,10 @@ export default function ManagerOverviewPage(): JSX.Element {
 
                 <button onClick={() => setScheduleOpen(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition">
                   <CalendarClock className="w-4 h-4" /> Schedule
+                </button>
+
+                <button onClick={() => setInviteOpen(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition">
+                  <UserPlus className="w-4 h-4" /> Invite employee
                 </button>
 
                 <a href={`/dashboard/manager/tasks/create?teamId=${selectedTeamId ?? ""}`} className="px-3 py-2 border rounded-md text-sm">Create task</a>
@@ -609,12 +745,10 @@ export default function ManagerOverviewPage(): JSX.Element {
           setScheduleOpen(false);
           if (success) {
             setToast("Meeting scheduled");
-            // refresh meetings
             setTimeout(() => {
               setToast(null);
-              // trigger meetings reload by toggling selectedTeamId (cheeky) or call fetch functions directly
+              // refresh meetings
               if (selectedTeamId) {
-                // re-run meetings effect by resetting state trigger (simple fetch)
                 (async () => {
                   try {
                     setMeetingsLoading(true);
@@ -633,6 +767,23 @@ export default function ManagerOverviewPage(): JSX.Element {
           }
         }}
         onCreated={() => {}}
+      />
+
+      {/* invite modal */}
+      <InviteModal
+        open={inviteOpen}
+        defaultTeamId={selectedTeamId ?? undefined}
+        teams={teams}
+        onClose={(sent?: boolean) => {
+          setInviteOpen(false);
+          if (sent) {
+            setToast("Invite sent");
+            setTimeout(() => setToast(null), 1800);
+          }
+        }}
+        onSent={() => {
+          // optionally refresh invited/pending lists here
+        }}
       />
 
       {/* ephemeral toast */}

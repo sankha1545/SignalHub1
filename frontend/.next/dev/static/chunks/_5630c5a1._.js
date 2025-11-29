@@ -2,7 +2,6 @@
 "[project]/src/app/(auth)/invite/accept/page.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// app/(auth)/invite/accept/page.tsx
 __turbopack_context__.s([
     "default",
     ()=>InviteAcceptPage
@@ -20,18 +19,18 @@ function InviteAcceptPage() {
     const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const token = searchParams.get("token") ?? "";
-    // data states
+    // invite / auth state
     const [invite, setInvite] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loadingInvite, setLoadingInvite] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [checkingAuth, setCheckingAuth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [currentUserEmail, setCurrentUserEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    // form states
+    // form state
     const [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [confirmPassword, setConfirmPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [passwordTouched, setPasswordTouched] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [submitting, setSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    // basic password validation (same rules as your signup)
+    // password validation rules
     function validatePassword(pw) {
         const errs = [];
         if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
@@ -43,37 +42,49 @@ function InviteAcceptPage() {
     }
     const passwordErrors = validatePassword(password);
     const passwordsMatch = password === confirmPassword || confirmPassword.length === 0;
-    // Load invite metadata and check /api/me concurrently
+    // load invite metadata and check current auth
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "InviteAcceptPage.useEffect": ()=>{
             let mounted = true;
+            async function safeJson(res) {
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch  {
+                    return {
+                        ok: res.ok,
+                        message: text || (res.statusText ?? "Unknown response")
+                    };
+                }
+            }
             async function loadInvite() {
                 setLoadingInvite(true);
                 setError(null);
                 if (!token) {
-                    setError("Missing invite token.");
+                    setError("Missing invite token. Please open the invite link you received by email.");
                     setLoadingInvite(false);
                     return;
                 }
                 try {
-                    const res = await fetch("/api/invites/accept", {
+                    const res_0 = await fetch("/api/invites/accept", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             token
-                        })
+                        }),
+                        credentials: "include"
                     });
-                    const json = await res.json();
-                    if (!res.ok || !json?.ok) {
+                    const json = await safeJson(res_0);
+                    if (!res_0.ok || !json?.ok) {
                         const msg = json?.message || json?.error || "Invalid or expired invite link.";
                         throw new Error(msg);
                     }
                     if (mounted) setInvite(json);
                 } catch (err) {
                     console.error("Invite accept error:", err);
-                    if (mounted) setError(err?.message || "Could not validate invite.");
+                    if (mounted) setError(err?.message || "Could not validate invite link.");
                 } finally{
                     if (mounted) setLoadingInvite(false);
                 }
@@ -81,7 +92,9 @@ function InviteAcceptPage() {
             async function checkAuth() {
                 setCheckingAuth(true);
                 try {
-                    const r = await fetch("/api/me");
+                    const r = await fetch("/api/me", {
+                        credentials: "include"
+                    });
                     if (!r.ok) {
                         if (mounted) setCurrentUserEmail(null);
                     } else {
@@ -105,17 +118,17 @@ function InviteAcceptPage() {
     }["InviteAcceptPage.useEffect"], [
         token
     ]);
-    // finalize invite: POST /api/invites/finalize { token, password }
+    // finalize invite flow
     async function handleFinalize(e_0) {
         e_0?.preventDefault();
         setPasswordTouched(true);
         setError(null);
         if (!invite?.email) {
-            setError("Invite data missing.");
+            setError("Invite data missing. Please reload the page or ask the inviter to resend the invite.");
             return;
         }
         if (passwordErrors.length > 0) {
-            setError("Please fix password requirements.");
+            setError("Please fix the password requirements before continuing.");
             return;
         }
         if (!passwordsMatch) {
@@ -124,46 +137,53 @@ function InviteAcceptPage() {
         }
         setSubmitting(true);
         try {
-            const payload = {
-                token,
-                password
-            };
-            const res_0 = await fetch("/api/invites/finalize", {
+            const res_1 = await fetch("/api/invites/finalize", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    token,
+                    password
+                }),
+                credentials: "include"
             });
-            const json_0 = await res_0.json();
-            if (!res_0.ok || !json_0?.ok) {
-                // provide granular messages when available
-                const msg_0 = json_0?.message || json_0?.error || "Failed to create account.";
+            const text_0 = await res_1.text();
+            let json_0;
+            try {
+                json_0 = text_0 ? JSON.parse(text_0) : {};
+            } catch  {
+                json_0 = {
+                    ok: res_1.ok,
+                    message: text_0
+                };
+            }
+            if (!res_1.ok || !json_0?.ok) {
+                const msg_0 = json_0?.message || json_0?.error || "Failed to create account. Contact the administrator.";
                 throw new Error(msg_0);
             }
-            // If server returned a session token (some flows sign session and return token),
-            // we persist it client-side as a fallback (note: httpOnly cookie is preferred).
+            // if server returned a session token, persist as fallback (server-set httpOnly cookie preferred)
             if (json_0.token) {
                 try {
-                    // store token in localStorage as fallback (you can change storage policy)
                     localStorage.setItem("sessionToken", json_0.token);
-                } catch (e_1) {
+                } catch  {
                 // ignore storage errors
                 }
-                // attempt to fetch user profile to warm the client and validate session
+                // optional: warm /api/me
                 try {
-                    await fetch("/api/me");
+                    await fetch("/api/me", {
+                        credentials: "include"
+                    });
                 } catch  {
                 // ignore
                 }
-                // redirect to server-provided redirect or manager dashboard
-                const redirectTo = json_0.redirect ?? "/dashboard/manager";
+                // decide redirect:
+                const redirectTo = json_0.redirect || (invite?.role && /manager/i.test(String(invite.role)) ? "/dashboard/manager" : "/dashboard/employee");
                 router.push(redirectTo);
                 return;
             }
-            // If no token returned, fall back to redirecting to login page with created flag
-            // (server may expect user to log in).
-            router.push("/login?created=1");
+            // fallback: redirect to login page and prefill email
+            router.push(`/auth/login?email=${encodeURIComponent(invite.email)}&created=1`);
         } catch (err_0) {
             console.error("Finalize error:", err_0);
             setError(err_0?.message || "Failed to create account. Please try again or contact support.");
@@ -171,7 +191,7 @@ function InviteAcceptPage() {
             setSubmitting(false);
         }
     }
-    // UI states
+    // show loaders / errors
     if (loadingInvite || checkingAuth) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "min-h-screen w-full flex items-center justify-center p-6",
@@ -180,12 +200,12 @@ function InviteAcceptPage() {
                 children: "Loading invite…"
             }, void 0, false, {
                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                lineNumber: 202,
+                lineNumber: 218,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-            lineNumber: 201,
+            lineNumber: 217,
             columnNumber: 12
         }, this);
     }
@@ -200,7 +220,7 @@ function InviteAcceptPage() {
                         children: "Invite issue"
                     }, void 0, false, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 208,
+                        lineNumber: 224,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -208,26 +228,26 @@ function InviteAcceptPage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 209,
+                        lineNumber: 225,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                         className: "text-sm text-gray-600",
-                        children: "If this looks wrong, ask the organization to resend the invite or contact support."
+                        children: "If this looks wrong, ask the organization admin to resend the invite or contact support."
                     }, void 0, false, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 210,
+                        lineNumber: 226,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                lineNumber: 207,
+                lineNumber: 223,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-            lineNumber: 206,
+            lineNumber: 222,
             columnNumber: 12
         }, this);
     }
@@ -242,7 +262,7 @@ function InviteAcceptPage() {
                         children: "Invite not found"
                     }, void 0, false, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 219,
+                        lineNumber: 235,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -250,22 +270,22 @@ function InviteAcceptPage() {
                         children: "This invite link is invalid, expired, or already used."
                     }, void 0, false, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 220,
+                        lineNumber: 236,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                lineNumber: 218,
+                lineNumber: 234,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-            lineNumber: 217,
+            lineNumber: 233,
             columnNumber: 12
         }, this);
     }
-    // Main UI (keeps same visual layout as original)
+    // main UI
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "min-h-screen w-full bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4 sm:p-6",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -284,7 +304,7 @@ function InviteAcceptPage() {
                                         children: "U"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 248,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -294,7 +314,7 @@ function InviteAcceptPage() {
                                                 children: "You're invited"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 236,
+                                                lineNumber: 252,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -305,26 +325,26 @@ function InviteAcceptPage() {
                                                         children: invite.organizationName ?? invite.organizationId
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 238,
+                                                        lineNumber: 254,
                                                         columnNumber: 49
                                                     }, this),
                                                     "."
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 237,
+                                                lineNumber: 253,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 235,
+                                        lineNumber: 251,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                lineNumber: 231,
+                                lineNumber: 247,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -336,7 +356,7 @@ function InviteAcceptPage() {
                                             className: "absolute left-4 right-4 top-6 h-0.5 bg-slate-100 rounded"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                            lineNumber: 246,
+                                            lineNumber: 262,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -346,7 +366,7 @@ function InviteAcceptPage() {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                            lineNumber: 247,
+                                            lineNumber: 263,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -368,10 +388,11 @@ function InviteAcceptPage() {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: `w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-sm font-semibold transition ${isCompleted ? "bg-indigo-600 text-white shadow-lg scale-105" : isActive ? "bg-indigo-600 text-white ring-4 ring-indigo-100 animate-pulse" : "bg-white border border-slate-200 text-slate-600"}`,
+                                                            "aria-hidden": true,
                                                             children: n
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                            lineNumber: 256,
+                                                            lineNumber: 272,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -379,30 +400,30 @@ function InviteAcceptPage() {
                                                             children: labels[n - 1]
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                            lineNumber: 259,
+                                                            lineNumber: 275,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, n, true, {
                                                     fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                    lineNumber: 255,
+                                                    lineNumber: 271,
                                                     columnNumber: 26
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                            lineNumber: 250,
+                                            lineNumber: 266,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                    lineNumber: 245,
+                                    lineNumber: 261,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                lineNumber: 244,
+                                lineNumber: 260,
                                 columnNumber: 13
                             }, this),
                             currentUserEmail && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -413,14 +434,14 @@ function InviteAcceptPage() {
                                         children: currentUserEmail
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 284,
                                         columnNumber: 38
                                     }, this),
                                     ". To accept this invite as a different user, sign out or open this link in a private/incognito window."
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                lineNumber: 267,
+                                lineNumber: 283,
                                 columnNumber: 34
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -430,20 +451,23 @@ function InviteAcceptPage() {
                                         className: "mb-4",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                htmlFor: "invite-email",
                                                 className: "block text-sm font-medium text-slate-700",
                                                 children: "Email (locked)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 275,
+                                                lineNumber: 291,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                id: "invite-email",
                                                 readOnly: true,
                                                 value: invite.email ?? "",
-                                                className: "mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                                                className: "mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm",
+                                                "aria-readonly": true
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 276,
+                                                lineNumber: 294,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -451,112 +475,122 @@ function InviteAcceptPage() {
                                                 children: "This email was invited by the organization and is already verified."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 277,
+                                                lineNumber: 295,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 274,
+                                        lineNumber: 290,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "mb-4",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                htmlFor: "invite-phone",
                                                 className: "block text-sm font-medium text-slate-700",
                                                 children: "Phone (verified)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 282,
+                                                lineNumber: 300,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                id: "invite-phone",
                                                 readOnly: true,
                                                 value: invite.phone ?? "Not provided — verified by admin",
                                                 className: "mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 283,
+                                                lineNumber: 303,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 className: "text-xs text-slate-400 mt-2",
-                                                children: "Phone verification is disabled for invited users (pre-verified by the inviter)."
+                                                children: "Phone verification is handled by the organization for invited users."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 284,
+                                                lineNumber: 304,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 281,
+                                        lineNumber: 299,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                                         onSubmit: handleFinalize,
                                         className: "space-y-4",
+                                        "aria-describedby": "invite-form-desc",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                        htmlFor: "invite-password",
                                                         className: "block text-sm font-medium text-slate-700",
                                                         children: "Password"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 290,
+                                                        lineNumber: 310,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                        id: "invite-password",
                                                         type: "password",
                                                         value: password,
-                                                        onChange: (e_2)=>setPassword(e_2.target.value),
+                                                        onChange: (e_1)=>setPassword(e_1.target.value),
                                                         onBlur: ()=>setPasswordTouched(true),
                                                         placeholder: "Create a secure password (8+ characters)",
                                                         className: "mt-1 block w-full rounded-md border-gray-200 px-3 py-2 text-sm",
-                                                        autoComplete: "new-password"
+                                                        autoComplete: "new-password",
+                                                        "aria-required": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 291,
+                                                        lineNumber: 313,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 289,
+                                                lineNumber: 309,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                        htmlFor: "invite-confirm",
                                                         className: "block text-sm font-medium text-slate-700",
                                                         children: "Retype password"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 295,
+                                                        lineNumber: 317,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                        id: "invite-confirm",
                                                         type: "password",
                                                         value: confirmPassword,
-                                                        onChange: (e_3)=>setConfirmPassword(e_3.target.value),
+                                                        onChange: (e_2)=>setConfirmPassword(e_2.target.value),
                                                         onBlur: ()=>setPasswordTouched(true),
                                                         placeholder: "Retype password",
                                                         className: "mt-1 block w-full rounded-md border-gray-200 px-3 py-2 text-sm",
-                                                        autoComplete: "new-password"
+                                                        autoComplete: "new-password",
+                                                        "aria-required": true
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 296,
+                                                        lineNumber: 320,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 294,
+                                                lineNumber: 316,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                id: "invite-form-desc",
                                                 className: "text-xs text-slate-500",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -564,7 +598,7 @@ function InviteAcceptPage() {
                                                         children: "Password must contain:"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 301,
+                                                        lineNumber: 324,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -595,10 +629,11 @@ function InviteAcceptPage() {
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         className: `w-4 h-4 rounded-sm flex items-center justify-center ${r_0.ok ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-400"}`,
+                                                                        "aria-hidden": true,
                                                                         children: r_0.ok ? "✓" : "•"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                                        lineNumber: 319,
+                                                                        lineNumber: 342,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -606,18 +641,18 @@ function InviteAcceptPage() {
                                                                         children: r_0.label
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                                        lineNumber: 322,
+                                                                        lineNumber: 345,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, r_0.label, true, {
                                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                                lineNumber: 318,
+                                                                lineNumber: 341,
                                                                 columnNumber: 33
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 302,
+                                                        lineNumber: 325,
                                                         columnNumber: 19
                                                     }, this),
                                                     !passwordsMatch && confirmPassword.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -625,13 +660,13 @@ function InviteAcceptPage() {
                                                         children: "Passwords do not match."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 325,
+                                                        lineNumber: 348,
                                                         columnNumber: 69
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 323,
                                                 columnNumber: 17
                                             }, this),
                                             error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -639,7 +674,7 @@ function InviteAcceptPage() {
                                                 children: error
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 328,
+                                                lineNumber: 351,
                                                 columnNumber: 27
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -647,51 +682,52 @@ function InviteAcceptPage() {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         type: "submit",
-                                                        disabled: submitting,
-                                                        className: "inline-flex items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60",
+                                                        disabled: submitting || passwordErrors.length > 0 || !passwordsMatch || password.length === 0,
+                                                        className: `inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium ${submitting || passwordErrors.length > 0 || !passwordsMatch || password.length === 0 ? "bg-slate-300 text-slate-600 cursor-not-allowed" : "bg-slate-900 text-white"}`,
+                                                        "aria-disabled": submitting || passwordErrors.length > 0 || !passwordsMatch || password.length === 0,
                                                         children: submitting ? "Creating account…" : `Create account and join ${invite.organizationName ?? "team"}`
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 331,
+                                                        lineNumber: 354,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         type: "button",
-                                                        onClick: ()=>router.push("/login"),
+                                                        onClick: ()=>router.push(`/auth/login?email=${encodeURIComponent(invite.email ?? "")}`),
                                                         className: "inline-flex items-center gap-2 rounded-md border border-gray-200 px-4 py-2 text-sm",
                                                         children: "Already have an account? Log in"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                        lineNumber: 335,
+                                                        lineNumber: 358,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                                lineNumber: 330,
+                                                lineNumber: 353,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                        lineNumber: 288,
+                                        lineNumber: 308,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                                lineNumber: 272,
+                                lineNumber: 288,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                        lineNumber: 230,
+                        lineNumber: 246,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                    lineNumber: 229,
+                    lineNumber: 245,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -703,31 +739,31 @@ function InviteAcceptPage() {
                             className: "w-full h-full object-cover min-h-[520px]"
                         }, void 0, false, {
                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                            lineNumber: 347,
+                            lineNumber: 369,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"
                         }, void 0, false, {
                             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                            lineNumber: 348,
+                            lineNumber: 370,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-                    lineNumber: 346,
+                    lineNumber: 368,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-            lineNumber: 227,
+            lineNumber: 243,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/(auth)/invite/accept/page.tsx",
-        lineNumber: 226,
+        lineNumber: 242,
         columnNumber: 10
     }, this);
 }

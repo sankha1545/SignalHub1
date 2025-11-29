@@ -284,9 +284,9 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
     { id: "dashboard", label: "Dashboard", href: "/dashboard/manager/overview", icon: LayoutDashboard, gradient: "from-blue-500 to-cyan-500" },
     { id: "team-inbox", label: "Team Inbox", href: "/dashboard/manager/TeamInbox", icon: Inbox, gradient: "from-emerald-500 to-teal-500" },
     
-    { id: "tasks", label: "Tasks", href: "/dashboard/manager/tasks", icon: Clipboard, gradient: "from-pink-500 to-rose-500" },
-    { id: "people", label: "People", href: "/dashboard/manager/people", icon: User, gradient: "from-teal-500 to-emerald-500" },
-    { id: "analytics", label: "Analytics", href: "/dashboard/manager/analytics", icon: BarChart3, gradient: "from-pink-500 to-rose-500" },
+    { id: "tasks", label: "Tasks", href: "/dashboard/manager/Tasks", icon: Clipboard, gradient: "from-pink-500 to-rose-500" },
+    { id: "people", label: "People", href: "/dashboard/manager/People", icon: User, gradient: "from-teal-500 to-emerald-500" },
+    { id: "analytics", label: "Analytics", href: "/dashboard/manager/Analytics", icon: BarChart3, gradient: "from-pink-500 to-rose-500" },
     { id: "settings", label: "Settings", href: "/dashboard/manager/settings", icon: Settings, gradient: "from-slate-500 to-slate-700" },
   ];
 

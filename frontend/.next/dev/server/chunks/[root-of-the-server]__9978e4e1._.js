@@ -289,9 +289,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$nodemailer$2
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$dotenv$2f$lib$2f$main$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/dotenv/lib/main.js [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/@prisma/client [external] (@prisma/client, cjs)");
-// Optional helper to get current user from request (if you have one).
-// If you don't have this helper, the route will accept invitedById in the body.
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/auth.ts [app-route] (ecmascript)"); // optional; if not present, invitedById may be provided in body
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/auth.ts [app-route] (ecmascript)"); // optional helper - if absent, should be no-op
 ;
 ;
 ;
@@ -301,65 +299,59 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5
 ;
 ;
 ;
-// load .env from project root if present (dev fallback)
+// Load .env from project root in dev (fallback)
 const envPath = __TURBOPACK__imported__module__$5b$externals$5d2f$path__$5b$external$5d$__$28$path$2c$__cjs$29$__["default"].join(process.cwd(), ".env");
 if (__TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["default"].existsSync(envPath)) {
     __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$dotenv$2f$lib$2f$main$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].config({
         path: envPath
     });
-    console.log("[invites/creates] Loaded .env from", envPath);
 } else {
-    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$dotenv$2f$lib$2f$main$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].config(); // still try to load from process.env, no-op if not found
-    console.log("[invites/creates] .env not found at", envPath, " — relying on process.env");
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$dotenv$2f$lib$2f$main$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].config();
 }
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+/* ---------- helpers ---------- */ function isValidEmail(email) {
+    // basic RFC-ish check and protect against extremely long inputs
+    return typeof email === "string" && email.length > 3 && email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-/**
- * Helper to create a transporter with sensible defaults.
- * Uses SMTP_* env vars (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM).
- */ function createTransporter() {
+function createTransporter() {
     const host = process.env.SMTP_HOST || "127.0.0.1";
     const port = Number(process.env.SMTP_PORT || 25);
     const secure = process.env.SMTP_SECURE === "true" || port === 465;
     const user = process.env.SMTP_USER || "";
     const pass = process.env.SMTP_PASS || "";
     const rejectUnauthorized = process.env.SMTP_TLS_REJECT !== "false";
-    console.log("[invites/creates] SMTP config:", {
+    const config = {
         host,
         port,
         secure,
-        authProvided: !!user
-    });
-    const transporter = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$nodemailer$2f$lib$2f$nodemailer$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].createTransport({
-        host,
-        port,
-        secure,
-        auth: user ? {
-            user,
-            pass
-        } : undefined,
         tls: {
             rejectUnauthorized
         }
-    });
-    return transporter;
+    };
+    if (user) config.auth = {
+        user,
+        pass
+    };
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$nodemailer$2f$lib$2f$nodemailer$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].createTransport(config);
 }
-/** small helper - generate hex token */ function cryptoRandomHex(len = 24) {
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__["default"].randomBytes(len).toString("hex");
+function cryptoRandomHex(bytes = 32) {
+    // 32 bytes -> 64 hex characters
+    return __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__["default"].randomBytes(bytes).toString("hex");
+}
+function safeString(v) {
+    return v === undefined || v === null ? null : String(v);
 }
 async function POST(req) {
     try {
-        // parse body (defensive)
-        const body = await req.json().catch(()=>({}));
-        const rawEmail = (body?.email || "").toString().trim();
-        const role = (body?.role || "MANAGER").toString().toUpperCase(); // default to MANAGER
-        const providedOrgId = body?.organizationId ?? null;
-        const providedInvitedById = body?.invitedById ?? null;
-        const providedTeamId = body?.teamId ?? null;
-        const customMessage = body?.message ?? null;
-        const expiresInHours = Number(body?.expiresInHours ?? 24);
-        if (!rawEmail || !isValidEmail(rawEmail)) {
+        // parse body defensively
+        let body = {};
+        try {
+            body = await req.json() || {};
+        } catch (e) {
+            body = {};
+        }
+        // normalize inputs
+        const rawEmail = safeString(body?.email ?? "").trim();
+        if (!isValidEmail(rawEmail)) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 message: "Invalid email address"
@@ -368,35 +360,43 @@ async function POST(req) {
             });
         }
         const email = rawEmail.toLowerCase();
-        // Determine organizationId and inviterId:
-        // Prefer explicit organizationId in body; otherwise try to derive from authenticated user.
-        let organizationId = providedOrgId;
-        let inviterId = providedInvitedById;
-        // Try to derive inviterId and/or organizationId from session if available
+        // read optional fields
+        const requestedRole = safeString(body?.role ?? "EMPLOYEE").toUpperCase();
+        const allowedRoles = new Set([
+            "EMPLOYEE",
+            "MANAGER",
+            "ADMIN"
+        ]);
+        const roleCandidate = allowedRoles.has(requestedRole) ? requestedRole : "EMPLOYEE";
+        const providedOrgId = safeString(body?.organizationId ?? null);
+        const providedTeamId = safeString(body?.teamId ?? null);
+        const providedInvitedById = safeString(body?.invitedById ?? null);
+        const customMessage = body?.message ?? null;
+        const expiresInHours = Math.max(1, Number(body?.expiresInHours ?? 48)); // default 48h
+        // derive organization & inviter from session if possible
+        let organizationId = providedOrgId || null;
+        let inviterId = providedInvitedById || null;
         try {
-            const authUser = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req).catch(()=>null);
-            if (authUser) {
-                // If org not provided, derive from session
-                if (!organizationId && authUser.organizationId) {
-                    organizationId = authUser.organizationId;
-                }
-                // If inviter not provided, set to authenticated user id
-                if (!inviterId && authUser.id) {
-                    inviterId = authUser.id;
+            if (typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"] === "function") {
+                const sessionUser = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req).catch(()=>null);
+                if (sessionUser) {
+                    if (!organizationId && sessionUser.organizationId) organizationId = sessionUser.organizationId;
+                    if (!inviterId && sessionUser.id) inviterId = sessionUser.id;
                 }
             }
         } catch (e) {
-        // If getSessionUser doesn't exist or throws, we gracefully fallback to provided fields
+            // non-fatal: proceed with provided fields
+            console.warn("[invites/creates] getSessionUser error:", e?.message || e);
         }
         if (!organizationId) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
-                message: "organizationId required (or send request as authenticated org member)"
+                message: "organizationId required (or request must be made by an authenticated org member)"
             }, {
                 status: 400
             });
         }
-        // Ensure organization exists
+        // ensure organization exists
         const org = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].organization.findUnique({
             where: {
                 id: organizationId
@@ -410,7 +410,67 @@ async function POST(req) {
                 status: 404
             });
         }
-        // Enforce global email uniqueness: cannot invite email already used by any user
+        // if providedTeamId, verify team exists and belongs to org
+        if (providedTeamId) {
+            const team = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].team.findUnique({
+                where: {
+                    id: providedTeamId
+                },
+                select: {
+                    id: true,
+                    organizationId: true
+                }
+            });
+            if (!team) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Team not found"
+            }, {
+                status: 404
+            });
+            if (team.organizationId !== organizationId) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: false,
+                    message: "Team does not belong to the organization"
+                }, {
+                    status: 400
+                });
+            }
+        }
+        // verify inviter if present and get inviterRole
+        let inviterRole = null;
+        if (inviterId) {
+            const inviter = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
+                where: {
+                    id: inviterId
+                },
+                select: {
+                    id: true,
+                    organizationId: true,
+                    role: true
+                }
+            });
+            if (!inviter) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Inviter not found"
+            }, {
+                status: 404
+            });
+            if (!inviter.organizationId || inviter.organizationId !== organizationId) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: false,
+                    message: "Inviter does not belong to the organization"
+                }, {
+                    status: 403
+                });
+            }
+            inviterRole = inviter.role ?? null;
+        }
+        // enforce invitation privilege: only ADMIN can invite MANAGER/ADMIN
+        let roleToSave = roleCandidate;
+        if (inviterRole && inviterRole !== "ADMIN") {
+            roleToSave = "EMPLOYEE"; // force to EMPLOYEE for non-admin inviters
+        }
+        // check existing user
         const existingUser = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
             where: {
                 email
@@ -424,9 +484,9 @@ async function POST(req) {
                 status: 409
             });
         }
-        // Prevent duplicate pending invite for same email in same org (and not expired)
+        // check for pending invite in same org (not accepted & not expired)
         const now = new Date();
-        const existingInvite = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].invite.findFirst({
+        const pending = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].invite.findFirst({
             where: {
                 email,
                 organizationId,
@@ -434,23 +494,47 @@ async function POST(req) {
                 expiresAt: {
                     gt: now
                 }
+            },
+            select: {
+                id: true,
+                token: true,
+                email: true,
+                expiresAt: true,
+                organizationId: true,
+                teamId: true,
+                role: true
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         });
-        if (existingInvite) {
+        if (pending) {
+            // Instead of hard 409, return existing invite metadata so UI can offer 'resend' or 'copy link'
+            const appUrl = (("TURBOPACK compile-time value", "http://localhost:3000") || process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000").replace(/\/$/, "");
+            const encoded = encodeURIComponent(pending.token);
+            const invitePath = `/invite/accept?token=${encoded}`;
+            const fallbackPath = `/auth/invite/accept?token=${encoded}`;
+            const inviteLink = `${appUrl}${invitePath}`;
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                ok: false,
-                message: "Pending invite already exists for this email in this organization"
+                ok: true,
+                message: "Pending invite already exists",
+                existing: true,
+                inviteId: pending.id,
+                role: pending.role ?? roleToSave,
+                expiresAt: pending.expiresAt?.toISOString() ?? null,
+                organizationId: pending.organizationId,
+                teamId: pending.teamId ?? null,
+                inviteLink
             }, {
-                status: 409
+                status: 200
             });
         }
-        // generate token + expiry
-        const token = cryptoRandomHex(24);
-        const expiresAt = new Date(Date.now() + Math.max(1, expiresInHours) * 60 * 60 * 1000); // at least 1 hour
-        // Build create payload; use relation connect for inviter & organization & team
-        const createData = {
+        // create invite
+        const token = cryptoRandomHex(32);
+        const expiresAt = new Date(Date.now() + expiresInHours * 3600 * 1000);
+        const inviteCreateData = {
             email,
-            role,
+            role: roleToSave,
             token,
             expiresAt,
             organization: {
@@ -459,68 +543,60 @@ async function POST(req) {
                 }
             }
         };
-        // Attach inviter relation if available (preferred).
-        // If inviterId is not present, we still allow creation (e.g. system invites) but it's better to have one.
-        if (inviterId) {
-            createData.inviter = {
-                connect: {
-                    id: inviterId
-                }
-            };
-        }
-        if (providedTeamId) {
-            createData.team = {
-                connect: {
-                    id: providedTeamId
-                }
-            };
-        }
-        // Persist invite in DB
+        if (inviterId) inviteCreateData.inviter = {
+            connect: {
+                id: inviterId
+            }
+        };
+        if (providedTeamId) inviteCreateData.team = {
+            connect: {
+                id: providedTeamId
+            }
+        };
         let inviteRecord;
         try {
             inviteRecord = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].invite.create({
-                data: createData,
+                data: inviteCreateData,
                 select: {
                     id: true,
-                    token: true,
                     email: true,
                     expiresAt: true,
-                    organizationId: true
+                    organizationId: true,
+                    teamId: true,
+                    role: true
                 }
             });
         } catch (dbErr) {
-            // Prisma unique constraint or other DB error
             if (dbErr instanceof __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__["Prisma"].PrismaClientKnownRequestError && dbErr.code === "P2002") {
-                const target = dbErr.meta?.target;
-                if (Array.isArray(target) && target.includes("email")) {
-                    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                        ok: false,
-                        message: "User with this email already exists (db)"
-                    }, {
-                        status: 409
-                    });
-                }
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: false,
+                    message: "Conflict creating invite (unique constraint)"
+                }, {
+                    status: 409
+                });
             }
-            console.error("[invites/creates] DB error when creating invite:", dbErr);
+            console.error("[invites/creates] DB error:", dbErr);
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
-                message: "Failed to create invite record"
+                message: "Failed to persist invite"
             }, {
                 status: 500
             });
         }
-        // build invite link (ensure you set NEXT_PUBLIC_APP_URL in .env)
-        const appUrl = ("TURBOPACK compile-time value", "http://localhost:3000") || "http://localhost:3000";
-        const inviteLink = `${appUrl.replace(/\/$/, "")}/invite/accept?token=${inviteRecord.token}`;
-        // prepare mail
-        const fromAddress = process.env.INVITE_FROM || process.env.SMTP_FROM || `"SignalHub" <no-reply@yourdomain.com>`;
+        // Build invite links
+        const appUrl = (("TURBOPACK compile-time value", "http://localhost:3000") || process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000").replace(/\/$/, "");
+        const encoded = encodeURIComponent(token);
+        const invitePath = `/invite/accept?token=${encoded}`;
+        const fallbackPath = `/auth/invite/accept?token=${encoded}`;
+        const inviteLink = `${appUrl}${invitePath}`;
+        const fallbackLink = `${appUrl}${fallbackPath}`;
+        // prepare and send email
         const transporter = createTransporter();
         try {
             await transporter.verify();
-            console.log("[invites/creates] SMTP verify OK");
         } catch (verifyErr) {
-            console.error("[invites/creates] SMTP verify failed:", verifyErr && (verifyErr.message || verifyErr));
-            // Rollback created invite to avoid orphaned invites when mail cannot be sent (optional but safer)
+            console.error("[invites/creates] SMTP verify failed:", verifyErr?.message || verifyErr);
+            // rollback DB invite
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].invite.delete({
                     where: {
@@ -528,24 +604,30 @@ async function POST(req) {
                     }
                 });
             } catch (delErr) {
-                console.error("[invites/creates] Failed to rollback invite after SMTP failure:", delErr);
+                console.error("[invites/creates] rollback delete failed after SMTP verify error:", delErr);
             }
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
-                message: `SMTP connection failed: ${verifyErr?.message || "check server logs"}`
+                message: `SMTP connection failed: ${verifyErr?.message || "check SMTP settings"}`
             }, {
                 status: 500
             });
         }
+        const fromAddress = process.env.INVITE_FROM || process.env.SMTP_FROM || `"SignalHub" <no-reply@yourdomain.com>`;
         const mailHtml = `
       <div style="font-family: Inter, Arial, sans-serif; color:#0f172a;">
         <h2>You're invited to join ${org.name}</h2>
         <p>Hello,</p>
-        <p>You were invited to join <strong>${org.name}</strong> as a <strong>${role}</strong>.</p>
-        ${customMessage ? `<p>${customMessage}</p>` : ""}
+        <p>You were invited to join <strong>${org.name}</strong> as a <strong>${inviteRecord.role}</strong>.</p>
+        ${customMessage ? `<p>${String(customMessage)}</p>` : ""}
         <p style="margin: 18px 0;">
-          <a href="${inviteLink}" style="display:inline-block;padding:10px 14px;background:#0f172a;color:#fff;border-radius:8px;text-decoration:none;">Accept invitation</a>
+          <a href="${inviteLink}" style="display:inline-block;padding:10px 14px;background:#0f172a;color:#fff;border-radius:8px;text-decoration:none;">
+            Accept invitation
+          </a>
         </p>
+        <p>If the button does not work, open this link in your browser:</p>
+        <p style="word-break:break-all"><a href="${inviteLink}">${inviteLink}</a></p>
+        <p style="font-size:12px;color:#6b7280;margin-top:8px;">(Fallback: <a href="${fallbackLink}">${fallbackLink}</a>)</p>
         <p>This link will expire on <strong>${expiresAt.toUTCString()}</strong>.</p>
         <p>If you didn't request this, you can ignore this email.</p>
         <hr />
@@ -558,17 +640,15 @@ async function POST(req) {
             subject: `You're invited to join ${org.name}`,
             html: mailHtml
         };
-        // send email
         try {
             const info = await transporter.sendMail(mailOptions);
-            console.log("[invites/creates] sendMail info:", {
-                messageId: info?.messageId,
-                accepted: Array.isArray(info?.accepted) ? info.accepted.length : info?.accepted || 0,
-                rejected: Array.isArray(info?.rejected) ? info.rejected.length : info?.rejected || 0
+            console.log("[invites/creates] Email sent", {
+                inviteId: inviteRecord.id,
+                messageId: info?.messageId ?? null
             });
         } catch (sendErr) {
-            console.error("[invites/creates] sendMail error:", sendErr);
-            // Roll back invite if email failed to send to avoid leftover invites
+            console.error("[invites/creates] sendMail error:", sendErr?.message || sendErr);
+            // rollback invite
             try {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].invite.delete({
                     where: {
@@ -576,28 +656,29 @@ async function POST(req) {
                     }
                 });
             } catch (delErr) {
-                console.error("[invites/creates] Failed to rollback invite after sendMail failure:", delErr);
+                console.error("[invites/creates] rollback delete failed after sendMail error:", delErr);
             }
-            const safeMsg = sendErr?.response || sendErr?.message || "Failed to send email";
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
-                message: `Can't send mail: ${safeMsg}`
+                message: `Failed to send invite email: ${sendErr?.message || "SMTP error"}`
             }, {
                 status: 500
             });
         }
-        // Success — return invite metadata. Note: remove token from responses in production for security.
+        // Success - return safe metadata (we include inviteLink for convenience)
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             message: "Invite sent",
             inviteId: inviteRecord.id,
             expiresAt: inviteRecord.expiresAt?.toISOString() ?? null,
-            organizationId: inviteRecord.organizationId
+            organizationId: inviteRecord.organizationId,
+            teamId: inviteRecord.teamId ?? null,
+            inviteLink
         }, {
             status: 201
         });
     } catch (err) {
-        console.error("[invites/creates] Fatal error:", err);
+        console.error("[invites/creates] unexpected error:", err?.message || err);
         const isDev = ("TURBOPACK compile-time value", "development") !== "production";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,

@@ -19,6 +19,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$up$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowUpRight$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/arrow-up-right.js [app-ssr] (ecmascript) <export default as ArrowUpRight>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$ellipsis$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MoreHorizontal$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/ellipsis.js [app-ssr] (ecmascript) <export default as MoreHorizontal>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$message$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MessageCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/message-circle.js [app-ssr] (ecmascript) <export default as MessageCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.js [app-ssr] (ecmascript) <export default as X>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__UserPlus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user-plus.js [app-ssr] (ecmascript) <export default as UserPlus>");
 "use client";
 ;
 ;
@@ -55,7 +57,7 @@ function StatCard({ title, value, change = "", trend = "up", icon: Icon, gradien
                                     children: title
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 70,
+                                    lineNumber: 63,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -63,13 +65,13 @@ function StatCard({ title, value, change = "", trend = "up", icon: Icon, gradien
                                     children: value
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 71,
+                                    lineNumber: 64,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 69,
+                            lineNumber: 62,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -88,18 +90,18 @@ function StatCard({ title, value, change = "", trend = "up", icon: Icon, gradien
                                 className: "w-5 h-5 text-white"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 78,
+                                lineNumber: 71,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 73,
+                            lineNumber: 66,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                    lineNumber: 68,
+                    lineNumber: 61,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -110,31 +112,31 @@ function StatCard({ title, value, change = "", trend = "up", icon: Icon, gradien
                             children: change || (trend === "up" ? "—" : "—")
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 83,
+                            lineNumber: 76,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: "vs last month"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 86,
+                            lineNumber: 79,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                    lineNumber: 82,
+                    lineNumber: 75,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-            lineNumber: 67,
+            lineNumber: 60,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-        lineNumber: 59,
+        lineNumber: 52,
         columnNumber: 5
     }, this);
 }
@@ -147,7 +149,7 @@ function MemberRow({ member }) {
                 children: member.name ? member.name.charAt(0).toUpperCase() : "U"
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 106,
+                lineNumber: 99,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -162,7 +164,7 @@ function MemberRow({ member }) {
                                     children: member.name
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 112,
+                                    lineNumber: 105,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -170,13 +172,13 @@ function MemberRow({ member }) {
                                     children: member.email ?? "No email"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 113,
+                                    lineNumber: 106,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 111,
+                            lineNumber: 104,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -187,7 +189,7 @@ function MemberRow({ member }) {
                                     children: member.online ? "Online" : "Offline"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 116,
+                                    lineNumber: 109,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -197,12 +199,12 @@ function MemberRow({ member }) {
                                         className: "w-4 h-4 text-slate-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 120,
+                                        lineNumber: 113,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 119,
+                                    lineNumber: 112,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -212,39 +214,39 @@ function MemberRow({ member }) {
                                         className: "w-4 h-4 text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 123,
+                                        lineNumber: 116,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 115,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 115,
+                            lineNumber: 108,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                    lineNumber: 110,
+                    lineNumber: 103,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 109,
+                lineNumber: 102,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-        lineNumber: 105,
+        lineNumber: 98,
         columnNumber: 5
     }, this);
 }
-/* ---------------- Schedule Modal (manager copy) ---------------- */ function ScheduleModal({ open, defaultOrganizer, defaultTeamId, onClose, onCreated }) {
+/* ---------------- Schedule Modal ---------------- */ function ScheduleModal({ open, defaultOrganizer, defaultTeamId, onClose, onCreated }) {
     const [organizer, setOrganizer] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(defaultOrganizer ?? "");
     const [datetime, setDatetime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [reminder, setReminder] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(10);
@@ -313,7 +315,7 @@ function MemberRow({ member }) {
                 onClick: ()=>onClose(false)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 201,
+                lineNumber: 194,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -338,29 +340,29 @@ function MemberRow({ member }) {
                                 children: "Schedule meeting"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 204,
+                                lineNumber: 197,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 className: "p-1 rounded-md hover:bg-slate-100",
                                 onClick: ()=>onClose(false),
                                 "aria-label": "Close",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(X, {
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 206,
+                                    lineNumber: 199,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 205,
+                                lineNumber: 198,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                        lineNumber: 203,
+                        lineNumber: 196,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -374,7 +376,7 @@ function MemberRow({ member }) {
                                         children: "Organizer"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 212,
+                                        lineNumber: 205,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -384,13 +386,13 @@ function MemberRow({ member }) {
                                         placeholder: "Organizer name or email"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 213,
+                                        lineNumber: 206,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 211,
+                                lineNumber: 204,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -400,7 +402,7 @@ function MemberRow({ member }) {
                                         children: "Date & time"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 217,
+                                        lineNumber: 210,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -410,13 +412,13 @@ function MemberRow({ member }) {
                                         className: "w-full mt-1 p-2 border rounded-md text-sm"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 218,
+                                        lineNumber: 211,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 216,
+                                lineNumber: 209,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -426,7 +428,7 @@ function MemberRow({ member }) {
                                         children: "Reminder"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 222,
+                                        lineNumber: 215,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -448,12 +450,12 @@ function MemberRow({ member }) {
                                                 ]
                                             }, m, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 224,
+                                                lineNumber: 217,
                                                 columnNumber: 52
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 223,
+                                        lineNumber: 216,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -461,13 +463,13 @@ function MemberRow({ member }) {
                                         children: "Reminder will be scheduled as meeting_time - reminder."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 226,
+                                        lineNumber: 219,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 221,
+                                lineNumber: 214,
                                 columnNumber: 11
                             }, this),
                             error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -475,7 +477,7 @@ function MemberRow({ member }) {
                                 children: error
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 229,
+                                lineNumber: 222,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -488,7 +490,7 @@ function MemberRow({ member }) {
                                         children: "Cancel"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 225,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -498,31 +500,353 @@ function MemberRow({ member }) {
                                         children: loading ? "Scheduling…" : "Schedule"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 226,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 231,
+                                lineNumber: 224,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                        lineNumber: 210,
+                        lineNumber: 203,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 202,
+                lineNumber: 195,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-        lineNumber: 200,
+        lineNumber: 193,
+        columnNumber: 5
+    }, this);
+}
+/* ---------------- Invite Modal ---------------- */ function InviteModal({ open, defaultTeamId, teams, onClose, onSent }) {
+    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [teamId, setTeamId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(defaultTeamId ?? null);
+    const [message, setMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [sending, setSending] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [successMsg, setSuccessMsg] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (open) {
+            setEmail("");
+            setTeamId(defaultTeamId ?? null);
+            setMessage("");
+            setSending(false);
+            setError(null);
+            setSuccessMsg(null);
+        }
+    }, [
+        open,
+        defaultTeamId
+    ]);
+    function isValidEmail(e) {
+        if (!e) return false;
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    }
+    const handleSend = async (ev)=>{
+        ev?.preventDefault();
+        setError(null);
+        setSuccessMsg(null);
+        if (!isValidEmail(email)) {
+            setError("Please enter a valid email address.");
+            return;
+        }
+        setSending(true);
+        try {
+            const body = {
+                email: email.trim().toLowerCase(),
+                role: "EMPLOYEE"
+            };
+            if (teamId) body.teamId = teamId;
+            if (message) body.message = message;
+            const res = await fetch("/api/invites/creates", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body),
+                credentials: "same-origin"
+            });
+            const json = await res.json().catch(()=>({}));
+            if (!res.ok || !json?.ok) {
+                // surface server message where available
+                const msg = json?.message || json?.error || "Failed to send invite.";
+                throw new Error(msg);
+            }
+            setSuccessMsg("Invite sent — the employee will receive an email with the signup link.");
+            onSent?.(json);
+            // keep modal open briefly to show success, then close
+            setTimeout(()=>{
+                onClose(true);
+            }, 900);
+        } catch (err) {
+            setError(err?.message || "Network error");
+        } finally{
+            setSending(false);
+        }
+    };
+    if (!open) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "fixed inset-0 z-60 flex items-center justify-center p-4 sm:p-6",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "absolute inset-0 bg-black/40",
+                onClick: ()=>onClose(false)
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                lineNumber: 316,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: {
+                    scale: 0.98,
+                    opacity: 0
+                },
+                animate: {
+                    scale: 1,
+                    opacity: 1
+                },
+                transition: {
+                    duration: 0.12
+                },
+                className: "relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl z-10",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center justify-between mb-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-indigo-600 text-white rounded-md p-2",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__UserPlus$3e$__["UserPlus"], {
+                                            className: "w-4 h-4"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                            lineNumber: 320,
+                                            columnNumber: 70
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 320,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        className: "text-lg font-semibold",
+                                        children: "Invite employee"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 321,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 319,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                className: "p-1 rounded-md hover:bg-slate-100",
+                                onClick: ()=>onClose(false),
+                                "aria-label": "Close",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
+                                    className: "w-4 h-4"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                    lineNumber: 324,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 323,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                        lineNumber: 318,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        onSubmit: handleSend,
+                        className: "space-y-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "text-xs text-slate-600",
+                                        children: "Employee email"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 330,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        value: email,
+                                        onChange: (e)=>setEmail(e.target.value),
+                                        placeholder: "employee@example.com",
+                                        className: "w-full mt-1 p-2 border rounded-md text-sm",
+                                        type: "email",
+                                        autoComplete: "email"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 331,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 329,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "text-xs text-slate-600",
+                                        children: "Team (optional)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 342,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        value: teamId ?? "",
+                                        onChange: (e)=>setTeamId(e.target.value || null),
+                                        className: "w-full mt-1 p-2 border rounded-md text-sm",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: "",
+                                                children: "(No team — general invite)"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                                lineNumber: 344,
+                                                columnNumber: 15
+                                            }, this),
+                                            teams.map((t)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                    value: t.id,
+                                                    children: t.name
+                                                }, t.id, false, {
+                                                    fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                                    lineNumber: 345,
+                                                    columnNumber: 33
+                                                }, this))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 343,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-xs text-slate-400 mt-1",
+                                        children: "Assign the employee to a team upon signup."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 347,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 341,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "text-xs text-slate-600",
+                                        children: "Message (optional)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 351,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                        value: message,
+                                        onChange: (e)=>setMessage(e.target.value),
+                                        className: "w-full mt-1 p-2 border rounded-md text-sm",
+                                        rows: 3,
+                                        placeholder: "Short message that appears in the invite email (optional)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 352,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 350,
+                                columnNumber: 11
+                            }, this),
+                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-sm text-rose-600",
+                                children: error
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 355,
+                                columnNumber: 21
+                            }, this),
+                            successMsg && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-sm text-emerald-600",
+                                children: successMsg
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 356,
+                                columnNumber: 26
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center justify-end gap-2 pt-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>onClose(false),
+                                        className: "px-3 py-1 rounded-md",
+                                        children: "Cancel"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 359,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        disabled: sending,
+                                        className: "px-4 py-2 rounded-md bg-indigo-600 text-white",
+                                        children: sending ? "Sending…" : "Send invite"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                        lineNumber: 360,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                lineNumber: 358,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                        lineNumber: 328,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                lineNumber: 317,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+        lineNumber: 315,
         columnNumber: 5
     }, this);
 }
@@ -540,6 +864,8 @@ function ManagerOverviewPage() {
     const [meetings, setMeetings] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [meetingsLoading, setMeetingsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [scheduleOpen, setScheduleOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Invite modal state
+    const [inviteOpen, setInviteOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [toast, setToast] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     /* -- load teams -- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         let mounted = true;
@@ -553,7 +879,7 @@ function ManagerOverviewPage() {
                 if (!res.ok) {
                     throw new Error("Failed to load teams");
                 }
-                const j = await res.json();
+                const j = await res.json().catch(()=>({}));
                 const list = Array.isArray(j) ? j : j?.teams ?? [];
                 if (mounted) {
                     setTeams(list);
@@ -571,7 +897,10 @@ function ManagerOverviewPage() {
     }, []);
     /* -- load metrics when selectedTeamId changes -- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         let mounted = true;
-        if (!selectedTeamId) return;
+        if (!selectedTeamId) {
+            setMetrics(null);
+            return;
+        }
         setMetricsLoading(true);
         (async ()=>{
             try {
@@ -579,10 +908,9 @@ function ManagerOverviewPage() {
                     credentials: "same-origin"
                 });
                 if (!res.ok) {
-                    // fallback: allow partial metrics using local calculations or show placeholders
                     throw new Error("Metrics unavailable");
                 }
-                const j = await res.json();
+                const j = await res.json().catch(()=>({}));
                 const m = j?.metrics ?? {
                     conversations: j?.conversations,
                     avgResponseHours: j?.avgResponseHours,
@@ -620,12 +948,12 @@ function ManagerOverviewPage() {
                         credentials: "same-origin"
                     });
                     if (!alt.ok) throw new Error("Members endpoint failed");
-                    const aj = await alt.json();
+                    const aj = await alt.json().catch(()=>({}));
                     const altList = Array.isArray(aj) ? aj : aj?.members ?? [];
                     if (mounted) setMembers(altList);
                     return;
                 }
-                const j = await res.json();
+                const j = await res.json().catch(()=>({}));
                 const list = Array.isArray(j) ? j : j?.members ?? [];
                 if (mounted) setMembers(list);
             } catch  {
@@ -653,7 +981,7 @@ function ManagerOverviewPage() {
                     credentials: "same-origin"
                 });
                 if (!res.ok) throw new Error("Tasks failed");
-                const j = await res.json();
+                const j = await res.json().catch(()=>({}));
                 const list = Array.isArray(j) ? j : j?.tasks ?? [];
                 if (mounted) setTasks(list);
             } catch  {
@@ -681,7 +1009,7 @@ function ManagerOverviewPage() {
                     credentials: "same-origin"
                 });
                 if (!res.ok) throw new Error("Meetings failed");
-                const j = await res.json();
+                const j = await res.json().catch(()=>({}));
                 const list = Array.isArray(j) ? j : j?.meetings ?? [];
                 if (mounted) setMeetings(list);
             } catch  {
@@ -696,7 +1024,7 @@ function ManagerOverviewPage() {
     }, [
         selectedTeamId
     ]);
-    /* -- derived -- */ const stats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
+    /* -- derived stats -- */ const stats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
         return [
             {
                 title: "Team Conversations",
@@ -762,7 +1090,7 @@ function ManagerOverviewPage() {
                                             children: "M"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                            lineNumber: 445,
+                                            lineNumber: 577,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -772,7 +1100,7 @@ function ManagerOverviewPage() {
                                                     children: "Manager dashboard"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 447,
+                                                    lineNumber: 579,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -780,19 +1108,19 @@ function ManagerOverviewPage() {
                                                     children: "Overview of your team's performance and upcoming work."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 580,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                            lineNumber: 446,
+                                            lineNumber: 578,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 444,
+                                    lineNumber: 576,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -805,7 +1133,7 @@ function ManagerOverviewPage() {
                                                     className: "w-4 h-4 text-slate-400"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 454,
+                                                    lineNumber: 586,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -813,13 +1141,13 @@ function ManagerOverviewPage() {
                                                     className: "text-sm outline-none py-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 587,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                            lineNumber: 453,
+                                            lineNumber: 585,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -834,14 +1162,14 @@ function ManagerOverviewPage() {
                                                             children: "Loading teams…"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                            lineNumber: 464,
+                                                            lineNumber: 596,
                                                             columnNumber: 36
                                                         }, this),
                                                         !teamsLoading && teams.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                             children: "No teams"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                            lineNumber: 465,
+                                                            lineNumber: 597,
                                                             columnNumber: 59
                                                         }, this),
                                                         !teamsLoading && teams.map((t)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -849,13 +1177,13 @@ function ManagerOverviewPage() {
                                                                 children: t.name
                                                             }, t.id, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 466,
+                                                                lineNumber: 598,
                                                                 columnNumber: 54
                                                             }, this))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 459,
+                                                    lineNumber: 591,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -866,14 +1194,32 @@ function ManagerOverviewPage() {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                            lineNumber: 470,
+                                                            lineNumber: 602,
                                                             columnNumber: 19
                                                         }, this),
                                                         " Schedule"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 469,
+                                                    lineNumber: 601,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    onClick: ()=>setInviteOpen(true),
+                                                    className: "inline-flex items-center gap-2 px-3 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__UserPlus$3e$__["UserPlus"], {
+                                                            className: "w-4 h-4"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                                            lineNumber: 606,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        " Invite employee"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                                                    lineNumber: 605,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -882,30 +1228,30 @@ function ManagerOverviewPage() {
                                                     children: "Create task"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                    lineNumber: 473,
+                                                    lineNumber: 609,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                            lineNumber: 458,
+                                            lineNumber: 590,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                    lineNumber: 452,
+                                    lineNumber: 584,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                            lineNumber: 443,
+                            lineNumber: 575,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                        lineNumber: 442,
+                        lineNumber: 574,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -920,12 +1266,12 @@ function ManagerOverviewPage() {
                                 delay: idx * 0.08
                             }, s.title, false, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 482,
+                                lineNumber: 618,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                        lineNumber: 480,
+                        lineNumber: 616,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -945,7 +1291,7 @@ function ManagerOverviewPage() {
                                                         children: "Team members"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 493,
+                                                        lineNumber: 629,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -956,13 +1302,13 @@ function ManagerOverviewPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 494,
+                                                        lineNumber: 630,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 492,
+                                                lineNumber: 628,
                                                 columnNumber: 15
                                             }, this),
                                             membersLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -975,19 +1321,19 @@ function ManagerOverviewPage() {
                                                         className: "h-12 bg-slate-100 rounded animate-pulse"
                                                     }, n, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 499,
+                                                        lineNumber: 635,
                                                         columnNumber: 37
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 498,
+                                                lineNumber: 634,
                                                 columnNumber: 17
                                             }, this) : members.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-sm text-slate-500",
                                                 children: "No members found for this team."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 502,
+                                                lineNumber: 638,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "space-y-2",
@@ -995,18 +1341,18 @@ function ManagerOverviewPage() {
                                                         member: m
                                                     }, m.id, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 505,
+                                                        lineNumber: 641,
                                                         columnNumber: 39
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 504,
+                                                lineNumber: 640,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 491,
+                                        lineNumber: 627,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1020,7 +1366,7 @@ function ManagerOverviewPage() {
                                                         children: "Open tasks"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 513,
+                                                        lineNumber: 649,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1031,13 +1377,13 @@ function ManagerOverviewPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 514,
+                                                        lineNumber: 650,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 512,
+                                                lineNumber: 648,
                                                 columnNumber: 15
                                             }, this),
                                             tasksLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1050,19 +1396,19 @@ function ManagerOverviewPage() {
                                                         className: "h-12 bg-slate-100 rounded animate-pulse"
                                                     }, n, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 519,
+                                                        lineNumber: 655,
                                                         columnNumber: 37
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 518,
+                                                lineNumber: 654,
                                                 columnNumber: 17
                                             }, this) : tasks.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-sm text-slate-500",
                                                 children: "No open tasks for this team."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 522,
+                                                lineNumber: 658,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "space-y-2",
@@ -1077,7 +1423,7 @@ function ManagerOverviewPage() {
                                                                         children: t.title ?? t.name ?? "Untitled task"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                        lineNumber: 528,
+                                                                        lineNumber: 664,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1085,13 +1431,13 @@ function ManagerOverviewPage() {
                                                                         children: t.description ?? t.summary ?? ""
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                        lineNumber: 529,
+                                                                        lineNumber: 665,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 527,
+                                                                lineNumber: 663,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1102,7 +1448,7 @@ function ManagerOverviewPage() {
                                                                         children: t.status ?? "open"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                        lineNumber: 532,
+                                                                        lineNumber: 668,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -1111,36 +1457,36 @@ function ManagerOverviewPage() {
                                                                         children: "View"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                        lineNumber: 535,
+                                                                        lineNumber: 671,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 531,
+                                                                lineNumber: 667,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, t.id ?? t.title, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 526,
+                                                        lineNumber: 662,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 524,
+                                                lineNumber: 660,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 511,
+                                        lineNumber: 647,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 489,
+                                lineNumber: 625,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -1157,7 +1503,7 @@ function ManagerOverviewPage() {
                                                         children: "Upcoming meetings"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 549,
+                                                        lineNumber: 685,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -1169,19 +1515,19 @@ function ManagerOverviewPage() {
                                                                 className: "w-3 h-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 550,
+                                                                lineNumber: 686,
                                                                 columnNumber: 150
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 550,
+                                                        lineNumber: 686,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 548,
+                                                lineNumber: 684,
                                                 columnNumber: 15
                                             }, this),
                                             meetingsLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1193,19 +1539,19 @@ function ManagerOverviewPage() {
                                                         className: "h-12 bg-slate-100 rounded animate-pulse"
                                                     }, n, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 555,
+                                                        lineNumber: 691,
                                                         columnNumber: 35
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 554,
+                                                lineNumber: 690,
                                                 columnNumber: 17
                                             }, this) : meetings.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-sm text-slate-500",
                                                 children: "No upcoming meetings — schedule one."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 558,
+                                                lineNumber: 694,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "space-y-2",
@@ -1218,12 +1564,12 @@ function ManagerOverviewPage() {
                                                                     className: "w-5 h-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                    lineNumber: 564,
+                                                                    lineNumber: 700,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 563,
+                                                                lineNumber: 699,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1238,7 +1584,7 @@ function ManagerOverviewPage() {
                                                                                     children: m.title ?? m.name ?? "Meeting"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                                    lineNumber: 569,
+                                                                                    lineNumber: 705,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1250,13 +1596,13 @@ function ManagerOverviewPage() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                                    lineNumber: 570,
+                                                                                    lineNumber: 706,
                                                                                     columnNumber: 29
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                            lineNumber: 568,
+                                                                            lineNumber: 704,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1267,47 +1613,47 @@ function ManagerOverviewPage() {
                                                                                 children: "Join"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                                lineNumber: 573,
+                                                                                lineNumber: 709,
                                                                                 columnNumber: 42
                                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 className: "text-xs px-2 py-1 rounded bg-slate-100",
                                                                                 children: "Details"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                                lineNumber: 573,
+                                                                                lineNumber: 709,
                                                                                 columnNumber: 140
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                            lineNumber: 572,
+                                                                            lineNumber: 708,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                    lineNumber: 567,
+                                                                    lineNumber: 703,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 566,
+                                                                lineNumber: 702,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, m.id ?? m.title, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 562,
+                                                        lineNumber: 698,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 560,
+                                                lineNumber: 696,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 547,
+                                        lineNumber: 683,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1323,7 +1669,7 @@ function ManagerOverviewPage() {
                                                                 children: "Team health"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 587,
+                                                                lineNumber: 723,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1331,13 +1677,13 @@ function ManagerOverviewPage() {
                                                                 children: "Good — keep momentum"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 588,
+                                                                lineNumber: 724,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 586,
+                                                        lineNumber: 722,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1345,13 +1691,13 @@ function ManagerOverviewPage() {
                                                         children: "Active"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 590,
+                                                        lineNumber: 726,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 585,
+                                                lineNumber: 721,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1364,20 +1710,20 @@ function ManagerOverviewPage() {
                                                                 children: "Avg response"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 594,
+                                                                lineNumber: 730,
                                                                 columnNumber: 68
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: metrics ? `${metrics.avgResponseHours ?? "—"}h` : "—"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 594,
+                                                                lineNumber: 730,
                                                                 columnNumber: 93
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 594,
+                                                        lineNumber: 730,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1387,20 +1733,20 @@ function ManagerOverviewPage() {
                                                                 children: "Open tasks"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 595,
+                                                                lineNumber: 731,
                                                                 columnNumber: 73
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: tasks.length
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 595,
+                                                                lineNumber: 731,
                                                                 columnNumber: 96
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 595,
+                                                        lineNumber: 731,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1410,50 +1756,50 @@ function ManagerOverviewPage() {
                                                                 children: "Utilization"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 596,
+                                                                lineNumber: 732,
                                                                 columnNumber: 73
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: metrics ? `${metrics.utilizationPercent ?? "—"}%` : "—"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                                lineNumber: 596,
+                                                                lineNumber: 732,
                                                                 columnNumber: 97
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                        lineNumber: 596,
+                                                        lineNumber: 732,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                                lineNumber: 593,
+                                                lineNumber: 729,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                        lineNumber: 584,
+                                        lineNumber: 720,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                                lineNumber: 545,
+                                lineNumber: 681,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                        lineNumber: 487,
+                        lineNumber: 623,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 440,
+                lineNumber: 572,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ScheduleModal, {
@@ -1464,12 +1810,10 @@ function ManagerOverviewPage() {
                     setScheduleOpen(false);
                     if (success) {
                         setToast("Meeting scheduled");
-                        // refresh meetings
                         setTimeout(()=>{
                             setToast(null);
-                            // trigger meetings reload by toggling selectedTeamId (cheeky) or call fetch functions directly
+                            // refresh meetings
                             if (selectedTeamId) {
-                                // re-run meetings effect by resetting state trigger (simple fetch)
                                 (async ()=>{
                                     try {
                                         setMeetingsLoading(true);
@@ -1492,7 +1836,26 @@ function ManagerOverviewPage() {
                 onCreated: ()=>{}
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 604,
+                lineNumber: 740,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(InviteModal, {
+                open: inviteOpen,
+                defaultTeamId: selectedTeamId ?? undefined,
+                teams: teams,
+                onClose: (sent)=>{
+                    setInviteOpen(false);
+                    if (sent) {
+                        setToast("Invite sent");
+                        setTimeout(()=>setToast(null), 1800);
+                    }
+                },
+                onSent: ()=>{
+                // optionally refresh invited/pending lists here
+                }
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
+                lineNumber: 773,
                 columnNumber: 7
             }, this),
             toast && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1500,13 +1863,13 @@ function ManagerOverviewPage() {
                 children: toast
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-                lineNumber: 640,
+                lineNumber: 791,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/manager/overview/page.tsx",
-        lineNumber: 439,
+        lineNumber: 571,
         columnNumber: 5
     }, this);
 }

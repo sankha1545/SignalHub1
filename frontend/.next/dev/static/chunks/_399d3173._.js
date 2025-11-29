@@ -70,7 +70,7 @@ function roleRedirectPath(role) {
     const r = (role ?? "").toString().toUpperCase();
     if (r === "MANAGER") return "/dashboard/manager/overview";
     if (r === "ADMIN") return "/dashboard/admin/overview";
-    if (r === "EMPLOYEE") return "/dashboard/employee/inbox";
+    if (r === "EMPLOYEE") return "/dashboard/employee/MySchedule";
     return "/";
 }
 function LoginPage() {

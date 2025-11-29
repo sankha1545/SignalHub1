@@ -1,11 +1,10 @@
-// File: app/(auth)/signup/page.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 /* ---------- types ---------- */
-type ApiResp = { ok?: boolean; tempToken?: string; sessionToken?: string; activated?: boolean; error?: string; reason?: string; [k: string]: any };
+type ApiResp = { ok?: boolean; tempToken?: string; sessionToken?: string; activated?: boolean; error?: string; reason?: string; token?: string; redirect?: string; [k: string]: any };
 type Country = { name: string; cca2: string; callingCode: string; flag?: string };
 
 /* ---------- helpers ---------- */
@@ -27,7 +26,7 @@ async function postJSON(url: string, body: any): Promise<ApiResp> {
   }
 }
 
-/* ---------- CountryDropdown component ---------- */
+/* ---------- CountryDropdown component (unchanged) ---------- */
 function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
   useEffect(() => {
     function listener(e: MouseEvent | TouchEvent) {
@@ -193,15 +192,17 @@ function CountryDropdown({
   );
 }
 
-/* ---------- Signup page component ---------- */
+/* ---------- Signup page component (enhanced to support invite token) ---------- */
 export default function SignupPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams.get("token") ?? "";
 
   // Mode / flow
-  type Mode = "choose" | "email" | "verifyEmail" | "phone" | "verifyPhone" | "org" | "done";
+  type Mode = "choose" | "email" | "verifyEmail" | "phone" | "verifyPhone" | "org" | "done" | "invite";
   const [mode, setMode] = useState<Mode>("choose");
 
-  // Fields
+  // Fields (shared)
   const [email, setEmail] = useState("");
   const [emailOtp, setEmailOtp] = useState(Array(6).fill(""));
   const [emailCode, setEmailCode] = useState("");
@@ -221,6 +222,11 @@ export default function SignupPage(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
 
+  // Invite-specific metadata
+  const [inviteMeta, setInviteMeta] = useState<any | null>(null);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+
   // password visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -238,13 +244,12 @@ export default function SignupPage(): JSX.Element {
   // Resend timers
   const [emailResendAvailableAt, setEmailResendAvailableAt] = useState<number | null>(null);
   const [phoneResendAvailableAt, setPhoneResendAvailableAt] = useState<number | null>(null);
-const [now, setNow] = useState<number>(0); // stable on server
-useEffect(() => {
-  setNow(Date.now()); // now real client time
-  const id = window.setInterval(() => setNow(Date.now()), 1000);
-  return () => window.clearInterval(id);
-}, []);
-
+  const [now, setNow] = useState<number>(0); // stable on client
+  useEffect(() => {
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   function modeToStep(m: Mode) {
     switch (m) {
@@ -259,13 +264,15 @@ useEffect(() => {
       case "org":
       case "done":
         return 4;
+      case "invite":
+        return 3; // treat invite as final-ish step
       default:
         return 1;
     }
   }
   const step = modeToStep(mode);
 
-  /* ---------- Country fetch (robust) ---------- */
+  /* ---------- Country fetch (unchanged) ---------- */
 
   const BUILT_IN_FALLBACK: Country[] = [
     { name: "India", cca2: "IN", callingCode: "+91", flag: "https://flagcdn.com/w40/in.png" },
@@ -341,7 +348,6 @@ useEffect(() => {
           else if (json && Array.isArray(json.data)) rawList = json.data;
         }
 
-        // fallback to /api/meta/countries if /api/countries yields nothing
         if ((!rawList || rawList.length === 0)) {
           try {
             const mres = await fetch("/api/meta/countries", { cache: "no-store" }).catch(() => null);
@@ -355,7 +361,6 @@ useEffect(() => {
           }
         }
 
-        // Map to Country shape
         let parsed: Country[] = [];
         if (Array.isArray(rawList) && rawList.length > 0) {
           parsed = rawList
@@ -374,7 +379,6 @@ useEffect(() => {
             })
             .filter((c: Country) => c.name && (c.callingCode || c.cca2));
 
-          // dedupe
           const seen = new Map<string, Country>();
           for (const it of parsed) {
             const key = (it.cca2 || it.callingCode || it.name).toUpperCase();
@@ -383,7 +387,6 @@ useEffect(() => {
           parsed = Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
         }
 
-        // final fallback
         if (!Array.isArray(parsed) || parsed.length === 0) {
           parsed = BUILT_IN_FALLBACK;
           setCountryError("Country list unavailable — using fallback. You can type your country manually.");
@@ -394,7 +397,6 @@ useEffect(() => {
         if (!mounted) return;
         setCountries(parsed);
 
-        // pick default by locale -> +91 -> +1 -> first
         const locale = (navigator.language || (navigator.languages && navigator.languages[0]) || "").toLowerCase();
         const match = locale.match(/-([a-z]{2})$/i);
         let defaultCountry: Country | null = null;
@@ -420,12 +422,9 @@ useEffect(() => {
     };
   }, []);
 
-  // When user selects a country, ensure the prefix shows up in UI and assist placeholder
+  // When user selects a country, ensure the prefix shows up in UI
   useEffect(() => {
     if (!country) return;
-    // If phone is empty, prefill placeholder hint by setting phone to empty (placeholder uses country in UI)
-    // We avoid modifying a non-empty phone typed by user.
-    // This effect merely ensures UI shows prefix; logic to send uses buildFullPhone.
   }, [country]);
 
   // helpers: countdown formatter
@@ -439,7 +438,7 @@ useEffect(() => {
     setter(Date.now() + seconds * 1000);
   }
 
-  // OTP utils
+  // OTP utils (unchanged)
   function handleOtpInput(e: React.KeyboardEvent<HTMLInputElement>, idx: number, otpArr: string[], setOtpArr: (a: string[]) => void) {
     const target = e.target as HTMLInputElement;
     const key = e.key;
@@ -497,8 +496,8 @@ useEffect(() => {
   useEffect(() => setEmailCode(emailOtp.join("")), [emailOtp]);
   useEffect(() => setPhoneCode(phoneOtp.join("")), [phoneOtp]);
 
-  // password validation
-  function validatePassword(pw: string): string[] {
+  // password validation (copied)
+  function validatePasswordClient(pw: string): string[] {
     const errs: string[] = [];
     if (!pw || pw.length < 8) errs.push("Password must be at least 8 characters.");
     if (!/[A-Z]/.test(pw)) errs.push("Include at least one uppercase letter.");
@@ -509,12 +508,77 @@ useEffect(() => {
   }
 
   useEffect(() => {
-    const errs = validatePassword(password);
+    const errs = validatePasswordClient(password);
     setPasswordErrors(errs);
     setPasswordsMatch(password === confirmPassword || confirmPassword.length === 0);
   }, [password, confirmPassword]);
 
-  // API actions
+  /* ---------- Invite detection + validation ---------- */
+  useEffect(() => {
+    let mounted = true;
+    async function validateInvite(token: string) {
+      setInviteLoading(true);
+      setInviteError(null);
+      try {
+        const res = await fetch("/api/invites/accept", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+          credentials: "include",
+        });
+        const json = await (async () => {
+          const text = await res.text();
+          try {
+            return text ? JSON.parse(text) : {};
+          } catch {
+            return { ok: res.ok, message: text };
+          }
+        })();
+        if (!res.ok || !json?.ok) {
+          const msg = json?.message || json?.error || "Invalid or expired invite token.";
+          throw new Error(msg);
+        }
+        if (!mounted) return;
+        // set invite metadata and switch to invite mode
+        setInviteMeta(json);
+        // prefill email (non-editable)
+        if (json.email) setEmail(String(json.email));
+        setMode("invite");
+      } catch (err: any) {
+        if (!mounted) return;
+        setInviteError(err?.message || String(err) || "Failed to validate invite token.");
+        // keep default mode (choose) so user can sign up normally or fix link
+      } finally {
+        if (mounted) setInviteLoading(false);
+      }
+    }
+
+    if (inviteToken) {
+      validateInvite(inviteToken);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [inviteToken]);
+
+  // helpers
+  function buildFullPhone(typed: string | undefined, country?: { callingCode?: string }) {
+    if (!typed) return null;
+    const raw = typed.trim();
+    if (raw.startsWith("+")) {
+      const digits = raw.replace(/[^\d+]/g, "");
+      return digits;
+    }
+    const cc = country?.callingCode ?? "";
+    const onlyDigits = raw.replace(/\D/g, "");
+    if (!cc && !onlyDigits) return null;
+    const normalizedCc = cc.startsWith("+") ? cc : cc ? `+${cc.replace(/[^\d]/g, "")}` : "";
+    return `${normalizedCc}${onlyDigits}`;
+  }
+
+  /* ---------- API actions (unchanged for normal flow) ---------- */
+
   async function handleSendEmailOtp(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
@@ -591,9 +655,7 @@ useEffect(() => {
         setPhoneOtp(Array(6).fill(""));
         setTimeout(() => document.getElementById("otp-phone-0")?.focus(), 120);
       } else {
-        // If Twilio trial fallback returns ok but with flags, handle it
         if (data?.twilioTrialUnverified || data?.devOtpLogged) {
-          // treat as ok for dev/test
           setMode("verifyPhone");
           setResendDeadline(setPhoneResendAvailableAt, 45);
           setPhoneOtp(Array(6).fill(""));
@@ -642,26 +704,12 @@ useEffect(() => {
     }
   }
 
-  function buildFullPhone(typed: string | undefined, country?: { callingCode?: string }) {
-    if (!typed) return null;
-    const raw = typed.trim();
-    if (raw.startsWith("+")) {
-      const digits = raw.replace(/[^\d+]/g, "");
-      return digits;
-    }
-    const cc = country?.callingCode ?? "";
-    const onlyDigits = raw.replace(/\D/g, "");
-    if (!cc && !onlyDigits) return null;
-    const normalizedCc = cc.startsWith("+") ? cc : cc ? `+${cc.replace(/[^\d]/g, "")}` : "";
-    return `${normalizedCc}${onlyDigits}`;
-  }
-
   async function handleFinalize(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
 
     setPasswordTouched(true);
-    const errs = validatePassword(password);
+    const errs = validatePasswordClient(password);
     if (errs.length > 0) {
       setPasswordErrors(errs);
       setError("Please fix the password requirements.");
@@ -758,7 +806,74 @@ useEffect(() => {
   }
   const fillPercent = computeFillPercent();
 
+  /* ---------- Invite finalize (when in invite mode) ---------- */
+  async function handleInviteFinalize(e?: React.FormEvent) {
+    e?.preventDefault();
+    setError(null);
+    setPasswordTouched(true);
+
+    const errs = validatePasswordClient(password);
+    if (errs.length > 0) {
+      setPasswordErrors(errs);
+      setError("Please fix the password requirements.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setPasswordsMatch(false);
+      setError("Passwords do not match.");
+      return;
+    }
+    if (!inviteToken) {
+      setError("Invite token missing. Use the invite link provided in your email.");
+      return;
+    }
+
+    setInviteLoading(true);
+    try {
+      const res = await fetch("/api/invites/finalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: inviteToken, password }),
+        credentials: "include",
+      });
+      const text = await res.text();
+      let json: any;
+      try {
+        json = text ? JSON.parse(text) : {};
+      } catch {
+        json = { ok: res.ok, message: text };
+      }
+
+      if (!res.ok || !json?.ok) {
+        const msg = json?.message || json?.error || "Failed to finalize invite signup.";
+        throw new Error(msg);
+      }
+
+      // if server returned a session token, persist as fallback and redirect to server redirect or dashboard
+      if (json.token) {
+        try {
+          localStorage.setItem("sessionToken", json.token);
+        } catch {}
+        try {
+          await fetch("/api/me", { credentials: "include" });
+        } catch {}
+        const redirectTo = json.redirect ?? (json.role && /manager/i.test(String(json.role)) ? "/dashboard/manager" : "/dashboard/employee");
+        router.push(redirectTo);
+        return;
+      }
+
+      // fallback: go to login with email prefilled
+      router.push(`/auth/login?email=${encodeURIComponent(inviteMeta?.email ?? email)}&created=1`);
+    } catch (err: any) {
+      setError(err?.message || "Failed to complete invite signup. Please contact the administrator.");
+    } finally {
+      setInviteLoading(false);
+    }
+  }
+
   /* ---------- UI (responsive & accessible) ---------- */
+
+  // If invite token present and failed validation, show that error up top and allow normal signup below (or show explicit invite error)
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-7xl bg-white/95 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ring-1 ring-slate-100">
@@ -770,7 +885,7 @@ useEffect(() => {
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-extrabold shadow-xl">U</div>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Welcome to SignalHub</h1>
-                <p className="text-sm text-slate-500 mt-1">Create an admin account and organization — secure by default.</p>
+                <p className="text-sm text-slate-500 mt-1">Create an account — secure by default.</p>
               </div>
             </div>
 
@@ -805,246 +920,67 @@ useEffect(() => {
 
             {/* status */}
             <div role="status" aria-live="polite" className="min-h-[1.4rem] mb-4">
+              {inviteToken && inviteError && <div className="text-sm text-red-600">Invite error: {inviteError}</div>}
               {error && <div className="text-sm text-red-600">{error}</div>}
               {success && <div className="text-sm text-emerald-600">{success}</div>}
             </div>
 
-            {/* Forms */}
-            <div>
-              {/* CHOOSE */}
-              {mode === "choose" && (
-                <div className="space-y-4">
-                  <button onClick={() => (window.location.href = "/api/auth/oauth/google/start?flow=signup")} className="w-full p-3 border rounded-lg flex items-center gap-3 justify-center hover:shadow-lg transition">
-                    <img src="/google.png" alt="Google" className="w-6 h-6" />
-                    <span className="text-sm font-medium text-slate-700">Continue with Google</span>
-                  </button>
-
-                  <div className="text-center text-sm text-slate-400">or</div>
-
-                  <button onClick={() => setMode("email")} className="w-full p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md">
-                    Sign up with Email
-                  </button>
-                  <div className="text-sm mt-2">Already have an account? <a className="text-blue-700 underline" href="/login">Login</a></div>
+            {/* If invite mode -> show invite-specific UI */}
+            {mode === "invite" ? (
+              <div className="bg-white p-4 rounded-md shadow-sm">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-slate-700">Email (locked)</label>
+                  <input
+                    readOnly
+                    value={inviteMeta?.email ?? email}
+                    className="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                  />
+                  <p className="text-xs text-slate-400 mt-2">This email was invited by the organization and is already verified.</p>
                 </div>
-              )}
 
-              {/* EMAIL - send */}
-              {mode === "email" && (
-                <form onSubmit={handleSendEmailOtp} className="space-y-3" noValidate>
-                  <label className="block text-sm font-medium text-slate-600">Email</label>
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 focus:outline-none" placeholder="you@example.com" type="email" />
-                  <div className="flex gap-3 flex-wrap">
-                    <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
-                      {loading ? "Sending..." : "Send code"}
-                    </button>
-                    <button type="button" onClick={() => setMode("choose")} className="px-4 py-2 border rounded">
-                      Back
-                    </button>
+                {/* Organization / team info if available */}
+                {inviteMeta?.organizationName && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700">Organization</label>
+                    <input readOnly value={inviteMeta.organizationName} className="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-sm" />
                   </div>
-                  <p className="text-xs text-slate-400">A one-time code will be sent to verify your email.</p>
-                </form>
-              )}
+                )}
 
-              {/* EMAIL - verify */}
-              {mode === "verifyEmail" && (
-                <form onSubmit={handleVerifyEmailOtp} className="space-y-3" noValidate>
-                  <p className="text-sm text-slate-600">Enter the code sent to <strong>{email}</strong></p>
-                  <label className="block text-sm font-medium text-slate-600">Code</label>
-                  <div className="flex gap-2">
-                    {emailOtp.map((digit, i) => (
+                <form onSubmit={handleInviteFinalize} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Password</label>
+                    <div className="relative">
                       <input
-                        key={i}
-                        id={`otp-email-${i}`}
-                        data-for="email"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={1}
-                        value={digit}
-                        onPaste={(e) => handleOtpPaste(e, emailOtp, setEmailOtp)}
-                        onKeyDown={(e) => handleOtpInput(e, i, emailOtp, setEmailOtp)}
-                        onChange={() => {}}
-                        aria-label={`Email code digit ${i + 1}`}
-                        className="w-12 h-12 text-center text-lg rounded border border-slate-200 focus:ring-2 focus:ring-indigo-300"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => setPasswordTouched(true)}
+                        placeholder="Create a strong password"
+                        className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12"
+                        autoComplete="new-password"
                       />
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
-                      {loading ? "Verifying..." : "Verify"}
-                    </button>
-                    <button type="button" onClick={() => setMode("email")} className="px-4 py-2 border rounded">
-                      Back
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div>
-                      {formatCountdown(emailResendAvailableAt) ? (
-                        <span>Resend in {formatCountdown(emailResendAvailableAt)}</span>
-                      ) : (
-                        <button type="button" onClick={handleResendEmail} className="underline text-indigo-600">
-                          Resend code
-                        </button>
-                      )}
-                    </div>
-                    <div className="text-right">Didn't receive? Check spam.</div>
-                  </div>
-                </form>
-              )}
-
-              {/* PHONE - send */}
-              {mode === "phone" && (
-                <form onSubmit={handleSendPhoneOtp} className="space-y-3" noValidate>
-                  <label className="block text-sm font-medium text-slate-600">Phone</label>
-
-                  <div className="flex gap-2 items-start flex-col sm:flex-row">
-                    <div className="w-full sm:w-44">
-                      <CountryDropdown
-                        countries={countries}
-                        value={country}
-                        onChange={(c) => {
-                          setCountry(c);
-                          // if phone is empty, add calling code as hint to input (we don't auto-prepend to typed number)
-                          // we leave actual submission to buildFullPhone
-                        }}
-                        disabled={countryLoading || !!countryError}
-                        placeholder={countryLoading ? "Loading..." : countryError ? "Unavailable" : "Select country"}
-                      />
-                      <div className="text-xs text-slate-400 mt-2">{countryLoading ? "Loading dial codes..." : countryError ? <span className="text-red-500">Unable to load list</span> : "Select country code"}</div>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex gap-2">
-                        <div className="flex items-center px-3 border rounded bg-slate-50 text-sm whitespace-nowrap">
-                          <span className="mr-2">{country?.flag ? <img src={country.flag} alt={country.name} className="w-5 h-4 object-cover inline-block" /> : null}</span>
-                          <span className="font-medium">{country?.callingCode ?? "+"}</span>
-                        </div>
-                        <input
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder={country ? `${country.callingCode} 98765 43210` : "98765 43210"}
-                          className="flex-1 p-2 border rounded focus:ring-2 focus:ring-indigo-300 bg-indigo-50"
-                          aria-label="Phone number"
-                        />
-                      </div>
+                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100">
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
-                      {loading ? "Sending..." : "Send SMS"}
-                    </button>
-                    <button type="button" onClick={() => setMode("verifyEmail")} className="px-4 py-2 border rounded">
-                      Back
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-slate-400">Standard SMS rates may apply.</p>
-                </form>
-              )}
-
-              {/* PHONE - verify */}
-              {mode === "verifyPhone" && (
-                <form onSubmit={handleVerifyPhoneOtp} className="space-y-3" noValidate>
-                  <p className="text-sm text-slate-600">Enter the SMS code sent to <strong>{country?.callingCode ?? ""} {phone}</strong></p>
-
-                  <label className="block text-sm font-medium text-slate-600">SMS Code</label>
-                  <div className="flex gap-2">
-                    {phoneOtp.map((digit, i) => (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">Retype password</label>
+                    <div className="relative">
                       <input
-                        key={i}
-                        id={`otp-phone-${i}`}
-                        data-for="phone"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={1}
-                        value={digit}
-                        onPaste={(e) => handleOtpPaste(e, phoneOtp, setPhoneOtp)}
-                        onKeyDown={(e) => handleOtpInput(e, i, phoneOtp, setPhoneOtp)}
-                        onChange={() => {}}
-                        aria-label={`Phone code digit ${i + 1}`}
-                        className="w-12 h-12 text-center text-lg rounded border border-slate-200 focus:ring-2 focus:ring-indigo-300"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => setPasswordTouched(true)}
+                        placeholder="Retype password"
+                        className={`w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12 ${passwordTouched && !passwordsMatch ? "border-red-400" : ""}`}
+                        autoComplete="new-password"
                       />
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
-                      {loading ? "Verifying..." : "Verify"}
-                    </button>
-                    <button type="button" onClick={() => setMode("phone")} className="px-4 py-2 border rounded">
-                      Back
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <div>
-                      {formatCountdown(phoneResendAvailableAt) ? (
-                        <span>Resend in {formatCountdown(phoneResendAvailableAt)}</span>
-                      ) : (
-                        <button type="button" onClick={handleResendPhone} className="underline text-indigo-600">
-                          Resend SMS
-                        </button>
-                      )}
+                      <button type="button" onClick={() => setShowConfirmPassword((v) => !v)} aria-label={showConfirmPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100">
+                        {showConfirmPassword ? "Hide" : "Show"}
+                      </button>
                     </div>
-                    <div>Contact support if you don't receive SMS.</div>
-                  </div>
-                </form>
-              )}
-
-              {/* ORG finalize */}
-              {mode === "org" && (
-                <form onSubmit={handleFinalize} className="space-y-4" noValidate>
-                  <label className="block text-sm font-medium text-slate-600">Organization name</label>
-                  <input value={orgName} placeholder="Enter the name" onChange={(e) => setOrgName(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300" />
-
-                  <label className="block text-sm font-medium text-slate-600">Your name</label>
-                  <input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300" />
-
-                  <label className="block text-sm font-medium text-slate-600">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => {
-                        setPasswordTouched(true);
-                        setPassword(e.target.value);
-                      }}
-                      onBlur={() => setPasswordTouched(true)}
-                      placeholder="Create a strong password"
-                      className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12"
-                      aria-required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100"
-                    >
-                      {showPassword ? "Hide" : "Show"}
-                    </button>
-                  </div>
-
-                  <label className="block text-sm font-medium text-slate-600">Retype password</label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      onBlur={() => setPasswordTouched(true)}
-                      placeholder="Retype password"
-                      className={`w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12 ${passwordTouched && !passwordsMatch ? "border-red-400" : ""}`}
-                      aria-required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword((v) => !v)}
-                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100"
-                    >
-                      {showConfirmPassword ? "Hide" : "Show"}
-                    </button>
                   </div>
 
                   {/* Password requirements */}
@@ -1066,30 +1002,301 @@ useEffect(() => {
                         </li>
                       ))}
                     </ul>
-                    {!passwordsMatch && confirmPassword.length > 0 && (
-                      <div className="mt-2 text-sm text-red-600">Passwords do not match.</div>
-                    )}
+                    {!passwordsMatch && confirmPassword.length > 0 && <div className="mt-2 text-sm text-red-600">Passwords do not match.</div>}
                   </div>
 
                   <div className="flex gap-3 pt-3">
-                    <button disabled={loading} className={`flex-1 px-4 py-2 bg-indigo-600 text-white rounded ${loading ? "opacity-70" : "hover:brightness-95"}`} type="submit">
-                      {loading ? "Creating..." : "Create organization"}
+                    <button disabled={inviteLoading || passwordErrors.length > 0 || !passwordsMatch || password.length === 0} className={`flex-1 px-4 py-2 bg-indigo-600 text-white rounded ${inviteLoading ? "opacity-70" : ""}`} type="submit">
+                      {inviteLoading ? "Creating account..." : "Create account and accept invite"}
                     </button>
-                    <button type="button" onClick={() => setMode("phone")} className="px-4 py-2 border rounded">
-                      Back
+                    <button type="button" onClick={() => router.push("/auth/login")} className="px-4 py-2 border rounded">
+                      Already have an account?
                     </button>
                   </div>
                 </form>
-              )}
+              </div>
+            ) : (
+              /* Normal multi-step signup UI (unchanged from your original, kept as-is) */
+              <div>
+                {/* CHOOSE */}
+                {mode === "choose" && (
+                  <div className="space-y-4">
+                    <button onClick={() => (window.location.href = "/api/auth/oauth/google/start?flow=signup")} className="w-full p-3 border rounded-lg flex items-center gap-3 justify-center hover:shadow-lg transition">
+                      <img src="/google.png" alt="Google" className="w-6 h-6" />
+                      <span className="text-sm font-medium text-slate-700">Continue with Google</span>
+                    </button>
 
-              {/* DONE */}
-              {mode === "done" && (
-                <div className="text-center py-6">
-                  <h3 className="text-lg font-semibold text-emerald-700">Success</h3>
-                  <p className="text-sm text-slate-600 mt-2">{success || "Your organization has been created."}</p>
-                </div>
-              )}
-            </div>
+                    <div className="text-center text-sm text-slate-400">or</div>
+
+                    <button onClick={() => setMode("email")} className="w-full p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md">
+                      Sign up with Email
+                    </button>
+                    <div className="text-sm mt-2">Already have an account? <a className="text-blue-700 underline" href="/login">Login</a></div>
+                  </div>
+                )}
+
+                {/* EMAIL - send */}
+                {mode === "email" && (
+                  <form onSubmit={handleSendEmailOtp} className="space-y-3" noValidate>
+                    <label className="block text-sm font-medium text-slate-600">Email</label>
+                    <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 focus:outline-none" placeholder="you@example.com" type="email" />
+                    <div className="flex gap-3 flex-wrap">
+                      <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
+                        {loading ? "Sending..." : "Send code"}
+                      </button>
+                      <button type="button" onClick={() => setMode("choose")} className="px-4 py-2 border rounded">
+                        Back
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-400">A one-time code will be sent to verify your email.</p>
+                  </form>
+                )}
+
+                {/* EMAIL - verify */}
+                {mode === "verifyEmail" && (
+                  <form onSubmit={handleVerifyEmailOtp} className="space-y-3" noValidate>
+                    <p className="text-sm text-slate-600">Enter the code sent to <strong>{email}</strong></p>
+                    <label className="block text-sm font-medium text-slate-600">Code</label>
+                    <div className="flex gap-2">
+                      {emailOtp.map((digit, i) => (
+                        <input
+                          key={i}
+                          id={`otp-email-${i}`}
+                          data-for="email"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={1}
+                          value={digit}
+                          onPaste={(e) => handleOtpPaste(e, emailOtp, setEmailOtp)}
+                          onKeyDown={(e) => handleOtpInput(e, i, emailOtp, setEmailOtp)}
+                          onChange={() => {}}
+                          aria-label={`Email code digit ${i + 1}`}
+                          className="w-12 h-12 text-center text-lg rounded border border-slate-200 focus:ring-2 focus:ring-indigo-300"
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
+                        {loading ? "Verifying..." : "Verify"}
+                      </button>
+                      <button type="button" onClick={() => setMode("email")} className="px-4 py-2 border rounded">
+                        Back
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <div>
+                        {formatCountdown(emailResendAvailableAt) ? (
+                          <span>Resend in {formatCountdown(emailResendAvailableAt)}</span>
+                        ) : (
+                          <button type="button" onClick={handleResendEmail} className="underline text-indigo-600">
+                            Resend code
+                          </button>
+                        )}
+                      </div>
+                      <div className="text-right">Didn't receive? Check spam.</div>
+                    </div>
+                  </form>
+                )}
+
+                {/* PHONE - send */}
+                {mode === "phone" && (
+                  <form onSubmit={handleSendPhoneOtp} className="space-y-3" noValidate>
+                    <label className="block text-sm font-medium text-slate-600">Phone</label>
+
+                    <div className="flex gap-2 items-start flex-col sm:flex-row">
+                      <div className="w-full sm:w-44">
+                        <CountryDropdown
+                          countries={countries}
+                          value={country}
+                          onChange={(c) => {
+                            setCountry(c);
+                          }}
+                          disabled={countryLoading || !!countryError}
+                          placeholder={countryLoading ? "Loading..." : countryError ? "Unavailable" : "Select country"}
+                        />
+                        <div className="text-xs text-slate-400 mt-2">{countryLoading ? "Loading dial codes..." : countryError ? <span className="text-red-500">Unable to load list</span> : "Select country code"}</div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex gap-2">
+                          <div className="flex items-center px-3 border rounded bg-slate-50 text-sm whitespace-nowrap">
+                            <span className="mr-2">{country?.flag ? <img src={country.flag} alt={country.name} className="w-5 h-4 object-cover inline-block" /> : null}</span>
+                            <span className="font-medium">{country?.callingCode ?? "+"}</span>
+                          </div>
+                          <input
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder={country ? `${country.callingCode} 98765 43210` : "98765 43210"}
+                            className="flex-1 p-2 border rounded focus:ring-2 focus:ring-indigo-300 bg-indigo-50"
+                            aria-label="Phone number"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
+                        {loading ? "Sending..." : "Send SMS"}
+                      </button>
+                      <button type="button" onClick={() => setMode("verifyEmail")} className="px-4 py-2 border rounded">
+                        Back
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-slate-400">Standard SMS rates may apply.</p>
+                  </form>
+                )}
+
+                {/* PHONE - verify */}
+                {mode === "verifyPhone" && (
+                  <form onSubmit={handleVerifyPhoneOtp} className="space-y-3" noValidate>
+                    <p className="text-sm text-slate-600">Enter the SMS code sent to <strong>{country?.callingCode ?? ""} {phone}</strong></p>
+
+                    <label className="block text-sm font-medium text-slate-600">SMS Code</label>
+                    <div className="flex gap-2">
+                      {phoneOtp.map((digit, i) => (
+                        <input
+                          key={i}
+                          id={`otp-phone-${i}`}
+                          data-for="phone"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={1}
+                          value={digit}
+                          onPaste={(e) => handleOtpPaste(e, phoneOtp, setPhoneOtp)}
+                          onKeyDown={(e) => handleOtpInput(e, i, phoneOtp, setPhoneOtp)}
+                          onChange={() => {}}
+                          aria-label={`Phone code digit ${i + 1}`}
+                          className="w-12 h-12 text-center text-lg rounded border border-slate-200 focus:ring-2 focus:ring-indigo-300"
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded">
+                        {loading ? "Verifying..." : "Verify"}
+                      </button>
+                      <button type="button" onClick={() => setMode("phone")} className="px-4 py-2 border rounded">
+                        Back
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <div>
+                        {formatCountdown(phoneResendAvailableAt) ? (
+                          <span>Resend in {formatCountdown(phoneResendAvailableAt)}</span>
+                        ) : (
+                          <button type="button" onClick={handleResendPhone} className="underline text-indigo-600">
+                            Resend SMS
+                          </button>
+                        )}
+                      </div>
+                      <div>Contact support if you don't receive SMS.</div>
+                    </div>
+                  </form>
+                )}
+
+                {/* ORG finalize */}
+                {mode === "org" && (
+                  <form onSubmit={handleFinalize} className="space-y-4" noValidate>
+                    <label className="block text-sm font-medium text-slate-600">Organization name</label>
+                    <input value={orgName} placeholder="Enter the name" onChange={(e) => setOrgName(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300" />
+
+                    <label className="block text-sm font-medium text-slate-600">Your name</label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300" />
+
+                    <label className="block text-sm font-medium text-slate-600">Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => {
+                          setPasswordTouched(true);
+                          setPassword(e.target.value);
+                        }}
+                        onBlur={() => setPasswordTouched(true)}
+                        placeholder="Create a strong password"
+                        className="w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12"
+                        aria-required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100"
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+
+                    <label className="block text-sm font-medium text-slate-600">Retype password</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => setPasswordTouched(true)}
+                        placeholder="Retype password"
+                        className={`w-full p-3 border rounded focus:ring-2 focus:ring-indigo-300 pr-12 ${passwordTouched && !passwordsMatch ? "border-red-400" : ""}`}
+                        aria-required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((v) => !v)}
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-slate-100"
+                      >
+                        {showConfirmPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+
+                    {/* Password requirements */}
+                    <div className="text-xs text-slate-500 mt-2">
+                      <div className="mb-1">Password must contain:</div>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                        {[
+
+                          { ok: password.length >= 8, label: "8+ characters" },
+                          { ok: /[A-Z]/.test(password), label: "Uppercase letter" },
+                          { ok: /[a-z]/.test(password), label: "Lowercase letter" },
+                          { ok: /[0-9]/.test(password), label: "Number" },
+                          { ok: /[^\w\s]/.test(password), label: "Symbol" },
+                        ].map((r) => (
+                          <li key={r.label} className="flex items-center gap-2 text-[13px]">
+                            <span className={`w-4 h-4 rounded-sm flex items-center justify-center ${r.ok ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-400"}`}>
+                              {r.ok ? "✓" : "•"}
+                            </span>
+                            <span className={`${r.ok ? "text-slate-700" : "text-slate-400"}`}>{r.label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {!passwordsMatch && confirmPassword.length > 0 && (
+                        <div className="mt-2 text-sm text-red-600">Passwords do not match.</div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 pt-3">
+                      <button disabled={loading} className={`flex-1 px-4 py-2 bg-indigo-600 text-white rounded ${loading ? "opacity-70" : "hover:brightness-95"}`} type="submit">
+                        {loading ? "Creating..." : "Create organization"}
+                      </button>
+                      <button type="button" onClick={() => setMode("phone")} className="px-4 py-2 border rounded">
+                        Back
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* DONE */}
+                {mode === "done" && (
+                  <div className="text-center py-6">
+                    <h3 className="text-lg font-semibold text-emerald-700">Success</h3>
+                    <p className="text-sm text-slate-600 mt-2">{success || "Your organization has been created."}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
