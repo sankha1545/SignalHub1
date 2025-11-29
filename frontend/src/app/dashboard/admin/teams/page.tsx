@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import CreateTeamForm from "@/app/ui/forms/create-team/page";
 import ScheduleMeetingForm from "@/app/ui/forms/Schedule-meeting/page";
+import Modal from "@/components/ui/modal"; // shared Modal (backdrop + panel)
 
 /* ----------------- Helpers ----------------- */
 function safeParseListResponse(j: any) {
@@ -32,12 +33,13 @@ function safeParseListResponse(j: any) {
   return [];
 }
 function uidFromTeam(team: any, idx: number) {
-  // ensure stable keys even if missing id
   return team?.id ?? `team_tmp_${idx}_${(team?.name ?? "unknown").slice(0, 6)}`;
 }
 
 /* ----------------- TeamCard ----------------- */
-const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
+/* ----------------- TeamCard (fixed layout) ----------------- */
+/* ----------------- TeamCard (ensure action buttons are fully visible) ----------------- */
+const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -51,10 +53,10 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
         setIsHovered(false);
         setMenuOpen(false);
       }}
-      className="relative p-6 bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-200 group overflow-hidden"
-    >
-      {/* actions menu */}
-      <div className="absolute right-3 top-3">
+    className="relative p-6 pb-8 bg-white rounded-2xl border flex flex-col justify-between"
+>
+      {/* actions menu (absolute, above content) */}
+      <div className="absolute right-3 top-3 z-40">
         <div className="relative">
           <button
             onClick={(e) => {
@@ -74,7 +76,7 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.12 }}
-              className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-30"
+              className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50"
             >
               <button
                 onClick={(e) => {
@@ -106,18 +108,18 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
       <div className="relative">
         {/* header */}
         <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 w-full">
             <motion.div
-              className={`w-14 h-14 rounded-xl bg-gradient-to-br ${team.gradient ?? "from-blue-500 to-cyan-500"} flex items-center justify-center shadow-md`}
+              className={`w-14 h-14 rounded-xl bg-gradient-to-br ${team.gradient ?? "from-blue-500 to-cyan-500"} flex items-center justify-center shadow-md flex-shrink-0`}
               animate={isHovered ? { scale: 1.03, rotate: 4 } : { scale: 1, rotate: 0 }}
               transition={{ duration: 0.25 }}
             >
               <Users className="w-7 h-7 text-white" />
             </motion.div>
 
-            <div className="min-w-0">
-              <h3 className="text-lg font-semibold text-slate-800 truncate">{team.name}</h3>
-              <p className="text-sm text-slate-500 truncate">{team.description ?? ""}</p>
+            <div className="min-w-0 flex-1 pr-12">
+              <h3 className="text-lg font-semibold text-slate-800 leading-tight break-words">{team.name}</h3>
+              <p className="text-sm text-slate-500 mt-1 break-words">{team.description ?? ""}</p>
             </div>
           </div>
         </div>
@@ -141,7 +143,6 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
         {/* members avatars */}
         <div className="flex -space-x-2 mb-4 flex-wrap">
           {(team.members ?? []).slice(0, 5).map((member: any, idx: number) => {
-            // stable key per member
             const key = member?.user?.id ?? member?.id ?? `m_${idx}`;
             const title = member?.user?.name ?? member?.name ?? "";
             const initials =
@@ -180,14 +181,16 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
             <p className="text-xs text-slate-500">Complete</p>
           </div>
         </div>
+      </div>
 
-        {/* actions */}
+      {/* actions — ensure visible and not clipped */}
+      <div className="mt-2 pt-2">
         <div className="flex flex-col sm:flex-row gap-2">
           <motion.button
             onClick={() => onOpenSchedule(team)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex-1 px-4 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 whitespace-nowrap"
             type="button"
           >
             <Mail className="w-4 h-4" /> Schedule Meeting
@@ -196,19 +199,21 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete }: any) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition flex items-center justify-center gap-2"
+            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition flex items-center justify-center gap-2 whitespace-nowrap"
             onClick={() => {
-              window.location.href = `/dashboard/admin/teams/${team.id}`;
+              onViewMembers(team);
             }}
             type="button"
           >
-            <Settings className="w-4 h-4" /> Manage
+            <Settings className="w-4 h-4" /> View Members
           </motion.button>
         </div>
       </div>
     </motion.div>
   );
 };
+
+
 
 /* ----------------- StatCard ----------------- */
 const StatCard = ({ icon: Icon, label, value, subtitle, gradient, delay }: any) => (
@@ -230,6 +235,119 @@ const StatCard = ({ icon: Icon, label, value, subtitle, gradient, delay }: any) 
   </motion.div>
 );
 
+/* ----------------- Members Modal ----------------- */
+function MembersModal({
+  open,
+  onClose,
+  team,
+  onRemove,
+}: {
+  open: boolean;
+  onClose: () => void;
+  team: any | null;
+  onRemove: (memberId: string, isManager?: boolean) => Promise<void>;
+}) {
+  if (!team) return null;
+
+  const members = team.members ?? [];
+  const manager = team.manager ?? null;
+  const total = (members?.length ?? 0) + (manager ? 1 : 0);
+
+  return (
+    <Modal open={open} onClose={onClose} ariaLabel={`Members of ${team.name}`} className="max-w-2xl">
+      <div className="w-full bg-transparent">
+        {/* Single unified panel — header + content */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">{team.name ?? "Team members"}</h2>
+                <p className="text-sm text-slate-500 mt-1">{total} member{total !== 1 ? "s" : ""}</p>
+              </div>
+              
+            </div>
+          </div>
+
+          <div className="p-4 space-y-3 max-h-[60vh] overflow-auto">
+            {/* Manager (if any) */}
+            {manager && (
+              <div className="flex items-center justify-between gap-4 bg-white rounded-lg p-3 border-none shadow-md">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700">
+                    {String((manager.name || "").split(" ").map((p: string) => p[0]).slice(0, 2).join("")).toUpperCase() || "M"}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-slate-800 truncate">{manager.name ?? "Manager"}</div>
+                    {manager.email && <div className="text-xs text-slate-500 truncate">{manager.email}</div>}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="text-xs font-medium px-2 py-1 rounded-full bg-amber-50 text-amber-700">MANAGER</div>
+                  <button
+                    onClick={() => {
+                      if (!confirm(`Remove ${manager.name ?? "this manager"} from team "${team.name}"?`)) return;
+                      onRemove(manager.id ?? manager.user?.id ?? manager.userId, true);
+                    }}
+                    type="button"
+                    className="px-3 py-1 rounded-md bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" /> Remove
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Member list */}
+            {members.length === 0 ? (
+              <div className="p-4 bg-slate-50 rounded-lg text-sm text-slate-600">No members assigned to this team.</div>
+            ) : (
+              <ul className="space-y-3">
+                {members.map((m: any, idx: number) => {
+                  const user = m?.user ?? {};
+                  const name = user?.name ?? m?.name ?? `Member ${idx + 1}`;
+                  const email = user?.email ?? m?.email ?? "";
+                  const role = m?.role ?? m?.assignedRole ?? "Member";
+                  const memberId = m?.id ?? user?.id ?? m?.userId ?? String(idx);
+                  return (
+                    <li key={memberId} className="flex items-center justify-between gap-4 bg-white rounded-lg p-3 border-none shadow-md">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700 ">
+                          {String(name.split(" ").map((p: string) => p[0]).slice(0, 2).join("")).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-slate-800 truncate">{name}</div>
+                          {email && <div className="text-xs text-slate-500 truncate">{email}</div>}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-slate-600 px-3 py-1 rounded-md bg-slate-50">{role}</div>
+                        <button
+                          onClick={() => {
+                            if (!confirm(`Remove ${name} from team "${team.name}"?`)) return;
+                            onRemove(memberId);
+                          }}
+                          type="button"
+                          className="px-3 py-1 rounded-md bg-rose-600 text-white hover:bg-rose-700 flex items-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" /> Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 /* ----------------- Main Page ----------------- */
 export default function TeamsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -240,6 +358,10 @@ export default function TeamsPage() {
   // schedule modal state
   const [showSchedule, setShowSchedule] = useState(false);
   const [selectedTeamForSchedule, setSelectedTeamForSchedule] = useState<any | null>(null);
+
+  // members modal state
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [selectedTeamForMembers, setSelectedTeamForMembers] = useState<any | null>(null);
 
   // data
   const [teams, setTeams] = useState<any[]>([]);
@@ -336,7 +458,6 @@ export default function TeamsPage() {
   /* -- create / update handler: accepts either server object (with id) or payload -- */
   async function handleCreateOrUpdateTeam(payloadOrCreated: any, opts?: { isEdit?: boolean; id?: string }) {
     try {
-      // UPDATE path (opts supplied) — prefer server call to update endpoint
       if (opts?.isEdit && opts.id) {
         const res = await fetch(`/api/teams/${encodeURIComponent(opts.id)}`, {
           method: "PUT",
@@ -350,7 +471,6 @@ export default function TeamsPage() {
         }
         const json = await res.json().catch(() => null);
         const updated = json?.team ?? json;
-        // Merge updated into existing list; fallback to merging payload
         setTeams((prev) =>
           prev.map((t) => (t.id === opts.id ? (updated ? { ...t, ...updated } : { ...t, ...payloadOrCreated }) : t))
         );
@@ -359,15 +479,12 @@ export default function TeamsPage() {
         return;
       }
 
-      // CREATE path:
-      // if payloadOrCreated already has an id, treat it as created team object (server response or optimistic)
       if (payloadOrCreated && payloadOrCreated.id) {
         setTeams((prev) => [payloadOrCreated, ...prev]);
         setShowCreate(false);
         return;
       }
 
-      // otherwise assume payload without id: send to server
       const res = await fetch("/api/teams", {
         method: "POST",
         credentials: "same-origin",
@@ -380,7 +497,6 @@ export default function TeamsPage() {
       }
       const json = await res.json().catch(() => null);
       const created = json?.team ?? json;
-      // if server returned created object use it; otherwise create optimistic object using payload
       if (created && created.id) {
         setTeams((prev) => [created, ...prev]);
       } else {
@@ -444,7 +560,61 @@ export default function TeamsPage() {
   function handleScheduleMeeting(meeting: any) {
     setSelectedTeamForSchedule(null);
     setShowSchedule(false);
-    // optionally persist meeting via API; left local for now
+  }
+
+  /* -- members modal handlers -- */
+  function openMembersModalForTeam(team: any) {
+    setSelectedTeamForMembers(team);
+    setShowMembersModal(true);
+  }
+  function closeMembersModal() {
+    setSelectedTeamForMembers(null);
+    setShowMembersModal(false);
+  }
+
+  /* -- remove member (employee or manager) */
+  async function removeMemberFromTeam(memberId: string, isManager = false) {
+    if (!selectedTeamForMembers) return;
+    const teamId = selectedTeamForMembers.id;
+    // optimistic UI update
+    setTeams((prev) =>
+      prev.map((t) => {
+        if (t.id !== teamId) return t;
+        if (isManager) {
+          return { ...t, manager: null };
+        }
+        return { ...t, members: (t.members ?? []).filter((m: any) => (m.id ?? m.user?.id ?? m.userId) !== memberId) };
+      })
+    );
+    setSelectedTeamForMembers((prev: any) => {
+      if (!prev) return prev;
+      if (isManager) {
+        return { ...prev, manager: null };
+      }
+      return { ...prev, members: (prev.members ?? []).filter((m: any) => (m.id ?? m.user?.id ?? m.userId) !== memberId) };
+    });
+
+    try {
+      const res = await fetch(`/api/teams/${encodeURIComponent(teamId)}/members/${encodeURIComponent(memberId)}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      if (!res.ok) throw new Error(`Failed to remove member (${res.status})`);
+    } catch (err: any) {
+      console.error("remove member failed:", err);
+      alert("Failed to remove member: " + (err?.message || "unknown"));
+      // rollback: refetch teams
+      try {
+        const r = await fetch("/api/teams", { credentials: "same-origin" });
+        const j = await r.json().catch(() => null);
+        const list = safeParseListResponse(j);
+        setTeams(list);
+        const updated = list.find((x: any) => x.id === teamId);
+        setSelectedTeamForMembers(updated ?? null);
+      } catch (e) {
+        console.warn("refetch teams failed:", e);
+      }
+    }
   }
 
   return (
@@ -484,7 +654,8 @@ export default function TeamsPage() {
           </div>
 
           {/* teams grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start auto-rows-auto">
+
             {teamsLoading ? (
               <div className="col-span-full p-6 bg-white rounded-2xl border border-slate-200">Loading teams…</div>
             ) : filteredTeams.length === 0 ? (
@@ -498,6 +669,7 @@ export default function TeamsPage() {
                   onOpenSchedule={openScheduleForTeam}
                   onEdit={handleEdit}
                   onDelete={handleDeleteRequest}
+                  onViewMembers={openMembersModalForTeam}
                 />
               ))
             )}
@@ -507,7 +679,7 @@ export default function TeamsPage() {
         </div>
       </div>
 
-      {/* create / edit modal */}
+      {/* create / edit modal (kept as-is) */}
       <AnimatePresence>
         {(showCreate || editTeam) && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center">
@@ -531,7 +703,6 @@ export default function TeamsPage() {
                 onCreate={(payloadOrCreated: any) => handleCreateOrUpdateTeam(payloadOrCreated)}
                 onUpdate={(id: string, payload: any) => handleCreateOrUpdateTeam(payload, { isEdit: true, id })}
                 onDelete={(id: string) => {
-                  // optional: parent-level deletion callback (not used here)
                   setTeams((prev) => prev.filter((t) => t.id !== id));
                 }}
                 onClose={() => {
@@ -570,6 +741,19 @@ export default function TeamsPage() {
               <ScheduleMeetingForm team={selectedTeamForSchedule} onClose={() => { setShowSchedule(false); setSelectedTeamForSchedule(null); }} onSchedule={(m) => handleScheduleMeeting(m)} />
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* members modal — rendered directly (no extra backdrop wrapper). Modal component provides backdrop + panel */}
+      <AnimatePresence>
+        {showMembersModal && selectedTeamForMembers && (
+          <MembersModal
+            key={selectedTeamForMembers.id ?? "members-modal"}
+            open={showMembersModal}
+            onClose={closeMembersModal}
+            team={selectedTeamForMembers}
+            onRemove={removeMemberFromTeam}
+          />
         )}
       </AnimatePresence>
     </>

@@ -1,7 +1,14 @@
 {
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/api/me/route": "app/api/me/route.js",
-  "/api/teams/[id]/route": "app/api/teams/[id]/route.js",
   "/api/teams/route": "app/api/teams/route.js",
   "/api/users/route": "app/api/users/route.js",
-  "/dashboard/admin/teams/page": "app/dashboard/admin/teams/page.js"
+  "/dashboard/admin/analytics/page": "app/dashboard/admin/analytics/page.js",
+  "/dashboard/admin/inbox/page": "app/dashboard/admin/inbox/page.js",
+  "/dashboard/admin/overview/page": "app/dashboard/admin/overview/page.js",
+  "/dashboard/admin/sent/page": "app/dashboard/admin/sent/page.js",
+  "/dashboard/admin/teams/page": "app/dashboard/admin/teams/page.js",
+  "/page": "app/page.js"
 }

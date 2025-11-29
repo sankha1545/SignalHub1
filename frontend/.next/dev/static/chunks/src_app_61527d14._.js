@@ -2019,11 +2019,11 @@ function uidFromTeam(team, idx) {
 /* ----------------- TeamCard ----------------- */ const TeamCard = (t0)=>{
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(94);
-    if ($[0] !== "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0") {
+    if ($[0] !== "ba674a90925b5e02bd4959cbe22a42df8ed107bf565b549b3b613b7690d1eedf") {
         for(let $i = 0; $i < 94; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0";
+        $[0] = "ba674a90925b5e02bd4959cbe22a42df8ed107bf565b549b3b613b7690d1eedf";
     }
     const { team, delay, onOpenSchedule, onEdit, onDelete } = t0;
     const [isHovered, setIsHovered] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -2263,7 +2263,7 @@ function uidFromTeam(team, idx) {
     let t15;
     if ($[23] !== team.name) {
         t15 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-            className: "text-lg font-semibold text-slate-800 truncate",
+            className: " text-lg font-semibold text-slate-800 truncate",
             children: team.name
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
@@ -2315,7 +2315,7 @@ function uidFromTeam(team, idx) {
         t19 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex items-start justify-between gap-4 mb-4",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex items-center gap-4",
+                className: "flex items-center gap-4 ",
                 children: [
                     t14,
                     t18
@@ -2720,7 +2720,7 @@ function uidFromTeam(team, idx) {
             type: "button",
             children: [
                 t47,
-                " Manage"
+                " View Members"
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/admin/teams/page.tsx",
@@ -2807,11 +2807,11 @@ _s(TeamCard, "ci96+gdGLmvtZ7A0ZNbPJPkAK8E=");
 _c = TeamCard;
 /* ----------------- StatCard ----------------- */ const StatCard = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(25);
-    if ($[0] !== "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0") {
+    if ($[0] !== "ba674a90925b5e02bd4959cbe22a42df8ed107bf565b549b3b613b7690d1eedf") {
         for(let $i = 0; $i < 25; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "ca9fab7751844c59a924e27aff8abaaf8efb40df1be6f9a366a3e07bf82424d0";
+        $[0] = "ba674a90925b5e02bd4959cbe22a42df8ed107bf565b549b3b613b7690d1eedf";
     }
     const { icon: Icon, label, value, subtitle, gradient, delay } = t0;
     let t1;
