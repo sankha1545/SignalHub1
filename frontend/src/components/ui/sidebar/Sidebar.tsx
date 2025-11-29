@@ -294,9 +294,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
     { id: "inbox", label: "Inbox", href: "/dashboard/employee/inbox", icon: Inbox, gradient: "from-emerald-500 to-teal-500" },
     { id: "my-tasks", label: "My Tasks", href: "/dashboard/employee/tasks", icon: Clipboard, gradient: "from-pink-500 to-rose-500" },
     { id: "my-schedule", label: "My Schedule", href: "/dashboard/employee/schedule", icon: Calendar, gradient: "from-violet-500 to-purple-500" },
-    { id: "knowledge", label: "Knowledge Base", href: "/dashboard/employee/knowledge", icon: Slack, gradient: "from-blue-500 to-cyan-500" },
-    { id: "profile", label: "Profile", href: "/dashboard/employee/profile", icon: User, gradient: "from-teal-500 to-emerald-500" },
-  ];
+     ];
 
   const NAV = portal === "admin" ? NAV_ADMIN : portal === "manager" ? NAV_MANAGER : NAV_EMPLOYEE;
 
