@@ -291,9 +291,10 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
   ];
 
   const NAV_EMPLOYEE: NavItem[] = [
-    { id: "inbox", label: "Inbox", href: "/dashboard/employee/inbox", icon: Inbox, gradient: "from-emerald-500 to-teal-500" },
+    { id: "inbox", label: "Inbox", href: "/dashboard/employee/Inbox", icon: Inbox, gradient: "from-emerald-500 to-teal-500" },
     { id: "my-tasks", label: "My Tasks", href: "/dashboard/employee/tasks", icon: Clipboard, gradient: "from-pink-500 to-rose-500" },
     { id: "my-schedule", label: "My Schedule", href: "/dashboard/employee/schedule", icon: Calendar, gradient: "from-violet-500 to-purple-500" },
+    {id:  "my-team", label: "My Team", href:"/dashboard/employee/myteam", icon: Users, gradient : "from-emerald-500 to-teal-500"},
      ];
 
   const NAV = portal === "admin" ? NAV_ADMIN : portal === "manager" ? NAV_MANAGER : NAV_EMPLOYEE;
@@ -318,7 +319,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
       if (t.startsWith("/dashboard/manager/analytics")) return "analytics";
       if (t.startsWith("/dashboard/manager/settings")) return "settings";
     } else {
-      if (t.startsWith("/dashboard/employee/inbox")) return "inbox";
+      if (t.startsWith("/dashboard/employee/Inbox")) return "inbox";
       if (t.startsWith("/dashboard/employee/tasks")) return "my-tasks";
       if (t.startsWith("/dashboard/employee/schedule")) return "my-schedule";
       if (t.startsWith("/dashboard/employee/knowledge")) return "knowledge";

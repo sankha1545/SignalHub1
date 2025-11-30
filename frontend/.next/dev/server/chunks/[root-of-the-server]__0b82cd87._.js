@@ -204,7 +204,7 @@ async function getSessionUser(req) {
 "[project]/src/app/api/me/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// app/api/me/route.ts
+// src/app/api/me/route.ts
 __turbopack_context__.s([
     "GET",
     ()=>GET,
@@ -225,17 +225,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
  * GET /api/me
  * PATCH /api/me
  *
- * Preserved behavior:
- * - Multiple session resolution strategies:
- *   1) getSessionUser(req)
- *   2) Authorization: Bearer <token>
- *   3) server-side 'session' cookie
- *
- * Additions:
- * - GET returns organization: { id, name } so frontend can render org name on account / overview
- * - PATCH disallows direct email changes through this endpoint (use dedicated email-change flow)
- * - Added defensiveness around metadata merges, length checks and Prisma error logging
- * - Consistent Cache-Control: no-store for authenticated responses
+ * - Resolve session using getSessionUser, Bearer JWT, or cookie fallback.
+ * - GET returns user + organization + teams (manager + member roles).
+ * - PATCH upserts profile, disallows changing email via this endpoint.
  */ const COOKIE_NAME = "session";
 const JWT_SECRET = process.env.JWT_SECRET || "";
 /** Safe JSON parse for request bodies */ async function jsonSafe(req) {
@@ -245,21 +237,13 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
         return {};
     }
 }
-/**
- * Resolve a session user using multiple fallbacks:
- * 1) getSessionUser(req) — your existing helper (preferred)
- * 2) Authorization: Bearer <token> — verify with JWT_SECRET if available
- * 3) server-side cookie fallback (next/headers cookies())
- *
- * Returns a minimal object { id } or null if no session.
- */ async function resolveSessionUser(req) {
+/** Resolve session user with multiple fallbacks */ async function resolveSessionUser(req) {
     try {
-        // 1) primary helper (existing logic)
+        // 1) helper
         try {
             const s = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
             if (s && s.id) return s;
         } catch (err) {
-            // don't fail hard here; fall through to other strategies
             console.warn("[resolveSessionUser] getSessionUser failed:", err);
         }
         // 2) Authorization: Bearer <token>
@@ -310,6 +294,113 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
         return null;
     }
 }
+/**
+ * Build teams array for the user.
+ * - includes teams where user is manager
+ * - includes teams where user is member via teamMember
+ * - de-duplicates preferring MANAGER when both apply
+ */ async function fetchUserTeams(userId) {
+    try {
+        if (!__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"] || typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"] !== "object") return [];
+        // 1) teams where user is manager
+        const managedTeamsPromise = (async ()=>{
+            try {
+                return await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].team.findMany({
+                    where: {
+                        managerId: userId
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        organizationId: true,
+                        managerId: true,
+                        createdAt: true
+                    }
+                });
+            } catch (e) {
+                console.warn("[fetchUserTeams] managed teams lookup failed:", e);
+                return [];
+            }
+        })();
+        // 2) teams where user is a teamMember
+        // IMPORTANT: use `select` to request both relation (team) and scalar (role).
+        const memberTeamsPromise = (async ()=>{
+            try {
+                const memberRows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].teamMember.findMany({
+                    where: {
+                        userId
+                    },
+                    select: {
+                        id: true,
+                        role: true,
+                        joinedAt: true,
+                        team: {
+                            select: {
+                                id: true,
+                                name: true,
+                                description: true,
+                                organizationId: true,
+                                managerId: true,
+                                createdAt: true
+                            }
+                        }
+                    }
+                });
+                return memberRows.filter((r)=>r.team).map((r)=>({
+                        id: r.team.id,
+                        teamId: r.team.id,
+                        name: r.team.name,
+                        description: r.team.description ?? null,
+                        organizationId: r.team.organizationId ?? null,
+                        managerId: r.team.managerId ?? null,
+                        createdAt: r.team.createdAt?.toISOString?.() ?? null,
+                        memberRole: r.role ?? null
+                    }));
+            } catch (e) {
+                console.warn("[fetchUserTeams] teamMember lookup failed:", e);
+                return [];
+            }
+        })();
+        const [managedTeams, memberTeams] = await Promise.all([
+            managedTeamsPromise,
+            memberTeamsPromise
+        ]);
+        // Deduplicate preferring manager
+        const map = new Map();
+        for (const t of memberTeams){
+            map.set(t.id, {
+                id: t.id,
+                name: t.name,
+                description: t.description ?? null,
+                organizationId: t.organizationId ?? null,
+                managerId: t.managerId ?? null,
+                role: t.memberRole ?? "EMPLOYEE",
+                createdAt: t.createdAt ?? null
+            });
+        }
+        for (const t of managedTeams){
+            map.set(t.id, {
+                id: t.id,
+                name: t.name,
+                description: t.description ?? null,
+                organizationId: t.organizationId ?? null,
+                managerId: t.managerId ?? null,
+                role: "MANAGER",
+                createdAt: t.createdAt?.toISOString?.() ?? null
+            });
+        }
+        const teams = Array.from(map.values()).sort((a, b)=>{
+            const at = a.createdAt ? Date.parse(a.createdAt) : 0;
+            const bt = b.createdAt ? Date.parse(b.createdAt) : 0;
+            return bt - at;
+        });
+        return teams;
+    } catch (err) {
+        console.warn("[fetchUserTeams] unexpected error:", err);
+        return [];
+    }
+}
 async function GET(req) {
     try {
         const sessionUser = await resolveSessionUser(req);
@@ -317,6 +408,7 @@ async function GET(req) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 user: null,
+                teams: [],
                 error: "Unauthorized"
             }, {
                 status: 401,
@@ -325,10 +417,10 @@ async function GET(req) {
                 }
             });
         }
-        // Fetch user and include small organization object
+        const userId = String(sessionUser.id);
         const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
             where: {
-                id: sessionUser.id
+                id: userId
             },
             select: {
                 id: true,
@@ -351,6 +443,7 @@ async function GET(req) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
                 user: null,
+                teams: [],
                 error: "User not found"
             }, {
                 status: 404,
@@ -359,14 +452,15 @@ async function GET(req) {
                 }
             });
         }
-        // Return organization as top-level convenience plus inside user
+        const teams = await fetchUserTeams(userId);
         const responseUser = {
             ...user,
             organization: user.organization ?? null
         };
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            user: responseUser
+            user: responseUser,
+            teams
         }, {
             status: 200,
             headers: {
@@ -377,6 +471,8 @@ async function GET(req) {
         console.error("GET /api/me error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
+            user: null,
+            teams: [],
             error: "Internal server error"
         }, {
             status: 500,
@@ -398,8 +494,7 @@ async function PATCH(req) {
             });
         }
         const body = await jsonSafe(req);
-        console.info("PATCH /api/me payload:", typeof body === "object" ? Object.keys(body) : typeof body);
-        // Disallow email changes here — use a dedicated, auditable flow instead
+        console.info("PATCH /api/me payload keys:", typeof body === "object" ? Object.keys(body) : typeof body);
         if (typeof body.email === "string" && body.email.trim().length > 0) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -408,49 +503,39 @@ async function PATCH(req) {
                 status: 400
             });
         }
-        // Validate required fields and basic length guards
         const name = typeof body.name === "string" ? body.name.trim() : undefined;
         const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
         const incomingProfile = body.profile && typeof body.profile === "object" ? body.profile : {};
-        if (!name || name.length === 0) {
-            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                ok: false,
-                error: "Name is required"
-            }, {
-                status: 400
-            });
-        }
-        if (name.length > 200) {
-            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                ok: false,
-                error: "Name too long"
-            }, {
-                status: 400
-            });
-        }
-        if (phone && phone.length > 40) {
-            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                ok: false,
-                error: "Phone too long"
-            }, {
-                status: 400
-            });
-        }
-        // Sanitize and prepare profile fields
+        if (!name || name.length === 0) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            error: "Name is required"
+        }, {
+            status: 400
+        });
+        if (name.length > 200) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            error: "Name too long"
+        }, {
+            status: 400
+        });
+        if (phone && phone.length > 40) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            error: "Phone too long"
+        }, {
+            status: 400
+        });
         const profileUpdates = {
             displayName: typeof incomingProfile.displayName === "string" ? incomingProfile.displayName.trim() : undefined,
             avatarUrl: typeof incomingProfile.avatarUrl === "string" ? incomingProfile.avatarUrl.trim() : undefined,
             bio: typeof incomingProfile.bio === "string" ? incomingProfile.bio.trim() : undefined,
             phoneNumber: typeof incomingProfile.phoneNumber === "string" ? incomingProfile.phoneNumber.trim() : phone ?? undefined
         };
-        // Build metadata safely (only accept known keys)
         const metadata = {};
         if (typeof incomingProfile.country === "string") metadata.country = incomingProfile.country.trim();
         if (typeof incomingProfile.region === "string") metadata.region = incomingProfile.region.trim();
         if (typeof incomingProfile.district === "string") metadata.district = incomingProfile.district.trim();
         if (typeof incomingProfile.postalCode === "string") metadata.postalCode = incomingProfile.postalCode.trim();
         if (typeof incomingProfile.language === "string") metadata.language = incomingProfile.language.trim();
-        // Fetch existing profile metadata to merge
         let existingMetadata = {};
         try {
             const existingProfileRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.findUnique({
@@ -470,7 +555,6 @@ async function PATCH(req) {
             ...existingMetadata,
             ...metadata
         };
-        // Upsert profile via nested update on User. Keep update minimal (only fields present).
         const dataToUpdate = {
             name,
             ...phone !== undefined ? {

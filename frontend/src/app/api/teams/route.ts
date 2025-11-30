@@ -251,6 +251,71 @@ export async function POST(req: Request) {
       updatedAt: (teamFull as any)?.updatedAt?.toISOString?.() ?? null,
     };
 
+    // -----------------------------
+    // Best-effort: create a Chat + ChatMember rows and emit socket event
+    // -----------------------------
+    (async () => {
+      try {
+        // Only attempt if Chat model exists on Prisma client
+        if ((prisma as any).chat && (prisma as any).chatMember) {
+          // create chat
+          const chat = await (prisma as any).chat.create({
+            data: {
+              name: responseTeam.name ?? `Team ${responseTeam.id}`,
+              type: "team",
+              teamId: responseTeam.id,
+            },
+            select: { id: true, name: true },
+          });
+
+          // gather unique user ids to add to chat: manager + memberIds + org admins
+          const toAdd = new Set<string>();
+          if (managerId) toAdd.add(managerId);
+          for (const mid of memberIds) toAdd.add(mid);
+
+          // find org admins (so admin monitors all team chats)
+          const orgAdmins = await prisma.user.findMany({
+            where: { organizationId: responseTeam.organizationId, role: "ADMIN" },
+            select: { id: true, role: true },
+          });
+          for (const a of orgAdmins) toAdd.add(a.id);
+
+          // fetch roles for these users
+          const usersForChat = await prisma.user.findMany({
+            where: { id: { in: Array.from(toAdd) } },
+            select: { id: true, role: true },
+          });
+
+          const chatMembersData = usersForChat.map((u) => ({
+            chatId: chat.id,
+            userId: u.id,
+            role: u.role ?? "EMPLOYEE",
+          }));
+
+          if (chatMembersData.length > 0) {
+            // create members (skip duplicates so this is safe to call multiple times)
+            await (prisma as any).chatMember.createMany({ data: chatMembersData, skipDuplicates: true });
+          }
+
+          // Emit socket event (best-effort) - many apps attach io to global object (e.g. global._io)
+          try {
+            const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+            if (io && typeof io.emit === "function") {
+              io.emit("team:created", { team: responseTeam, chat: { id: chat.id, name: chat.name } });
+            }
+          } catch (emitErr) {
+            console.warn("[api/teams] socket emit failed:", emitErr);
+          }
+        } else {
+          // If Chat model not present, silently skip (safe)
+          console.warn("[api/teams] Chat model not found on prisma client — skipping chat creation.");
+        }
+      } catch (err) {
+        // do not make team creation fail; only warn
+        console.warn("[api/teams] creating chat/chatMembers failed (non-fatal):", err);
+      }
+    })();
+
     return NextResponse.json({ ok: true, team: responseTeam }, { status: 201 });
   } catch (err: any) {
     console.error("[api/teams][POST] error:", err);

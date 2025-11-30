@@ -53,7 +53,7 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
         setIsHovered(false);
         setMenuOpen(false);
       }}
-    className="relative p-6 pb-8 bg-white rounded-2xl border flex flex-col justify-between"
+    className="relative p-6 pb-8 bg-white rounded-2xl border-none flex flex-col justify-between shadow-md"
 >
       {/* actions menu (absolute, above content) */}
       <div className="absolute right-3 top-3 z-40">
@@ -76,7 +76,7 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.12 }}
-              className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50"
+              className="absolute right-0 mt-2 w-44 bg-white border-none rounded-lg shadow-lg z-50"
             >
               <button
                 onClick={(e) => {
@@ -258,7 +258,7 @@ function MembersModal({
       <div className="w-full bg-transparent">
         {/* Single unified panel — header + content */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b">
+          <div className="px-6 py-4 border-none">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">{team.name ?? "Team members"}</h2>

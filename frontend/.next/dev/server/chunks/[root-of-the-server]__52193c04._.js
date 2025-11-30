@@ -536,6 +536,89 @@ async function POST(req) {
             createdAt: teamFull?.createdAt?.toISOString?.() ?? created.team.createdAt?.toISOString?.() ?? null,
             updatedAt: teamFull?.updatedAt?.toISOString?.() ?? null
         };
+        // -----------------------------
+        // Best-effort: create a Chat + ChatMember rows and emit socket event
+        // -----------------------------
+        (async ()=>{
+            try {
+                // Only attempt if Chat model exists on Prisma client
+                if (__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat && __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember) {
+                    // create chat
+                    const chat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.create({
+                        data: {
+                            name: responseTeam.name ?? `Team ${responseTeam.id}`,
+                            type: "team",
+                            teamId: responseTeam.id
+                        },
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    });
+                    // gather unique user ids to add to chat: manager + memberIds + org admins
+                    const toAdd = new Set();
+                    if (managerId) toAdd.add(managerId);
+                    for (const mid of memberIds)toAdd.add(mid);
+                    // find org admins (so admin monitors all team chats)
+                    const orgAdmins = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findMany({
+                        where: {
+                            organizationId: responseTeam.organizationId,
+                            role: "ADMIN"
+                        },
+                        select: {
+                            id: true,
+                            role: true
+                        }
+                    });
+                    for (const a of orgAdmins)toAdd.add(a.id);
+                    // fetch roles for these users
+                    const usersForChat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findMany({
+                        where: {
+                            id: {
+                                in: Array.from(toAdd)
+                            }
+                        },
+                        select: {
+                            id: true,
+                            role: true
+                        }
+                    });
+                    const chatMembersData = usersForChat.map((u)=>({
+                            chatId: chat.id,
+                            userId: u.id,
+                            role: u.role ?? "EMPLOYEE"
+                        }));
+                    if (chatMembersData.length > 0) {
+                        // create members (skip duplicates so this is safe to call multiple times)
+                        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.createMany({
+                            data: chatMembersData,
+                            skipDuplicates: true
+                        });
+                    }
+                    // Emit socket event (best-effort) - many apps attach io to global object (e.g. global._io)
+                    try {
+                        const io = /*TURBOPACK member replacement*/ __turbopack_context__.g.io || /*TURBOPACK member replacement*/ __turbopack_context__.g._io || /*TURBOPACK member replacement*/ __turbopack_context__.g.socketServer;
+                        if (io && typeof io.emit === "function") {
+                            io.emit("team:created", {
+                                team: responseTeam,
+                                chat: {
+                                    id: chat.id,
+                                    name: chat.name
+                                }
+                            });
+                        }
+                    } catch (emitErr) {
+                        console.warn("[api/teams] socket emit failed:", emitErr);
+                    }
+                } else {
+                    // If Chat model not present, silently skip (safe)
+                    console.warn("[api/teams] Chat model not found on prisma client — skipping chat creation.");
+                }
+            } catch (err) {
+                // do not make team creation fail; only warn
+                console.warn("[api/teams] creating chat/chatMembers failed (non-fatal):", err);
+            }
+        })();
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             team: responseTeam

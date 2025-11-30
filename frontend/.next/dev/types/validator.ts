@@ -182,6 +182,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../src/app/dashboard/employee/MyTeam/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/dashboard/employee/MyTeam">> = Specific
+  const handler = {} as typeof import("../../../src/app/dashboard/employee/MyTeam/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../src/app/dashboard/manager/Analytics/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/dashboard/manager/Analytics">> = Specific
@@ -344,6 +353,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../src/app/api/chats/[chatId]/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/chats/[chatId]">> = Specific
+  const handler = {} as typeof import("../../../src/app/api/chats/[chatId]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../src/app/api/chats/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/chats">> = Specific
+  const handler = {} as typeof import("../../../src/app/api/chats/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../src/app/api/countries/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/countries">> = Specific
@@ -438,6 +465,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/me">> = Specific
   const handler = {} as typeof import("../../../src/app/api/me/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../src/app/api/socketio/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/socketio">> = Specific
+  const handler = {} as typeof import("../../../src/app/api/socketio/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Plus, UserPlus, Star, Trash2 } from "lucide-react";
+import socketClient from "@/lib/socketClient";
 
 type User = { id: string; name?: string; email?: string };
 type TeamMemberShape = { id?: string; user?: { id?: string; name?: string; email?: string } };
@@ -222,6 +223,26 @@ export default function CreateTeamForm({
     return j?.team ?? j;
   }
 
+  // NEW: create team chat server-side (non-blocking, safe)
+  async function createTeamChatServer(team: any) {
+    if (!team?.id) return;
+    try {
+      await fetch("/api/chats", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "team",
+          teamId: team.id,
+          name: team.name ?? `Team ${team.id}`,
+        }),
+      });
+    } catch (err) {
+      // do not surface to user — server-side can create later or admin can bootstrap
+      console.warn("Failed to create team chat:", err);
+    }
+  }
+
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
     setErrorMsg(null);
@@ -252,6 +273,19 @@ export default function CreateTeamForm({
           // call server and pass the server response (or optimistic) to parent
           try {
             const created = await createTeamServer(payload);
+
+            // try to create a team chat (best-effort, non-blocking)
+            createTeamChatServer(created).catch(() => { /* intentionally swallow */ });
+
+            // emit socket event so connected clients can react immediately
+            try {
+              if (socketClient && typeof socketClient.emit === "function") {
+                socketClient.emit("team:created", { team: created });
+              }
+            } catch (err) {
+              console.warn("Socket emit failed (team:created):", err);
+            }
+
             await Promise.resolve(onCreate(created));
           } catch (err) {
             // server create failed — still return optimistic object to parent so UI reflects inputs
@@ -264,12 +298,31 @@ export default function CreateTeamForm({
                 return { id, user: u ? { id: u.id, name: u.name, email: u.email } : undefined, initials: u ? getInitialsFromName(u.name ?? "") : undefined };
               }),
             };
+            // Attempt to create a chat for optimistic team (best-effort - it's okay if it fails)
+            createTeamChatServer(optimistic).catch(() => { /* ignore */ });
+
+            try {
+              if (socketClient && typeof socketClient.emit === "function") {
+                socketClient.emit("team:created", { team: optimistic });
+              }
+            } catch (err2) {
+              console.warn("Socket emit failed for optimistic team:", err2);
+            }
+
             console.warn("Create failed, returning optimistic:", err);
             await Promise.resolve(onCreate(optimistic));
           }
         } else {
           // no parent handler — attempt server create and ignore response except errors
-          await createTeamServer(payload);
+          const created = await createTeamServer(payload);
+          createTeamChatServer(created).catch(() => {});
+          try {
+            if (socketClient && typeof socketClient.emit === "function") {
+              socketClient.emit("team:created", { team: created });
+            }
+          } catch (err) {
+            console.warn("Socket emit failed (team:created):", err);
+          }
         }
       }
 
@@ -299,6 +352,16 @@ export default function CreateTeamForm({
         const j = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(j?.message || `Delete failed (${res.status})`);
       }
+
+      // Inform socket listeners that a team was deleted so UIs can update (best-effort)
+      try {
+        if (socketClient && typeof socketClient.emit === "function") {
+          socketClient.emit("team:deleted", { teamId: initialTeam.id });
+        }
+      } catch (err) {
+        console.warn("Socket emit failed (team:deleted):", err);
+      }
+
       onClose();
     } catch (err: any) {
       console.error("Delete team failed:", err);

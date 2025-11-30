@@ -57,6 +57,21 @@ enum InviteStatus {
 }
 
 /**
+ * Chat specific enums
+ */
+enum ChatRole {
+  MEMBER
+  MANAGER
+  ADMIN
+}
+
+enum ChatType {
+  TEAM
+  DIRECT
+  PRIVATE
+}
+
+/**
  * ----------------------------- Models -----------------------------
  */
 
@@ -80,22 +95,22 @@ model Organization {
   notifications        Notification[]
   auditReports         AuditReport[]
 
+  // Chats scoped to organization
+  chats Chat[]
+
   @@index([name])
 }
 
 /**
  * Core user/auth models
- * - email: unique at DB level (global uniqueness)
- * - organization: required — every user belongs to an organization
- * - role: ADMIN | MANAGER | EMPLOYEE
  */
 model User {
   id             String       @id @default(cuid())
   name           String?
   email          String       @unique
   passwordHash   String?
-  provider       String       @default("email") // "email" | "google" | "github" | ...
-  providerId     String? // provider-specific id (not globally unique across providers)
+  provider       String       @default("email")
+  providerId     String?
   googleSub      String?      @unique
   emailVerified  Boolean      @default(false)
   phone          String?      @unique
@@ -138,6 +153,11 @@ model User {
   assignedMessages Message[] @relation("UserAssignedMessages")
   managedTeams     Team[]    @relation("UserManagedTeams")
 
+  // Chat-specific relations
+  chatMemberships ChatMember[] // membership entries
+  chatsCreated    Chat[] // chats created by this user (creator)
+  chatMessages    ChatMessage[] @relation("ChatMessagesSent")
+
   @@index([organizationId])
 }
 
@@ -164,7 +184,6 @@ model Profile {
 
 /**
  * Invite model for Managers / Employees
- * Consolidated and aligned so there is only one invite model in the schema.
  */
 model Invite {
   id             String       @id @default(cuid())
@@ -186,7 +205,7 @@ model Invite {
 }
 
 /**
- * OTP stores (email & phone). Keep for auditing/rate-limiting.
+ * OTP stores (email & phone).
  */
 model EmailOtp {
   id        String   @id @default(cuid())
@@ -211,7 +230,6 @@ model PhoneOtp {
 
 /**
  * Activity logs for auditing user actions
- * Added optional organization reference so Organization.activity has an opposite.
  */
 model ActivityLog {
   id             String        @id @default(cuid())
@@ -269,7 +287,9 @@ model VerificationToken {
 }
 
 /**
- * ----------------------------- Messaging / Contacts (org-scoped) -----------------------------
+ * -----------------------------
+ * Messaging / Contacts (org-scoped)
+ * -----------------------------
  */
 
 model Contact {
@@ -286,7 +306,6 @@ model Contact {
 
   @@unique([organizationId, phone], map: "unique_org_phone")
   @@unique([organizationId, email], map: "unique_org_email")
-  /// ensure contact uniqueness per organization where values exist
   @@index([organizationId])
 }
 
@@ -318,7 +337,7 @@ model Thread {
 }
 
 /**
- * Message: normalized incoming/outgoing messages for all channels.
+ * Message: normalized incoming/outgoing messages for all channels (contact threads)
  */
 model Message {
   id       String @id @default(cuid())
@@ -365,6 +384,71 @@ model ScheduledMessage {
 }
 
 /**
+ * -----------------------------
+ * Chat models (new)
+ * - Chat: represents a conversation (team group chat or direct/private chat)
+ * - ChatMember: membership rows, roles (ADMIN/MANAGER/MEMBER)
+ * - ChatMessage: chat-specific messages (keeps separate from Thread/Message used for contacts)
+ * -----------------------------
+ */
+
+model Chat {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // optional relation to a Team (team group chats) — one-to-one
+  teamId String? @unique
+  team   Team?   @relation("ChatToTeam", fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  type ChatType @default(TEAM)
+  name String?
+  meta Json?
+
+  members  ChatMember[]
+  messages ChatMessage[]
+
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+}
+
+model ChatMember {
+  id       String   @id @default(cuid())
+  chatId   String
+  chat     Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     ChatRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+  meta     Json?
+
+  @@unique([chatId, userId])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  chatId     String
+  chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  senderId   String?
+  sender     User?    @relation("ChatMessagesSent", fields: [senderId], references: [id], onDelete: SetNull)
+  content    String
+  metadata   Json?
+  externalId String?
+  createdAt  DateTime @default(now())
+
+  @@index([chatId])
+  @@index([externalId])
+}
+
+/**
  * ----------------------------- Teams, Tasks, Performance -----------------------------
  */
 
@@ -379,10 +463,15 @@ model Team {
   members        TeamMember[]
   threads        Thread[]
   invites        Invite[] // opposite for Invite.team
-   featured       Boolean?     @default(false)
-  gradient       String?      // e.g. "from-blue-500 to-cyan-500"
+  featured       Boolean?     @default(false)
+  gradient       String? // e.g. "from-blue-500 to-cyan-500"
   projects       Int?         @default(0)
   completion     Int?         @default(0)
+  chat           Chat?        @relation("ChatToTeam")
+  // optional link to the team group chat (one-to-one)
+  // Note: we store teamId on Chat; this inverse relation is optional
+  // Prisma will infer inverse relation automatically if Chat.teamId references Team.id
+  // chat Chat?  <-- not strictly required; using Chat.team relation suffices
 
   // opposite for Task.team
   tasks Task[]

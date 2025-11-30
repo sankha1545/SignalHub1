@@ -1025,7 +1025,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
         {
             id: "inbox",
             label: "Inbox",
-            href: "/dashboard/employee/inbox",
+            href: "/dashboard/employee/Inbox",
             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$inbox$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Inbox$3e$__["Inbox"],
             gradient: "from-emerald-500 to-teal-500"
         },
@@ -1042,6 +1042,13 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
             href: "/dashboard/employee/schedule",
             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Calendar$3e$__["Calendar"],
             gradient: "from-violet-500 to-purple-500"
+        },
+        {
+            id: "my-team",
+            label: "My Team",
+            href: "/dashboard/employee/myteam",
+            icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"],
+            gradient: "from-emerald-500 to-teal-500"
         }
     ];
     const NAV = portal === "admin" ? NAV_ADMIN : portal === "manager" ? NAV_MANAGER : NAV_EMPLOYEE;
@@ -1064,7 +1071,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
             if (t.startsWith("/dashboard/manager/analytics")) return "analytics";
             if (t.startsWith("/dashboard/manager/settings")) return "settings";
         } else {
-            if (t.startsWith("/dashboard/employee/inbox")) return "inbox";
+            if (t.startsWith("/dashboard/employee/Inbox")) return "inbox";
             if (t.startsWith("/dashboard/employee/tasks")) return "my-tasks";
             if (t.startsWith("/dashboard/employee/schedule")) return "my-schedule";
             if (t.startsWith("/dashboard/employee/knowledge")) return "knowledge";
@@ -1102,7 +1109,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             children: "S"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 341,
+                                            lineNumber: 342,
                                             columnNumber: 13
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1120,13 +1127,13 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 342,
+                                            lineNumber: 343,
                                             columnNumber: 13
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 340,
+                                    lineNumber: 341,
                                     columnNumber: 11
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1137,7 +1144,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             children: "SignalHub"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 346,
+                                            lineNumber: 347,
                                             columnNumber: 13
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1147,26 +1154,26 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                     className: "w-3 h-3"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 348,
+                                                    lineNumber: 349,
                                                     columnNumber: 15
                                                 }, this),
                                                 "Unified Inbox"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 347,
+                                            lineNumber: 348,
                                             columnNumber: 13
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 345,
+                                    lineNumber: 346,
                                     columnNumber: 11
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 339,
+                            lineNumber: 340,
                             columnNumber: 9
                         }, this),
                         portal === "manager" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1177,7 +1184,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                     children: "Team"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 357,
+                                    lineNumber: 358,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1187,7 +1194,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                         children: "Loading teams…"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                        lineNumber: 360,
+                                        lineNumber: 361,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                         value: currentTeamId ?? "",
@@ -1199,7 +1206,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                 children: "No teams"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 363,
+                                                lineNumber: 364,
                                                 columnNumber: 42
                                             }, this),
                                             teams.map((t)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1207,24 +1214,24 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                     children: t.name
                                                 }, t.id, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 365,
+                                                    lineNumber: 366,
                                                     columnNumber: 21
                                                 }, this))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                        lineNumber: 362,
+                                        lineNumber: 363,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 358,
+                                    lineNumber: 359,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 356,
+                            lineNumber: 357,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1246,7 +1253,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                     className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 377,
+                                    lineNumber: 378,
                                     columnNumber: 11
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1257,19 +1264,19 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                     className: "w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 378,
+                                    lineNumber: 379,
                                     columnNumber: 11
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 376,
+                            lineNumber: 377,
                             columnNumber: 9
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 338,
+                    lineNumber: 339,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -1315,7 +1322,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                 }
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 412,
+                                                lineNumber: 413,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1334,12 +1341,12 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                             className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])("w-4 h-4 transition-colors", isActive ? "text-white" : "text-slate-600")
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 417,
+                                                            lineNumber: 418,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                        lineNumber: 416,
+                                                        lineNumber: 417,
                                                         columnNumber: 21
                                                     }, this),
                                                     item.badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1354,13 +1361,13 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                         children: item.badge
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                        lineNumber: 421,
+                                                        lineNumber: 422,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 415,
+                                                lineNumber: 416,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1368,7 +1375,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                 children: item.label
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 427,
+                                                lineNumber: 428,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1388,12 +1395,12 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                     className: "w-4 h-4 text-slate-400"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 430,
+                                                    lineNumber: 431,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 429,
+                                                lineNumber: 430,
                                                 columnNumber: 19
                                             }, this),
                                             isActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1412,29 +1419,29 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                     className: "w-4 h-4 text-blue-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 435,
+                                                    lineNumber: 436,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 434,
+                                                lineNumber: 435,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                        lineNumber: 398,
+                                        lineNumber: 399,
                                         columnNumber: 17
                                     }, this)
                                 }, item.id, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 397,
+                                    lineNumber: 398,
                                     columnNumber: 15
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 390,
+                            lineNumber: 391,
                             columnNumber: 9
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1457,7 +1464,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                     children: "Quick Actions"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 446,
+                                    lineNumber: 447,
                                     columnNumber: 11
                                 }, this),
                                 portal === "admin" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1470,7 +1477,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                 children: "Invite managers"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 451,
+                                                lineNumber: 452,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1478,7 +1485,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                 children: "Send an invite to a new manager"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 452,
+                                                lineNumber: 453,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1495,24 +1502,24 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                         className: "w-3 h-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                        lineNumber: 454,
+                                                        lineNumber: 455,
                                                         columnNumber: 26
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                lineNumber: 453,
+                                                lineNumber: 454,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                        lineNumber: 450,
+                                        lineNumber: 451,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 449,
+                                    lineNumber: 450,
                                     columnNumber: 13
                                 }, this),
                                 portal === "manager" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1528,14 +1535,14 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 464,
+                                                            lineNumber: 465,
                                                             columnNumber: 19
                                                         }, this),
                                                         " Schedule meeting"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 463,
+                                                    lineNumber: 464,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1549,20 +1556,20 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 470,
+                                                            lineNumber: 471,
                                                             columnNumber: 19
                                                         }, this),
                                                         " Task"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 466,
+                                                    lineNumber: 467,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 462,
+                                            lineNumber: 463,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1570,7 +1577,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             children: "Quickly schedule meetings for your team or create tasks."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 473,
+                                            lineNumber: 474,
                                             columnNumber: 15
                                         }, this)
                                     ]
@@ -1597,14 +1604,14 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 484,
+                                                            lineNumber: 485,
                                                             columnNumber: 19
                                                         }, this),
                                                         " Start break"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 480,
+                                                    lineNumber: 481,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1615,20 +1622,20 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                            lineNumber: 487,
+                                                            lineNumber: 488,
                                                             columnNumber: 19
                                                         }, this),
                                                         " Note"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                                    lineNumber: 486,
+                                                    lineNumber: 487,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 479,
+                                            lineNumber: 480,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1636,7 +1643,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             children: "Set your status or jot down a quick note."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 490,
+                                            lineNumber: 491,
                                             columnNumber: 15
                                         }, this)
                                     ]
@@ -1644,25 +1651,25 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 445,
+                            lineNumber: 446,
                             columnNumber: 9
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 389,
+                    lineNumber: 390,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "p-4 border-t border-slate-200 bg-slate-50/50",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$forms$2f$ProfileMenu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                        lineNumber: 498,
+                        lineNumber: 499,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 497,
+                    lineNumber: 498,
                     columnNumber: 7
                 }, this),
                 portal === "manager" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ScheduleModal, {
@@ -1680,13 +1687,13 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                     defaultOrganizer: undefined
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 503,
+                    lineNumber: 504,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-            lineNumber: 336,
+            lineNumber: 337,
             columnNumber: 5
         }, this);
     /* ------------------- Render root (desktop + mobile) ------------------- */ return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1725,12 +1732,12 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                 className: "w-5 h-5"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                lineNumber: 537,
+                                lineNumber: 538,
                                 columnNumber: 19
                             }, this)
                         }, "close", false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 536,
+                            lineNumber: 537,
                             columnNumber: 17
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
                             initial: {
@@ -1752,27 +1759,27 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                 className: "w-5 h-5"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                lineNumber: 541,
+                                lineNumber: 542,
                                 columnNumber: 19
                             }, this)
                         }, "menu", false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 540,
+                            lineNumber: 541,
                             columnNumber: 17
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                        lineNumber: 534,
+                        lineNumber: 535,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                    lineNumber: 527,
+                    lineNumber: 528,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                lineNumber: 526,
+                lineNumber: 527,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].aside, {
@@ -1792,7 +1799,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                 children: sidebarContent(false)
             }, void 0, false, {
                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                lineNumber: 550,
+                lineNumber: 551,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -1816,7 +1823,7 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                             "aria-hidden": "true"
                         }, void 0, false, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 558,
+                            lineNumber: 559,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].aside, {
@@ -1860,31 +1867,31 @@ function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose, hideToggle = f
                                             className: "w-5 h-5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                            lineNumber: 563,
+                                            lineNumber: 564,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                        lineNumber: 562,
+                                        lineNumber: 563,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                                    lineNumber: 561,
+                                    lineNumber: 562,
                                     columnNumber: 15
                                 }, this),
                                 sidebarContent(true)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                            lineNumber: 560,
+                            lineNumber: 561,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true)
             }, void 0, false, {
                 fileName: "[project]/src/components/ui/sidebar/Sidebar.tsx",
-                lineNumber: 555,
+                lineNumber: 556,
                 columnNumber: 7
             }, this)
         ]
