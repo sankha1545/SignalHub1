@@ -2,8 +2,8 @@
   "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)": {
     "id": "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)",
     "files": [
-      "static/chunks/src_components_chat_27f8ba2a._.js",
-      "static/chunks/src_components_chat_TeamChat_tsx_81af96dc._.js"
+      "static/chunks/src_e041e6bf._.js",
+      "static/chunks/src_components_chat_TeamChat_tsx_9d35b6d4._.js"
     ]
   }
 }

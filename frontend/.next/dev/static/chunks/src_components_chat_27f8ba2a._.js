@@ -133,12 +133,12 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/components/chat/TeamChat.tsx
 __turbopack_context__.s([
     "default",
     ()=>TeamChat
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/socketClient.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$chat$2f$MessageBubble$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/chat/MessageBubble.tsx [app-client] (ecmascript)");
@@ -148,288 +148,315 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-;
-function TeamChat(t0) {
+function TeamChat({ chatId, currentUser }) {
     _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(33);
-    if ($[0] !== "488421d7cfe584c1daf36b0c86a381c00f2abf3ab643c9118f3cb2ef2b29c169") {
-        for(let $i = 0; $i < 33; $i += 1){
-            $[$i] = Symbol.for("react.memo_cache_sentinel");
-        }
-        $[0] = "488421d7cfe584c1daf36b0c86a381c00f2abf3ab643c9118f3cb2ef2b29c169";
-    }
-    const { chatId, currentUser } = t0;
-    let t1;
-    if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
-        t1 = [];
-        $[1] = t1;
-    } else {
-        t1 = $[1];
-    }
-    const [messages, setMessages] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(t1);
+    const [messages, setMessages] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [text, setText] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [sending, setSending] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const listRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    let t2;
-    let t3;
-    if ($[2] !== chatId) {
-        t2 = ({
-            "TeamChat[useEffect()]": ()=>{
-                let mounted = true;
-                fetch(`/api/chats/${chatId}`).then(_TeamChatUseEffectAnonymous).then({
-                    "TeamChat[useEffect() > (anonymous)()]": (data)=>{
-                        if (!mounted) {
-                            return;
-                        }
-                        setMessages(data.messages || []);
-                        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("join", {
-                            room: `team:${chatId}`
+    // track IDs we've seen to prevent duplicates (optimistic + server)
+    const seenIdsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(new Set());
+    // fetch history and join room
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TeamChat.useEffect": ()=>{
+            let mounted = true;
+            const fetchHistory = {
+                "TeamChat.useEffect.fetchHistory": async ()=>{
+                    try {
+                        const res = await fetch(`/api/chats/${encodeURIComponent(chatId)}`, {
+                            credentials: "same-origin"
                         });
+                        if (!mounted) return;
+                        const j = await res.json().catch({
+                            "TeamChat.useEffect.fetchHistory": ()=>({})
+                        }["TeamChat.useEffect.fetchHistory"]);
+                        const msgs = j?.messages ?? [];
+                        // dedupe and set
+                        seenIdsRef.current = new Set(msgs.map({
+                            "TeamChat.useEffect.fetchHistory": (m)=>m.id
+                        }["TeamChat.useEffect.fetchHistory"]));
+                        if (mounted) setMessages(msgs);
+                    } catch (err) {
+                        console.warn("Failed to load chat history", err);
                     }
-                }["TeamChat[useEffect() > (anonymous)()]"]);
-                const onMessage = {
-                    "TeamChat[useEffect() > onMessage]": (msg)=>setMessages({
-                            "TeamChat[useEffect() > onMessage > setMessages()]": (m)=>[
-                                    ...m,
-                                    msg
-                                ]
-                        }["TeamChat[useEffect() > onMessage > setMessages()]"])
-                }["TeamChat[useEffect() > onMessage]"];
-                __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("message", {
-                    "TeamChat[useEffect() > socketClient.on()]": (payload)=>{
-                        if (payload.chatId === chatId) {
-                            onMessage(payload.message);
-                        }
-                    }
-                }["TeamChat[useEffect() > socketClient.on()]"]);
-                return ()=>{
+                }
+            }["TeamChat.useEffect.fetchHistory"];
+            fetchHistory();
+            // join room on socket
+            try {
+                // some socket servers expect: "join-room", payload chatId
+                __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("join-room", chatId);
+            } catch (err_0) {
+                console.warn("Socket join-room failed", err_0);
+            }
+            return ({
+                "TeamChat.useEffect": ()=>{
                     mounted = false;
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("leave", {
-                        room: `team:${chatId}`
-                    });
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("message");
-                };
-            }
-        })["TeamChat[useEffect()]"];
-        t3 = [
-            chatId
-        ];
-        $[2] = chatId;
-        $[3] = t2;
-        $[4] = t3;
-    } else {
-        t2 = $[3];
-        t3 = $[4];
-    }
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t2, t3);
-    let t4;
-    if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-        t4 = ({
-            "TeamChat[useEffect()]": ()=>{
-                if (listRef.current) {
-                    listRef.current.scrollTop = listRef.current.scrollHeight;
-                }
-            }
-        })["TeamChat[useEffect()]"];
-        $[5] = t4;
-    } else {
-        t4 = $[5];
-    }
-    let t5;
-    if ($[6] !== messages.length) {
-        t5 = [
-            messages.length
-        ];
-        $[6] = messages.length;
-        $[7] = t5;
-    } else {
-        t5 = $[7];
-    }
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t4, t5);
-    let t6;
-    if ($[8] !== chatId || $[9] !== currentUser || $[10] !== text) {
-        t6 = ({
-            "TeamChat[send]": async ()=>{
-                if (!text.trim()) {
-                    return;
-                }
-                const payload_0 = {
-                    chatId,
-                    content: text.trim(),
-                    senderId: currentUser.id,
-                    meta: {
-                        role: currentUser.role
+                    try {
+                        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("leave-room", chatId);
+                    } catch (err_1) {
+                    // ignore
                     }
-                };
-                setMessages({
-                    "TeamChat[send > setMessages()]": (m_0)=>[
-                            ...m_0,
-                            {
-                                id: `local-${Date.now()}`,
-                                ...payload_0,
-                                createdAt: new Date().toISOString()
-                            }
-                        ]
-                }["TeamChat[send > setMessages()]"]);
-                setText("");
-                __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("message", payload_0);
-                await fetch(`/api/chats/${chatId}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload_0)
-                });
-            }
-        })["TeamChat[send]"];
-        $[8] = chatId;
-        $[9] = currentUser;
-        $[10] = text;
-        $[11] = t6;
-    } else {
-        t6 = $[11];
-    }
-    const send = t6;
-    let t7;
-    if ($[12] !== currentUser || $[13] !== messages) {
-        let t8;
-        if ($[15] !== currentUser) {
-            t8 = ({
-                "TeamChat[messages.map()]": (m_1)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$chat$2f$MessageBubble$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        message: m_1,
-                        currentUserId: currentUser.id
-                    }, m_1.id, false, {
-                        fileName: "[project]/src/components/chat/TeamChat.tsx",
-                        lineNumber: 145,
-                        columnNumber: 44
-                    }, this)
-            })["TeamChat[messages.map()]"];
-            $[15] = currentUser;
-            $[16] = t8;
-        } else {
-            t8 = $[16];
+                }
+            })["TeamChat.useEffect"];
         }
-        t7 = messages.map(t8);
-        $[12] = currentUser;
-        $[13] = messages;
-        $[14] = t7;
-    } else {
-        t7 = $[14];
-    }
-    let t8;
-    if ($[17] !== t7) {
-        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            ref: listRef,
-            className: "flex-1 overflow-auto p-4 space-y-3",
-            children: t7
-        }, void 0, false, {
-            fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 161,
-            columnNumber: 10
-        }, this);
-        $[17] = t7;
-        $[18] = t8;
-    } else {
-        t8 = $[18];
-    }
-    let t9;
-    if ($[19] === Symbol.for("react.memo_cache_sentinel")) {
-        t9 = ({
-            "TeamChat[<input>.onChange]": (e)=>setText(e.target.value)
-        })["TeamChat[<input>.onChange]"];
-        $[19] = t9;
-    } else {
-        t9 = $[19];
-    }
-    let t10;
-    if ($[20] !== send) {
-        t10 = ({
-            "TeamChat[<input>.onKeyDown]": (e_0)=>e_0.key === "Enter" && send()
-        })["TeamChat[<input>.onKeyDown]"];
-        $[20] = send;
-        $[21] = t10;
-    } else {
-        t10 = $[21];
-    }
-    let t11;
-    if ($[22] !== t10 || $[23] !== text) {
-        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-            value: text,
-            onChange: t9,
-            onKeyDown: t10,
-            placeholder: "Write a message...",
-            className: "flex-1 rounded-md border px-3 py-2"
-        }, void 0, false, {
-            fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 188,
-            columnNumber: 11
-        }, this);
-        $[22] = t10;
-        $[23] = text;
-        $[24] = t11;
-    } else {
-        t11 = $[24];
-    }
-    let t12;
-    if ($[25] !== send) {
-        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-            onClick: send,
-            className: "btn",
-            children: "Send"
-        }, void 0, false, {
-            fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 197,
-            columnNumber: 11
-        }, this);
-        $[25] = send;
-        $[26] = t12;
-    } else {
-        t12 = $[26];
-    }
-    let t13;
-    if ($[27] !== t11 || $[28] !== t12) {
-        t13 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "p-3 border-t flex gap-2",
-            children: [
-                t11,
-                t12
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 205,
-            columnNumber: 11
-        }, this);
-        $[27] = t11;
-        $[28] = t12;
-        $[29] = t13;
-    } else {
-        t13 = $[29];
-    }
-    let t14;
-    if ($[30] !== t13 || $[31] !== t8) {
-        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "flex flex-col h-full",
-            children: [
-                t8,
-                t13
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 214,
-            columnNumber: 11
-        }, this);
-        $[30] = t13;
-        $[31] = t8;
-        $[32] = t14;
-    } else {
-        t14 = $[32];
-    }
-    return t14;
+    }["TeamChat.useEffect"], [
+        chatId
+    ]);
+    // message handler from socket (server broadcasts "chat:message")
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TeamChat.useEffect": ()=>{
+            const handler = {
+                "TeamChat.useEffect.handler": (payload)=>{
+                    try {
+                        // Expect server to send: { chatId, message: { ... } } or message directly
+                        const incomingChatId = payload?.chatId ?? payload?.message?.chatId ?? payload?.message?.chat_id;
+                        const msg = payload?.message ?? (payload?.id ? payload : null);
+                        if (!msg || incomingChatId !== chatId) return;
+                        // dedupe by id
+                        if (msg.id && seenIdsRef.current.has(msg.id)) return;
+                        if (msg.id) seenIdsRef.current.add(msg.id);
+                        setMessages({
+                            "TeamChat.useEffect.handler": (prev)=>{
+                                // avoid double optimistic message (match by temporary id -> replace)
+                                if (msg.id && String(msg.id).startsWith("local-")) {
+                                    // shouldn't happen from server, but handle defensively
+                                    return prev.map({
+                                        "TeamChat.useEffect.handler": (p)=>p.id === msg.id ? msg : p
+                                    }["TeamChat.useEffect.handler"]);
+                                }
+                                // if we have a local optimistic message with same content and sender/time close, try to replace it
+                                const optimisticIndex = prev.findIndex({
+                                    "TeamChat.useEffect.handler.optimisticIndex": (p_0)=>p_0.id?.startsWith("local-") && p_0.content === msg.content && p_0.sender?.id === msg.sender?.id
+                                }["TeamChat.useEffect.handler.optimisticIndex"]);
+                                if (optimisticIndex >= 0) {
+                                    const copy = [
+                                        ...prev
+                                    ];
+                                    copy[optimisticIndex] = msg;
+                                    return copy;
+                                }
+                                return [
+                                    ...prev,
+                                    msg
+                                ];
+                            }
+                        }["TeamChat.useEffect.handler"]);
+                    } catch (err_2) {
+                        console.warn("Error handling incoming socket message", err_2);
+                    }
+                }
+            }["TeamChat.useEffect.handler"];
+            // listen for server event name — your server emits 'chat:message'
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:message", handler);
+            // also listen for older 'message' or generic events if any
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("message", handler);
+            return ({
+                "TeamChat.useEffect": ()=>{
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("chat:message", handler);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("message", handler);
+                }
+            })["TeamChat.useEffect"];
+        }
+    }["TeamChat.useEffect"], [
+        chatId
+    ]);
+    // scroll to bottom when messages change
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TeamChat.useEffect": ()=>{
+            if (!listRef.current) return;
+            // use requestAnimationFrame to wait for DOM update
+            requestAnimationFrame({
+                "TeamChat.useEffect": ()=>{
+                    try {
+                        listRef.current.scrollTop = listRef.current.scrollHeight;
+                    } catch (e) {
+                    // ignore
+                    }
+                }
+            }["TeamChat.useEffect"]);
+        }
+    }["TeamChat.useEffect"], [
+        messages.length
+    ]);
+    const send = async ()=>{
+        const trimmed = text.trim();
+        if (!trimmed || sending) return;
+        setSending(true);
+        // build payload expected by your server
+        const payload_0 = {
+            content: trimmed,
+            metadata: {
+                role: currentUser?.role ?? null
+            },
+            // don't need chatId here for POST as it's in URL, but keep for optimistic
+            chatId
+        };
+        // optimistic UI - add local temporary message id
+        const localMsg = {
+            id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            chatId,
+            content: trimmed,
+            metadata: payload_0.metadata,
+            createdAt: new Date().toISOString(),
+            sender: {
+                id: currentUser.id,
+                name: currentUser.name ?? null,
+                email: currentUser.email ?? null
+            }
+        };
+        seenIdsRef.current.add(localMsg.id);
+        setMessages((m_0)=>[
+                ...m_0,
+                localMsg
+            ]);
+        setText("");
+        // emit via socket (best-effort) — servers may handle incoming events differently
+        try {
+            // emit to server so others get it instantly (server should create/persist and broadcast)
+            // Emit both common event names so integration is robust
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("message", {
+                chatId,
+                message: payload_0
+            });
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("chat:message", {
+                chatId,
+                message: payload_0
+            });
+            // some servers expect a dedicated event name like "chat:post" — adjust if needed
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("chat:post", {
+                chatId,
+                message: payload_0
+            });
+        } catch (err_3) {
+            console.warn("Socket emit failed (non-fatal)", err_3);
+        }
+        // persist via API (server will broadcast to others on create)
+        try {
+            const res_0 = await fetch(`/api/chats/${encodeURIComponent(chatId)}`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload_0)
+            });
+            if (res_0.ok) {
+                const j_0 = await res_0.json().catch(()=>({}));
+                // server returns created message as j.message — replace local optimistic with server result (by content/sender/closest time)
+                const created = j_0?.message ?? undefined;
+                if (created && created.id) {
+                    // if server returns an id that's not our local id, replace the optimistic local message
+                    setMessages((prev_0)=>{
+                        // find local optimistic message by matching content + sender + a recent createdAt
+                        const idx = prev_0.findIndex((p_1)=>p_1.id?.startsWith("local-") && p_1.content === created.content && p_1.sender?.id === created.sender?.id);
+                        if (idx >= 0) {
+                            const copy_0 = [
+                                ...prev_0
+                            ];
+                            copy_0[idx] = created;
+                            seenIdsRef.current.add(created.id);
+                            // remove old local id from seen set
+                            prev_0[idx].id && seenIdsRef.current.delete(prev_0[idx].id);
+                            return copy_0;
+                        }
+                        // otherwise append if not already present
+                        if (!created.id || !seenIdsRef.current.has(created.id)) {
+                            seenIdsRef.current.add(created.id);
+                            return [
+                                ...prev_0,
+                                created
+                            ];
+                        }
+                        return prev_0;
+                    });
+                } else {
+                // if server didn't return message object, optionally refetch or ignore (we rely on socket broadcast)
+                }
+            } else {
+                console.warn("Message persist returned non-OK", res_0.status);
+            }
+        } catch (err_4) {
+            console.warn("Failed to persist message", err_4);
+        } finally{
+            setSending(false);
+        }
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "flex flex-col h-full min-h-[200px]",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                ref: listRef,
+                className: "flex-1 overflow-auto p-4 space-y-3",
+                children: [
+                    messages.map((m_1)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$chat$2f$MessageBubble$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                            message: m_1,
+                            currentUserId: currentUser.id
+                        }, m_1.id, false, {
+                            fileName: "[project]/src/components/chat/TeamChat.tsx",
+                            lineNumber: 235,
+                            columnNumber: 30
+                        }, this)),
+                    messages.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "text-sm text-slate-500",
+                        children: "No messages yet."
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 236,
+                        columnNumber: 35
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/chat/TeamChat.tsx",
+                lineNumber: 234,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "p-3 border-t flex items-center gap-2",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        value: text,
+                        onChange: (e_0)=>setText(e_0.target.value),
+                        onKeyDown: (e_1)=>{
+                            if (e_1.key === "Enter" && !e_1.shiftKey) {
+                                e_1.preventDefault();
+                                send();
+                            }
+                        },
+                        placeholder: "Write a message...",
+                        className: "flex-1 rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/30",
+                        "aria-label": "Type a message",
+                        disabled: sending
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 240,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: send,
+                        disabled: sending || text.trim().length === 0,
+                        className: `px-4 py-2 rounded-md text-sm font-medium ${sending ? "opacity-60 cursor-wait bg-slate-200" : "bg-blue-600 text-white hover:bg-blue-700"}`,
+                        children: sending ? "Sending…" : "Send"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 246,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/chat/TeamChat.tsx",
+                lineNumber: 239,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/chat/TeamChat.tsx",
+        lineNumber: 233,
+        columnNumber: 10
+    }, this);
 }
-_s(TeamChat, "l7TTMOw7XaiVONrt93ozSIBdHug=");
+_s(TeamChat, "e54CZBtlc/+dgoX8xtwzhlxth5I=");
 _c = TeamChat;
-function _TeamChatUseEffectAnonymous(r) {
-    return r.json();
-}
 var _c;
 __turbopack_context__.k.register(_c, "TeamChat");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {

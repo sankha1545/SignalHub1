@@ -1,16 +1,20 @@
 {
   "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/chats/[chatId]/read/route": "app/api/chats/[chatId]/read/route.js",
+  "/api/chats/[chatId]/route": "app/api/chats/[chatId]/route.js",
   "/api/chats/route": "app/api/chats/route.js",
   "/api/dashboard/teams/route": "app/api/dashboard/teams/route.js",
   "/api/me/route": "app/api/me/route.js",
+  "/api/teams/[id]/route": "app/api/teams/[id]/route.js",
   "/api/teams/route": "app/api/teams/route.js",
   "/api/users/route": "app/api/users/route.js",
   "/dashboard/admin/inbox/page": "app/dashboard/admin/inbox/page.js",
+  "/dashboard/admin/overview/page": "app/dashboard/admin/overview/page.js",
+  "/dashboard/admin/sent/page": "app/dashboard/admin/sent/page.js",
   "/dashboard/admin/teams/page": "app/dashboard/admin/teams/page.js",
-  "/dashboard/employee/Inbox/page": "app/dashboard/employee/Inbox/page.js",
-  "/dashboard/employee/MySchedule/page": "app/dashboard/employee/MySchedule/page.js",
+  "/dashboard/manager/People/page": "app/dashboard/manager/People/page.js",
   "/dashboard/manager/TeamInbox/page": "app/dashboard/manager/TeamInbox/page.js",
-  "/dashboard/manager/overview/page": "app/dashboard/manager/overview/page.js"
+  "/dashboard/manager/overview/page": "app/dashboard/manager/overview/page.js",
+  "/page": "app/page.js"
 }

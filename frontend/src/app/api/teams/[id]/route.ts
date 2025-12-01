@@ -8,14 +8,12 @@ import { getSessionUser } from "@/lib/auth"; // optional helper; if absent make 
  *
  * Handlers:
  *  - GET    -> fetch team (with manager + members)
- *  - PUT    -> update team fields and (optionally) replace members
- *  - DELETE -> delete team and its members
+ *  - PUT    -> update team fields and (optionally) replace members (keeps chat members in sync)
+ *  - DELETE -> delete team and its members (attempts to cleanup related chat)
  *
  * Notes:
  *  - In App Router handlers the `params` argument can be a Promise; always `await params`.
- *  - This file is defensive: when attempting to update optional UI fields (featured/gradient/projects/completion)
- *    it will retry the update without those fields if Prisma raises an "Unknown argument" validation error
- *    (useful when your Prisma schema doesn't have those columns yet).
+ *  - Defensive: when Prisma doesn't have optional UI fields, it retries without them.
  */
 
 /* ----------------- Helpers ----------------- */
@@ -26,7 +24,7 @@ function jsonError(message: string, status = 400) {
 async function resolveSessionOrganizationId(req: Request): Promise<string | null> {
   try {
     if (typeof getSessionUser === "function") {
-      const session = await getSessionUser(req).catch(() => null);
+      const session = await (getSessionUser as any)(req).catch(() => null);
       if (session?.organizationId) return String(session.organizationId);
     }
   } catch (e: any) {
@@ -38,6 +36,17 @@ async function resolveSessionOrganizationId(req: Request): Promise<string | null
 
 function isValidId(v: any) {
   return typeof v === "string" && v.trim().length > 0;
+}
+
+/**
+ * Map User.role (Role enum) -> ChatMember.role (ChatRole enum)
+ * ChatRole values: "MEMBER" | "MANAGER" | "ADMIN"
+ * We only assign MANAGER for managers; admins handled separately (admins should not be added as ChatMember in team chats).
+ */
+function mapUserRoleToChatRole(userRole: string | null | undefined) {
+  if (userRole === "MANAGER") return "MANAGER";
+  // other roles (ADMIN, EMPLOYEE) map to MEMBER for chat membership purposes; ADMIN will be handled specially
+  return "MEMBER";
 }
 
 /* ---------- GET /api/teams/:id ---------- */
@@ -287,6 +296,142 @@ export async function PUT(req: Request, context: { params: Promise<{ id?: string
       updatedAt: (teamFull as any).updatedAt?.toISOString?.() ?? null,
     };
 
+    // -----------------------------
+    // CHAT SYNC (best-effort): if the team has a group chat, sync chat members to match team membership
+    // -----------------------------
+    (async () => {
+      try {
+        if (!(prisma as any).chat || !(prisma as any).chatMember) {
+          // Chat model not present; nothing to do
+          return;
+        }
+
+        // find chat for this team (assumes chat.teamId relation exists)
+        const teamChat = await (prisma as any).chat.findFirst({
+          where: { teamId: id },
+          select: { id: true, organizationId: true, name: true },
+        });
+
+        if (!teamChat) {
+          // no chat for this team; nothing to sync
+          return;
+        }
+
+        const chatId = teamChat.id;
+
+        // Build the intended set of userIds for the chat: manager + members (do NOT include org admins)
+        const intended = new Set<string>();
+        if (teamFull.manager?.id) intended.add(teamFull.manager.id);
+        for (const m of teamFull.members ?? []) {
+          if (m.userId) intended.add(m.userId);
+        }
+
+        // fetch existing chat members (include role so we can handle admin rows)
+        const existingChatMembers = await (prisma as any).chatMember.findMany({
+          where: { chatId },
+          select: { id: true, userId: true, role: true },
+        });
+
+        // Enforce invariant: admins should not be present in ChatMember for team chats.
+        const adminRows = existingChatMembers.filter((cm: any) => String(cm.role).toUpperCase() === "ADMIN");
+        if (adminRows.length > 0) {
+          const adminRowIds = adminRows.map((r: any) => r.id);
+          try {
+            await (prisma as any).chatMember.deleteMany({ where: { id: { in: adminRowIds } } });
+            // emit removal events for admins removed (best-effort)
+            try {
+              const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+              if (io && typeof io.to === "function") {
+                for (const r of adminRows) {
+                  io.to(`user:${r.userId}`).emit("chat:member:removed", { chatId, userId: r.userId });
+                }
+               io.to(`chat:${chatId}`).emit("chat:member:list:updated", { chatId });
+
+              }
+            } catch (e) {
+              // ignore emit failures
+            }
+          } catch (e) {
+            console.warn("[api/teams] failed to remove admin ChatMember rows (non-fatal):", e);
+          }
+        }
+
+        const existingUserIds = new Set(existingChatMembers.map((cm: any) => cm.userId));
+
+        // Determine additions and removals (after admin cleanup)
+        const toAdd = Array.from(intended).filter((uid) => !existingUserIds.has(uid));
+        const toRemove = existingChatMembers.filter((cm: any) => !intended.has(cm.userId));
+
+        // Remove chat members that are no longer part of the team
+        if (toRemove.length > 0) {
+          const removeIds = toRemove.map((r: any) => r.id);
+          await (prisma as any).chatMember.deleteMany({ where: { id: { in: removeIds } } });
+          // emit removed events
+          try {
+            const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+            if (io && typeof io.to === "function") {
+              for (const r of toRemove) {
+                io.to(`user:${r.userId}`).emit("chat:member:removed", { chatId, userId: r.userId });
+              }
+              io.to(`chat:${chatId}`).emit("chat:member:list:updated", { chatId });
+            }
+          } catch (e) {
+            console.warn("[api/teams] chat:member:removed emit failed:", e);
+          }
+        }
+
+        // Add new chat members (skip org admins)
+        if (toAdd.length > 0) {
+          // Filter out org admins from toAdd (admins should not be chat members)
+          const usersForAdd = await prisma.user.findMany({
+            where: { id: { in: toAdd } },
+            select: { id: true, role: true },
+          });
+
+          const filteredUsersForAdd = usersForAdd.filter((u) => String(u.role).toUpperCase() !== "ADMIN");
+
+          const chatMemberRows = filteredUsersForAdd.map((u) => ({
+            chatId,
+            userId: u.id,
+            role: mapUserRoleToChatRole(u.role),
+          }));
+
+          if (chatMemberRows.length > 0) {
+            await (prisma as any).chatMember.createMany({ data: chatMemberRows, skipDuplicates: true });
+          }
+
+          // emit added events
+          try {
+            const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+            if (io && typeof io.to === "function") {
+              for (const u of filteredUsersForAdd) {
+                io.to(`user:${u.id}`).emit("chat:member:added", { chatId, user: { id: u.id, role: mapUserRoleToChatRole(u.role) } });
+              }
+              io.to(`chat:${chatId}`).emit("chat:member:list:updated", { chatId });
+            }
+          } catch (e) {
+            console.warn("[api/teams] chat:member:added emit failed:", e);
+          }
+        }
+      } catch (syncErr) {
+        console.warn("[api/teams] chat sync failed (non-fatal):", syncErr);
+      }
+    })();
+
+    // Emit team updated event to org room (best-effort)
+    (async () => {
+      try {
+        const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+        if (io && typeof io.to === "function") {
+          io.to(`org:${response.organizationId}`).emit("team:updated", { team: response });
+        } else if (io && typeof io.emit === "function") {
+          io.emit("team:updated", { team: response });
+        }
+      } catch (e) {
+        console.warn("[api/teams] team:updated emit failed:", e);
+      }
+    })();
+
     return NextResponse.json({ ok: true, team: response }, { status: 200 });
   } catch (err: any) {
     console.error("[api/teams/[id]][PUT] error:", err);
@@ -309,10 +454,74 @@ export async function DELETE(req: Request, context: { params: Promise<{ id?: str
     if (sessionOrg && team.organizationId !== sessionOrg) return jsonError("Unauthorized for this organization", 403);
 
     // Delete members then team to avoid FK problems
-    await prisma.$transaction(async (tx) => {
-      await tx.teamMember.deleteMany({ where: { teamId: id } });
-      await tx.team.delete({ where: { id } });
-    });
+  // Delete members then team to avoid FK problems (idempotent)
+try {
+  const txResult = await prisma.$transaction(async (tx) => {
+    // remove team members (safe)
+    await tx.teamMember.deleteMany({ where: { teamId: id } });
+
+    // attempt to delete the team without throwing if already missing
+    const deleted = await tx.team.deleteMany({ where: { id } });
+    return { deletedCount: deleted.count ?? 0 };
+  });
+
+  if ((txResult?.deletedCount ?? 0) === 0) {
+    // Team was not present (already deleted) -> return 404 to the client
+    return jsonError("Team not found", 404);
+  }
+} catch (e) {
+  // if anything unexpected happens, log and propagate to outer handler
+  console.error("[api/teams/[id]][DELETE] transaction failed:", e);
+  throw e;
+}
+
+
+    // best-effort: cleanup or archive the related chat for this team
+    (async () => {
+      try {
+        if ((prisma as any).chat) {
+          const teamChat = await (prisma as any).chat.findFirst({ where: { teamId: id }, select: { id: true } });
+          if (teamChat) {
+            // try delete chat members and chat itself (non-fatal)
+            try {
+              if ((prisma as any).chatMember) {
+                await (prisma as any).chatMember.deleteMany({ where: { chatId: teamChat.id } });
+              }
+            } catch (e) {
+              console.warn("[api/teams] cleaning chat members failed:", e);
+            }
+            try {
+              // if schema supports "archived" field prefer archiving instead of delete
+              if ((prisma as any).chat.update) {
+                // attempt archive if field exists
+                try {
+                  await (prisma as any).chat.update({ where: { id: teamChat.id }, data: { archived: true } });
+                } catch (e) {
+                  // no archived field — fallback to delete
+                  await (prisma as any).chat.delete({ where: { id: teamChat.id } });
+                }
+              }
+            } catch (e) {
+              console.warn("[api/teams] deleting/archiving chat failed:", e);
+            }
+            // emit removal event
+            try {
+              const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+              if (io && typeof io.to === "function") {
+                io.to(`org:${team.organizationId}`).emit("team:deleted", { teamId: id, chatId: teamChat.id });
+                io.to(`chat:${teamChat.id}`).emit("chat:archived", { chatId: teamChat.id });
+              } else if (io && typeof io.emit === "function") {
+                io.emit("team:deleted", { teamId: id, chatId: teamChat.id });
+              }
+            } catch (e) {
+              console.warn("[api/teams] emit after chat cleanup failed:", e);
+            }
+          }
+        }
+      } catch (cleanupErr) {
+        console.warn("[api/teams] best-effort chat cleanup failed:", cleanupErr);
+      }
+    })();
 
     return NextResponse.json({ ok: true, message: "Team deleted" }, { status: 200 });
   } catch (err: any) {

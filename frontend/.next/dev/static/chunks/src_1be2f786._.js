@@ -2,6 +2,7 @@
 "[project]/src/lib/socketClient.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/lib/socketClient.ts
 __turbopack_context__.s([
     "default",
     ()=>__TURBOPACK__default__export__
@@ -9,20 +10,22 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/socket.io-client/build/esm/index.js [app-client] (ecmascript) <locals>");
 ;
-let socket = null;
-function getSocket() {
-    if (!socket) {
-        socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_SOCKET_URL || "", {
-            path: "/api/socketio",
-            autoConnect: true,
-            transports: [
-                "websocket"
-            ]
-        });
-    }
-    return socket;
-}
-const __TURBOPACK__default__export__ = getSocket();
+const SOCKET_URL = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4001";
+const socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(SOCKET_URL, {
+    path: "/api/socketio",
+    transports: [
+        "websocket"
+    ],
+    autoConnect: true
+});
+// Debug logs (optional but VERY useful)
+socket.on("connect", ()=>{
+    console.log("Socket connected:", socket.id);
+});
+socket.on("disconnect", ()=>{
+    console.log("Socket disconnected");
+});
+const __TURBOPACK__default__export__ = socket;
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

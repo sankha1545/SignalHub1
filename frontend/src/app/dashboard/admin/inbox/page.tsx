@@ -1,222 +1,186 @@
-// src/app/dashboard/admin/inbox/page.tsx
+// src/app/dashboard/manager/TeamInbox/page.tsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Search,
-  Star,
-  Mail,
-  MailOpen,
-  Clock,
-  Paperclip,
+  Users,
   Inbox as InboxIcon,
-  Tag,
+  Clock,
+  UserCheck,
+  MailOpen,
+  MoreVertical,
   User,
 } from "lucide-react";
-import socketClient from "@/lib/socketClient";
+import { useChatSocket } from "@/app/dashboard/ChatSocketProvider";
 
 // Dynamically import the TeamChat and ChatList components (client-only UI)
 const TeamChat = dynamic(() => import("@/components/chat/TeamChat").then((m) => m.default), { ssr: false });
 const ChatList = dynamic(() => import("@/components/chat/ChatList").then((m) => m.default), { ssr: false });
 
-/* ============================
-   Types
-   ============================ */
 type ChatSummary = {
   id: string;
   name: string;
-  type?: string;
+  type?: "team" | "direct";
+  teamId?: string | null;
   lastMessagePreview?: string | null;
   unreadCount?: number;
-  teamId?: string | null;
-};
-
-type Message = {
-  id: string | number;
-  senderId?: string;
-  senderName?: string;
-  content: string;
-  createdAt: string;
   meta?: any;
 };
 
-/* ============================
-   Reusable UI pieces (kept from original)
-   ============================ */
+type User = { id: string; name?: string | null; email?: string | null; role?: string | null };
 
-const IconButton: React.FC<{ children: React.ReactNode; ariaLabel?: string; title?: string }> = ({ children, ariaLabel, title }) => (
+const IconButton: React.FC<{ children: React.ReactNode; ariaLabel?: string; title?: string; onClick?: (e: React.MouseEvent) => void }> = ({
+  children,
+  ariaLabel,
+  title,
+  onClick,
+}) => (
   <button
     type="button"
     aria-label={ariaLabel}
     title={title}
+    onClick={onClick}
     className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200"
   >
     {children}
   </button>
 );
 
-/* MessageCard adapted to display chat previews */
-const MessageCard: React.FC<{
-  chat: ChatSummary;
-  isSelected: boolean;
-  onSelect: () => void;
-  delay?: number;
-}> = ({ chat, isSelected, onSelect, delay = 0 }) => {
-  const [hover, setHover] = useState(false);
-
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onClick={onSelect}
-      tabIndex={0}
-      role="button"
-      aria-pressed={isSelected}
-      className={`relative p-3 rounded-xl border transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-        isSelected ? "bg-blue-50 border-blue-200 shadow-md" : "bg-white border-slate-200 hover:border-blue-200 hover:shadow-sm"
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-slate-200 to-slate-300`}>
-          <User className="w-5 h-5 text-slate-600" />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <div className="flex items-center gap-2 min-w-0">
-              <h3 className={`text-sm truncate font-medium text-slate-800`} title={chat.name}>
-                {chat.name}
-              </h3>
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0 text-xs text-slate-400">
-              <Clock className="w-3 h-3" />
-              <span>{chat.lastMessagePreview ? "" : ""}</span>
-            </div>
-          </div>
-
-          <h4 className="text-sm mb-1 truncate text-slate-600" title={chat.lastMessagePreview ?? ""}>
-            {chat.lastMessagePreview ?? "No messages yet"}
-          </h4>
-
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              {/* placeholder for labels or badges */}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              {chat.unreadCount ? <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">{chat.unreadCount}</span> : null}
-            </div>
-          </div>
-        </div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: hover ? 1 : 0 }} className="flex items-center gap-1">
-          <IconButton ariaLabel="More" title="More">
-            <Mail className="w-4 h-4" />
-          </IconButton>
-        </motion.div>
-      </div>
-    </motion.article>
-  );
-};
-
-/* ============================
-   Main Admin Inbox Page
-   ============================ */
-
-export default function InboxPage(): JSX.Element {
+export default function TeamInboxPage(): JSX.Element {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "unread" | "starred">("all");
-  const [chats, setChats] = useState<ChatSummary[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "assigned" | "unassigned" | "flagged">("all");
 
-  // Fetch chats visible to the admin (should return group chats for all teams + any direct chats)
+  const [chats, setChats] = useState<ChatSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // socket provider
+  const chatSocket = useChatSocket();
+
   async function loadChats() {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/chats", { credentials: "same-origin" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const j = await res.json();
-      const payload = (j?.chats ?? []) as ChatSummary[];
+      const json = await res.json();
+      const payload = (json?.chats ?? []) as ChatSummary[];
       setChats(payload);
-      // if nothing selected, pick first chat
       if (!selectedChatId && payload.length > 0) setSelectedChatId(payload[0].id);
     } catch (err: any) {
       console.warn("Failed to load chats:", err);
       setError("Could not load chats");
+      setChats([]);
     } finally {
       setLoading(false);
     }
   }
 
+  async function loadCurrentUser() {
+    try {
+      const res = await fetch("/api/me", { credentials: "same-origin" });
+      if (!res.ok) return;
+      const j = await res.json();
+      if (j?.user) setCurrentUser(j.user);
+    } catch (e) {
+      // ignore
+    }
+  }
+
   useEffect(() => {
+    loadCurrentUser();
     loadChats();
 
-    // socket: listen for team/chat creation and new messages (admin monitors everything)
+    const handleTeamCreated = (payload: any) => {
+      const newChat = payload?.chat ?? (payload?.team ? { id: payload.team.id, name: payload.team.name, teamId: payload.team.id } : null);
+      if (!newChat) return;
+      setChats((prev) => {
+        if (prev.find((c) => c.id === newChat.id)) return prev;
+        return [{ id: newChat.id, name: newChat.name ?? `Team ${newChat.teamId ?? ""}`, type: "team", teamId: newChat.teamId ?? null, lastMessagePreview: null, unreadCount: 0 }, ...prev];
+      });
+    };
+
+    const handleChatMessage = (payload: any) => {
+      const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
+      if (!chatId) return;
+      const text = payload?.message?.content ?? "";
+      setChats((prev) =>
+        prev.map((c) => {
+          if (c.id !== chatId) return c;
+          return {
+            ...c,
+            lastMessagePreview: text.length > 120 ? text.slice(0, 120) + "…" : text,
+            unreadCount: (c.unreadCount ?? 0) + 1,
+          };
+        })
+      );
+    };
+
     try {
-      if (socketClient && typeof socketClient.on === "function") {
-        const onTeamCreated = (payload: any) => {
-          // payload.chat or payload.team may be present
-          const chat = payload?.chat ? payload.chat : payload?.team ? { id: `team-${payload.team.id}`, name: payload.team.name } : null;
-          if (chat) {
-            setChats((prev) => {
-              const exists = prev.find((c) => c.id === chat.id);
-              if (exists) return prev;
-              return [ { id: chat.id, name: chat.name, lastMessagePreview: null, unreadCount: 0, teamId: payload?.team?.id ?? null }, ...prev ];
-            });
-          } else if (payload?.team) {
-            // if server emitted team but not chat, create a stub using team id
-            const stubId = `team-${payload.team.id}`;
-            setChats((prev) => {
-              const exists = prev.find((c) => c.id === stubId);
-              if (exists) return prev;
-              return [{ id: stubId, name: payload.team.name ?? `Team ${payload.team.id}`, lastMessagePreview: null, unreadCount: 0, teamId: payload.team.id }, ...prev];
-            });
-          }
-        };
-
-        const onMessage = (payload: any) => {
-          // payload: { chatId, message }
-          const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
-          if (!chatId) return;
-          setChats((prev) =>
-            prev.map((c) => {
-              if (c.id !== chatId) return c;
-              return {
-                ...c,
-                lastMessagePreview: payload?.message?.content ? (payload.message.content.length > 120 ? payload.message.content.slice(0, 120) + "…" : payload.message.content) : c.lastMessagePreview,
-                unreadCount: (typeof c.unreadCount === "number" ? c.unreadCount + 1 : 1),
-              };
-            })
-          );
-        };
-
-        socketClient.on("team:created", onTeamCreated);
-        socketClient.on("message", onMessage);
-
-        return () => {
-          socketClient.off("team:created", onTeamCreated);
-          socketClient.off("message", onMessage);
-        };
-      }
-    } catch (err) {
-      console.warn("Socket client not available:", err);
+      chatSocket.on("team:created", handleTeamCreated);
+      chatSocket.on("chat:message", handleChatMessage);
+    } catch (e) {
+      // non-fatal
+      console.warn("chatSocket hook registration failed:", e);
     }
-  }, []);
+
+    return () => {
+      try {
+        chatSocket.off("team:created", handleTeamCreated);
+        chatSocket.off("chat:message", handleChatMessage);
+      } catch {}
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatSocket]);
+
+  // join selected chat and persist read
+  useEffect(() => {
+    if (!selectedChatId) return;
+    (async () => {
+      try {
+        if (chatSocket && typeof chatSocket.joinChat === "function") {
+          await chatSocket.joinChat(selectedChatId);
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // clear unread locally for immediate feedback
+      setChats((prev) => prev.map((c) => (c.id === selectedChatId ? { ...c, unreadCount: 0 } : c)));
+
+      // persist read
+      try {
+        await fetch(`/api/chats/${encodeURIComponent(selectedChatId)}/read`, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (err) {
+        console.warn("Failed to persist read state:", err);
+      }
+    })();
+
+    return () => {
+      (async () => {
+        try {
+          if (chatSocket && typeof chatSocket.leaveChat === "function") {
+            await chatSocket.leaveChat(selectedChatId);
+          }
+        } catch {}
+      })();
+    };
+  }, [selectedChatId, chatSocket]);
 
   const filteredChats = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return chats.filter((c) => {
       const matchesSearch = q === "" || c.name.toLowerCase().includes(q) || (c.lastMessagePreview ?? "").toLowerCase().includes(q);
-      const matchesFilter = filter === "all" || (filter === "unread" && (c.unreadCount ?? 0) > 0) || (filter === "starred" && false);
+      const matchesFilter = filter === "all"; // expand filter logic as needed
       return matchesSearch && matchesFilter;
     });
   }, [chats, searchQuery, filter]);
@@ -225,27 +189,43 @@ export default function InboxPage(): JSX.Element {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* header */}
-        <header className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-bold">Admin Inbox</h1>
-            {unreadCount > 0 && (
-              <div className="px-3 py-1 bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-bold rounded-full shadow-lg">
-                {unreadCount}
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                Team Inbox
+              </h1>
+
+              {unreadCount > 0 && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="px-3 py-1 bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-bold rounded-full shadow-lg">
+                  {unreadCount}
+                </motion.div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Users className="w-4 h-4" />
+                <span>Team view</span>
               </div>
-            )}
+
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <UserCheck className="w-4 h-4" />
+                <span>{/* assignedCount placeholder */} assigned</span>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <MailOpen className="w-4 h-4" />
+                <span>{/* totalCount placeholder */} total</span>
+              </div>
+            </div>
           </div>
 
-          <p className="text-sm text-slate-500 flex items-center gap-2">
-            <InboxIcon className="w-4 h-4" />
-            Monitor team chats across your organization
-          </p>
+          <p className="text-sm text-slate-500 mt-2">Manage incoming customer messages for your team. Use the left pane to pick a team or direct thread.</p>
         </header>
 
-        {/* layout: left pane = chat list, right pane = chat viewer */}
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-[360px_1fr]">
-          {/* left: chat list + controls */}
           <div className="p-4 border-b lg:border-b-0 lg:border-r border-slate-200">
             <div className="space-y-3">
               <div className="relative">
@@ -261,24 +241,10 @@ export default function InboxPage(): JSX.Element {
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFilter("all")}
-                  className={`px-3 py-2 rounded-xl text-sm ${filter === "all" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setFilter("unread")}
-                  className={`px-3 py-2 rounded-xl text-sm ${filter === "unread" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}
-                >
-                  Unread
-                </button>
-                <button
-                  onClick={() => setFilter("starred")}
-                  className={`px-3 py-2 rounded-xl text-sm ${filter === "starred" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}
-                >
-                  Starred
-                </button>
+                <button onClick={() => setFilter("all")} className={`px-3 py-2 rounded-xl text-sm ${filter === "all" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>All</button>
+                <button onClick={() => setFilter("assigned")} className={`px-3 py-2 rounded-xl text-sm ${filter === "assigned" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>Assigned</button>
+                <button onClick={() => setFilter("unassigned")} className={`px-3 py-2 rounded-xl text-sm ${filter === "unassigned" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>Unassigned</button>
+                <button onClick={() => setFilter("flagged")} className={`px-3 py-2 rounded-xl text-sm ${filter === "flagged" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>Flagged</button>
               </div>
 
               <div className="text-xs text-slate-500">Chats</div>
@@ -291,37 +257,54 @@ export default function InboxPage(): JSX.Element {
                 ) : filteredChats.length === 0 ? (
                   <div className="py-8 text-center text-sm text-slate-500">
                     No chats found — invite users or create a team to start a chat.
+                    <div className="mt-3">
+                      <a href="/dashboard/manager/overview" className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-sm">
+                        Create a team or invite members
+                      </a>
+                    </div>
                   </div>
                 ) : (
                   filteredChats.map((c, idx) => (
-                    <MessageCard
-                      key={c.id}
-                      chat={c}
-                      isSelected={selectedChatId === c.id}
-                      onSelect={() => setSelectedChatId(c.id)}
-                      delay={idx * 0.03}
-                    />
+                    <div key={c.id} className="transition-all">
+                      <div
+                        onClick={() => setSelectedChatId(c.id)}
+                        role="button"
+                        tabIndex={0}
+                        className={`p-3 rounded-xl border cursor-pointer mb-2 ${selectedChatId === c.id ? "bg-blue-50 border-blue-200 shadow-md" : "bg-white border-slate-200 hover:border-blue-200"}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300">
+                            <User className="w-5 h-5 text-slate-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-sm font-medium text-slate-800 truncate">{c.name}</h3>
+                              <div className="text-xs text-slate-400"><Clock className="w-3 h-3 inline" /></div>
+                            </div>
+                            <p className="text-xs text-slate-600 truncate">{c.lastMessagePreview ?? "No messages yet"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))
                 )}
               </div>
             </div>
           </div>
 
-          {/* right: viewer */}
           <div className="p-4 min-h-[60vh]">
             {selectedChatId ? (
-              // TeamChat expects props: chatId and currentUser; we supply chatId and let TeamChat fetch message history itself
               <div className="h-full rounded-md border border-slate-100 overflow-hidden">
-                {/* @ts-ignore - TeamChat is loaded client-side dynamically */}
-                <TeamChat chatId={selectedChatId} currentUser={{ /* admin context resolved by TeamChat via /api/me too */ }} />
+                {/* @ts-ignore */}
+                <TeamChat chatId={selectedChatId} currentUser={currentUser ?? { id: "me" }} />
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center text-slate-500">
                 <div className="w-20 h-20 mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                   <InboxIcon className="w-8 h-8 text-slate-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-1">Select a chat to begin monitoring</h3>
-                <p className="text-sm">Select a team chat on the left, or create a team to generate a new chat.</p>
+                <h3 className="text-lg font-semibold text-slate-800 mb-1">Select a chat to begin</h3>
+                <p className="text-sm">Pick a team group chat or a direct thread to start messaging.</p>
               </div>
             )}
           </div>

@@ -7,23 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Star,
-  Archive,
-  Trash2,
   MoreVertical,
-  Mail,
-  MailOpen,
   Clock,
-  Paperclip,
   Inbox as InboxIcon,
-  Tag,
   User,
   Users,
-  CheckCircle2,
-  Calendar,
   UserCheck,
-  MessageCircle,
 } from "lucide-react";
-import socketClient from "@/lib/socketClient";
+import { useChatSocket } from "@/app/dashboard/ChatSocketProvider";
 
 /* ============================
    Dynamic imports (client only)
@@ -33,23 +24,7 @@ const TeamChat = dynamic(() => import("@/components/chat/TeamChat").then((m) => 
 /* ============================
    Types
    ============================ */
-type Label = { text: string; colorClass: string } | null;
-type Channel = "Email" | "SMS" | "WhatsApp" | "In-App";
-type TeamMessage = {
-  id: number | string;
-  customer: string;
-  subject: string;
-  preview: string;
-  time: string;
-  unread: boolean;
-  starred: boolean;
-  hasAttachment: boolean;
-  label: Label;
-  channel: Channel;
-  assignedTo?: string | null;
-  responded: boolean;
-  slaDue?: string;
-};
+type FilterKey = "all" | "assigned" | "unassigned" | "flagged";
 
 type ChatSummary = {
   id: string;
@@ -60,6 +35,8 @@ type ChatSummary = {
   unreadCount?: number;
   meta?: any;
 };
+
+type MinimalUser = { id: string; role?: string; name?: string; email?: string; organizationId?: string | null };
 
 /* ============================
    Small reusable IconButton
@@ -84,7 +61,6 @@ const IconButton: React.FC<{
 /* ============================
    Filter Buttons
    ============================ */
-type FilterKey = "all" | "assigned" | "unassigned" | "flagged";
 const FilterButtons: React.FC<{ active: FilterKey; onChange: (v: FilterKey) => void }> = ({ active, onChange }) => {
   const items: { key: FilterKey; label: string; Icon?: React.ComponentType<any> }[] = [
     { key: "all", label: "All" },
@@ -202,11 +178,6 @@ const MessageCard: React.FC<{
 };
 
 /* ============================
-   Helper SLA icon
-   ============================ */
-const AlertSlaIcon: React.FC = () => <CheckCircle2 className="w-3 h-3 text-rose-600" />;
-
-/* ============================
    Main Manager TeamInbox Page
    ============================ */
 export default function TeamInboxPage(): JSX.Element {
@@ -220,56 +191,11 @@ export default function TeamInboxPage(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // local fallbacks — keep your original mock messages so page still works if /api isn't wired yet
-  const fallbackMessages = useMemo<TeamMessage[]>(
-    () => [
-      {
-        id: 101,
-        customer: "Nisha Patel",
-        subject: "Payment failed — need help",
-        preview: "I tried to add my card and the payment keeps failing with error code 402...",
-        time: "5m ago",
-        unread: true,
-        starred: false,
-        hasAttachment: false,
-        label: { text: "Billing", colorClass: "bg-amber-50 text-amber-700" },
-        channel: "Email",
-        assignedTo: "Ravi Kumar",
-        responded: false,
-        slaDue: "in 25m",
-      },
-      {
-        id: 102,
-        customer: "Thomas Green",
-        subject: "Unable to login via app",
-        preview: "App crashes on startup after the latest update — Android 13. Repro steps attached.",
-        time: "12m ago",
-        unread: true,
-        starred: true,
-        hasAttachment: true,
-        label: { text: "Support", colorClass: "bg-blue-50 text-blue-700" },
-        channel: "In-App",
-        assignedTo: null,
-        responded: false,
-        slaDue: "in 1h",
-      },
-      {
-        id: 103,
-        customer: "Aisha Mohammed",
-        subject: "Request: Feature X for reports",
-        preview: "Would love a filter to export only paid invoices — it's blocking our month-end process.",
-        time: "2h ago",
-        unread: false,
-        starred: false,
-        hasAttachment: false,
-        label: { text: "Feature", colorClass: "bg-cyan-50 text-cyan-700" },
-        channel: "WhatsApp",
-        assignedTo: "Meera Singh",
-        responded: true,
-      },
-    ],
-    []
-  );
+  // current user (for TeamChat)
+  const [currentUser, setCurrentUser] = useState<MinimalUser | null>(null);
+
+  // use chat socket provider
+  const chatSocket = useChatSocket();
 
   // load chats (manager relevant) from API
   async function loadChats() {
@@ -285,58 +211,116 @@ export default function TeamInboxPage(): JSX.Element {
     } catch (err: any) {
       console.warn("Failed to load chats:", err);
       setError("Could not load chats");
-      // keep UI usable with fallback messages by clearing chats so old UI shows fallback
       setChats([]);
     } finally {
       setLoading(false);
     }
   }
 
+  // load current user
+  async function loadMe() {
+    try {
+      const res = await fetch("/api/me", { credentials: "include" });
+      if (!res.ok) {
+        setCurrentUser(null);
+        return;
+      }
+      const j = await res.json().catch(() => ({}));
+      const u = j?.user ?? j ?? null;
+      if (u && u.id) {
+        setCurrentUser({ id: String(u.id), role: u.role ?? u?.role ?? null, name: u.name ?? null, email: u.email ?? null, organizationId: u.organizationId ?? null });
+      } else {
+        setCurrentUser(null);
+      }
+    } catch (e) {
+      console.warn("Failed to load /api/me:", e);
+      setCurrentUser(null);
+    }
+  }
+
   useEffect(() => {
+    loadMe();
     loadChats();
 
-    // socket handlers for real-time updates (only for manager's relevant chats)
+    // subscribe to socket events via provider
+    const handleTeamCreated = (payload: any) => {
+      const newChat = payload?.chat ?? (payload?.team ? { id: payload.team.id, name: payload.team.name, teamId: payload.team.id } : null);
+      if (!newChat) return;
+      setChats((prev) => {
+        if (prev.find((c) => c.id === newChat.id)) return prev;
+        const inserted: ChatSummary = {
+          id: newChat.id,
+          name: newChat.name ?? `Team ${newChat.teamId ?? ""}`,
+          type: "team",
+          teamId: newChat.teamId ?? null,
+          lastMessagePreview: null,
+          unreadCount: 0,
+        };
+        return [inserted, ...prev];
+      });
+    };
+
+    const handleChatMessage = (payload: any) => {
+      const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
+      if (!chatId) return;
+
+      setChats((prev) =>
+        prev.map((c) => {
+          if (c.id !== chatId) return c;
+          const text = payload?.message?.content ?? "";
+          return {
+            ...c,
+            lastMessagePreview: text.length > 120 ? text.slice(0, 120) + "…" : text,
+            unreadCount: (c.unreadCount ?? 0) + 1,
+          };
+        })
+      );
+    };
+
     try {
-      if (socketClient && typeof socketClient.on === "function") {
-        const onTeamCreated = (payload: any) => {
-          // payload.chat or payload.team may be present
-          const chat = payload?.chat ? payload.chat : payload?.team ? { id: `team-${payload.team.id}`, name: payload.team.name } : null;
-          if (chat) {
-            setChats((prev) => {
-              const exists = prev.find((c) => c.id === chat.id);
-              if (exists) return prev;
-              return [{ id: chat.id, name: chat.name, type: "team", lastMessagePreview: null, unreadCount: 0, teamId: payload?.team?.id ?? null }, ...prev];
-            });
-          }
-        };
-
-        const onMessage = (payload: any) => {
-          const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
-          if (!chatId) return;
-          setChats((prev) =>
-            prev.map((c) => {
-              if (c.id !== chatId) return c;
-              return {
-                ...c,
-                lastMessagePreview: payload?.message?.content ? (payload.message.content.length > 120 ? payload.message.content.slice(0, 120) + "…" : payload.message.content) : c.lastMessagePreview,
-                unreadCount: (typeof c.unreadCount === "number" ? c.unreadCount + 1 : 1),
-              };
-            })
-          );
-        };
-
-        socketClient.on("team:created", onTeamCreated);
-        socketClient.on("message", onMessage);
-
-        return () => {
-          socketClient.off("team:created", onTeamCreated);
-          socketClient.off("message", onMessage);
-        };
-      }
-    } catch (err) {
-      console.warn("Socket client not available:", err);
+      chatSocket.on("team:created", handleTeamCreated);
+      chatSocket.on("chat:message", handleChatMessage);
+    } catch (e) {
+      // non-fatal
+      // eslint-disable-next-line no-console
+      console.warn("chatSocket hook registration failed:", e);
     }
-  }, []);
+
+    // cleanup
+    return () => {
+      try {
+        chatSocket.off("team:created", handleTeamCreated);
+        chatSocket.off("chat:message", handleChatMessage);
+      } catch {}
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatSocket]);
+
+  // join selected chat room when selectedChatId changes
+  useEffect(() => {
+    if (!selectedChatId) return;
+
+    // join selected chat room
+    (async () => {
+      try {
+        await chatSocket.joinChat(selectedChatId);
+      } catch (e) {
+        // ignore
+      }
+    })();
+
+    // clear unread count locally for this chat (optionally call API to persist)
+    setChats((prev) => prev.map((c) => (c.id === selectedChatId ? { ...c, unreadCount: 0 } : c)));
+
+    // leave previous chat handled by joinChat calls — if you want to leave others, implement tracking
+    return () => {
+      (async () => {
+        try {
+          await chatSocket.leaveChat(selectedChatId);
+        } catch {}
+      })();
+    };
+  }, [selectedChatId, chatSocket]);
 
   // search + filter
   const filteredChats = useMemo(() => {
@@ -354,13 +338,12 @@ export default function TeamInboxPage(): JSX.Element {
 
   const unreadCount = chats.reduce((acc, c) => acc + (c.unreadCount ?? 0), 0);
 
-  // action handlers (stubs to preserve original API hooks)
-  const handleArchive = (id: TeamMessage["id"]) => {
+  const handleArchive = (id: string) => {
     console.log("Archive", id);
     // TODO: call API
   };
 
-  const handleDelete = (id: TeamMessage["id"]) => {
+  const handleDelete = (id: string) => {
     console.log("Delete", id);
     // TODO: confirmation + API
   };
@@ -395,15 +378,13 @@ export default function TeamInboxPage(): JSX.Element {
               </div>
 
               <div className="flex items-center gap-2 text-sm text-slate-500">
-                <MailOpen className="w-4 h-4" />
+                <InboxIcon className="w-4 h-4" />
                 <span>{/* totalCount placeholder */} total</span>
               </div>
             </div>
           </div>
 
-          <p className="text-sm text-slate-500 mt-2">
-            Manage incoming customer messages for your team. Use the left pane to pick a team or direct thread.
-          </p>
+          <p className="text-sm text-slate-500 mt-2">Manage incoming customer messages for your team. Use the left pane to pick a team or direct thread.</p>
         </header>
 
         {/* layout: left pane = chat list, right pane = chat viewer (TeamChat) */}
@@ -434,37 +415,15 @@ export default function TeamInboxPage(): JSX.Element {
                   <div className="text-sm text-slate-500">Loading chats…</div>
                 ) : error ? (
                   <div className="text-sm text-rose-600">{error}</div>
-                ) : (filteredChats.length === 0 ? (
-                  // Fallback to original message list if no chats (keeps behavior consistent)
-                  <div className="space-y-3">
-                    {fallbackMessages.map((m, idx) => (
-                      <div key={m.id} className="p-3 rounded-xl border bg-white border-slate-200">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
-                            <User className="w-5 h-5 text-slate-600" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-sm font-medium text-slate-800">{m.customer}</h3>
-                              <span className="text-xs text-slate-400">{m.time}</span>
-                            </div>
-                            <p className="text-xs text-slate-500 line-clamp-2">{m.preview}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                ) : filteredChats.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-slate-500">
+                    No chats found — create a team or start a direct chat to begin.
                   </div>
                 ) : (
                   filteredChats.map((c, idx) => (
-                    <MessageCard
-                      key={c.id}
-                      chat={c}
-                      isSelected={selectedChatId === c.id}
-                      onSelect={() => setSelectedChatId(c.id)}
-                      delay={idx * 0.03}
-                    />
+                    <MessageCard key={c.id} chat={c} isSelected={selectedChatId === c.id} onSelect={() => setSelectedChatId(c.id)} delay={idx * 0.03} />
                   ))
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -473,9 +432,9 @@ export default function TeamInboxPage(): JSX.Element {
           <div className="p-4 min-h-[60vh]">
             {selectedChatId ? (
               <div className="h-full rounded-md border border-slate-100 overflow-hidden">
-                {/* TeamChat will fetch message history for chatId and connect to socket; pass currentUser info via /api/me inside TeamChat */}
+                {/* TeamChat will fetch message history for chatId and connect to socket; pass currentUser so optimistic messages/sender info works */}
                 {/* @ts-ignore */}
-                <TeamChat chatId={selectedChatId} currentUser={{}} />
+                <TeamChat chatId={selectedChatId} currentUser={currentUser ?? { id: "unknown" }} />
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center text-slate-500">

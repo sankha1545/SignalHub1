@@ -92,26 +92,29 @@ module.exports = mod;
 "[project]/src/lib/socketClient.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/lib/socketClient.ts
 __turbopack_context__.s([
     "default",
     ()=>__TURBOPACK__default__export__
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2d$debug$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/socket.io-client/build/esm-debug/index.js [app-ssr] (ecmascript) <locals>");
 ;
-let socket = null;
-function getSocket() {
-    if (!socket) {
-        socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2d$debug$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(process.env.NEXT_PUBLIC_SOCKET_URL || "", {
-            path: "/api/socketio",
-            autoConnect: true,
-            transports: [
-                "websocket"
-            ]
-        });
-    }
-    return socket;
-}
-const __TURBOPACK__default__export__ = getSocket();
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4001";
+const socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2d$debug$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(SOCKET_URL, {
+    path: "/api/socketio",
+    transports: [
+        "websocket"
+    ],
+    autoConnect: true
+});
+// Debug logs (optional but VERY useful)
+socket.on("connect", ()=>{
+    console.log("Socket connected:", socket.id);
+});
+socket.on("disconnect", ()=>{
+    console.log("Socket disconnected");
+});
+const __TURBOPACK__default__export__ = socket;
 }),
 "[project]/src/app/dashboard/admin/inbox/page.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";

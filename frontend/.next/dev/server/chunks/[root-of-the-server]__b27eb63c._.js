@@ -207,7 +207,9 @@ async function getSessionUser(req) {
 // src/app/api/chats/route.ts
 __turbopack_context__.s([
     "GET",
-    ()=>GET
+    ()=>GET,
+    "POST",
+    ()=>POST
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/server.js [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-route] (ecmascript)");
@@ -220,50 +222,157 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
 ;
 ;
 const JWT_SECRET = process.env.JWT_SECRET || "";
-// ---------------- Session Resolver ----------------
-async function resolveSessionUser(req) {
+/* -------------------------------------------------------
+   Helpers
+------------------------------------------------------- */ async function safeJson(req) {
     try {
-        // 1) via your existing auth helper
-        try {
-            const user = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
-            if (user?.id) return user;
-        } catch  {}
-        // 2) bearer token
-        const headerAuth = req.headers.get("authorization") ?? req.headers.get("Authorization");
-        if (headerAuth?.toLowerCase().startsWith("bearer ")) {
-            const token = headerAuth.slice(7).trim();
+        return await req.json();
+    } catch  {
+        return {};
+    }
+}
+/**
+ * Resolve logged-in user from:
+ * 1. next-auth helper
+ * 2. Authorization header
+ * 3. Session cookie
+ */ async function resolveSessionUser(req) {
+    // #1 next-auth
+    try {
+        const u = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
+        if (u?.id) return u;
+    } catch  {}
+    // #2 bearer
+    try {
+        const auth = req.headers.get("authorization") ?? req.headers.get("Authorization");
+        if (auth?.toLowerCase().startsWith("bearer ")) {
+            const token = auth.slice(7).trim();
             if (token && JWT_SECRET) {
                 const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
                 if (payload?.id) return payload;
             }
         }
-        // 3) cookie
-        try {
-            const cookieStore = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["cookies"])();
-            const token = cookieStore.get("session")?.value;
-            if (token && JWT_SECRET) {
-                const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
-                if (payload?.id) return payload;
-            }
-        } catch  {}
-        return null;
-    } catch  {
-        return null;
-    }
+    } catch  {}
+    // #3 cookie
+    try {
+        const store = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["cookies"])();
+        const token = store.get("session")?.value;
+        if (token && JWT_SECRET) {
+            const payload = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
+            if (payload?.id) return payload;
+        }
+    } catch  {}
+    return null;
+}
+/**
+ * Authorize that user can access a team.
+ * ADMIN → always pass
+ * Manager or Member of team → pass
+ */ async function authorizeTeamAccess(userId, userRole, teamId) {
+    if (userRole === "ADMIN") return true;
+    const team = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].team.findUnique({
+        where: {
+            id: teamId
+        },
+        select: {
+            managerId: true
+        }
+    });
+    if (!team) return false;
+    // Is manager?
+    if (team.managerId === userId) return true;
+    // Is team member?
+    const member = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].teamMember.findFirst({
+        where: {
+            teamId,
+            userId
+        },
+        select: {
+            id: true
+        }
+    });
+    return !!member;
+}
+/**
+ * Normalize a chat for frontend use
+ */ function normalizeChat(chat) {
+    return {
+        id: chat.id,
+        name: chat.name ?? (chat.team ? `Team: ${chat.team.name}` : "Chat"),
+        type: chat.type,
+        teamId: chat.teamId ?? null,
+        createdBy: chat.createdBy ? {
+            id: chat.createdBy.id,
+            name: chat.createdBy.name
+        } : null,
+        members: chat.members?.map((m)=>({
+                id: m.user.id,
+                name: m.user.name,
+                email: m.user.email,
+                role: m.role
+            })) ?? [],
+        lastMessageAt: chat.lastMessageAt?.toISOString?.() ?? null,
+        createdAt: chat.createdAt?.toISOString?.() ?? null
+    };
 }
 async function GET(req) {
     try {
         const session = await resolveSessionUser(req);
-        if (!session) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            chats: [],
-            error: "Unauthorized"
-        }, {
-            status: 401
-        });
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Unauthorized",
+                chats: []
+            }, {
+                status: 401
+            });
+        }
         const userId = String(session.id);
-        // 1. Chats where user is a member
-        const membership = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findMany({
+        const url = new URL(req.url);
+        const teamId = url.searchParams.get("teamId");
+        /* ----------------------------------------------
+       TEAM CHAT MODE
+    ---------------------------------------------- */ if (teamId) {
+            const chat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.findFirst({
+                where: {
+                    teamId
+                },
+                include: {
+                    members: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true
+                                }
+                            }
+                        }
+                    },
+                    team: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    },
+                    createdBy: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
+            });
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: true,
+                chat: chat ? normalizeChat(chat) : null
+            }, {
+                status: 200
+            });
+        }
+        /* ----------------------------------------------
+       ALL CHATS FOR THIS USER
+    ---------------------------------------------- */ const membership = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findMany({
             where: {
                 userId
             },
@@ -271,14 +380,13 @@ async function GET(req) {
                 chatId: true
             }
         });
-        const chatIds = membership.map((m)=>m.chatId);
-        if (chatIds.length === 0) {
+        if (membership.length === 0) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: true,
                 chats: []
             });
         }
-        // 2. Fetch chats including member info
+        const chatIds = membership.map((m)=>m.chatId);
         const chats = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.findMany({
             where: {
                 id: {
@@ -287,8 +395,7 @@ async function GET(req) {
             },
             include: {
                 members: {
-                    select: {
-                        role: true,
+                    include: {
                         user: {
                             select: {
                                 id: true,
@@ -315,31 +422,182 @@ async function GET(req) {
                 lastMessageAt: "desc"
             }
         });
-        const normalized = chats.map((c)=>({
-                id: c.id,
-                name: c.name || (c.team ? `Team: ${c.team.name}` : "Chat"),
-                type: c.type,
-                members: c.members.map((m)=>({
-                        id: m.user.id,
-                        name: m.user.name,
-                        email: m.user.email,
-                        role: m.role
-                    })),
-                teamId: c.teamId,
-                createdBy: c.createdBy,
-                lastMessageAt: c.lastMessageAt?.toISOString?.() ?? null,
-                createdAt: c.createdAt?.toISOString?.() ?? null
-            }));
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
-            chats: normalized
+            chats: chats.map(normalizeChat)
         });
     } catch (err) {
         console.error("GET /api/chats error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
-            chats: [],
             error: "Internal Server Error"
+        }, {
+            status: 500
+        });
+    }
+}
+async function POST(req) {
+    try {
+        const session = await resolveSessionUser(req);
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Unauthorized",
+                chat: null
+            }, {
+                status: 401
+            });
+        }
+        const userId = String(session.id);
+        const userRole = session.role ?? null;
+        const body = await safeJson(req);
+        const name = typeof body.name === "string" ? body.name.trim() : undefined;
+        const teamId = typeof body.teamId === "string" ? body.teamId.trim() : undefined;
+        let memberIds = Array.isArray(body.memberIds) ? body.memberIds.filter((x)=>typeof x === "string") : [];
+        /* ----------------------------------------------
+       TEAM CHAT
+    ---------------------------------------------- */ if (teamId) {
+            const team = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].team.findUnique({
+                where: {
+                    id: teamId
+                },
+                select: {
+                    id: true
+                }
+            });
+            if (!team) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: false,
+                    error: "Team not found"
+                }, {
+                    status: 404
+                });
+            }
+            const allowed = await authorizeTeamAccess(userId, userRole, teamId);
+            if (!allowed) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: false,
+                    error: "Forbidden"
+                }, {
+                    status: 403
+                });
+            }
+            const existingTeamChat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.findFirst({
+                where: {
+                    teamId
+                },
+                include: {
+                    members: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true
+                                }
+                            }
+                        }
+                    },
+                    team: true,
+                    createdBy: true
+                }
+            });
+            if (existingTeamChat) {
+                return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                    ok: true,
+                    created: false,
+                    chat: normalizeChat(existingTeamChat)
+                });
+            }
+            const teamMembers = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].teamMember.findMany({
+                where: {
+                    teamId
+                },
+                select: {
+                    userId: true
+                }
+            });
+            memberIds = Array.from(new Set([
+                ...memberIds,
+                userId,
+                ...teamMembers.map((x)=>x.userId)
+            ]));
+        }
+        /* ----------------------------------------------
+       DIRECT CHAT
+    ---------------------------------------------- */ const uniqueMemberIds = Array.from(new Set([
+            ...memberIds,
+            userId
+        ]));
+        const chat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.create({
+            data: {
+                name: name ?? null,
+                type: teamId ? "TEAM" : "DIRECT",
+                organization: {
+                    connect: {
+                        id: session.organizationId
+                    }
+                },
+                team: teamId ? {
+                    connect: {
+                        id: teamId
+                    }
+                } : undefined,
+                createdBy: {
+                    connect: {
+                        id: userId
+                    }
+                },
+                members: {
+                    create: uniqueMemberIds.map((mid)=>({
+                            user: {
+                                connect: {
+                                    id: mid
+                                }
+                            },
+                            role: mid === userId ? "ADMIN" : "MEMBER"
+                        }))
+                }
+            },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                },
+                team: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
+                createdBy: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: true,
+            created: true,
+            chat: normalizeChat(chat)
+        }, {
+            status: 201
+        });
+    } catch (err) {
+        console.error("POST /api/chats error:", err);
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            error: "Internal Server Error",
+            chat: null
         }, {
             status: 500
         });

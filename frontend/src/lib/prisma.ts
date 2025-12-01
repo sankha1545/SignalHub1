@@ -1,5 +1,7 @@
 // lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
+// near the top, before exports
+import "@/lib/socketAdapter";
 
 declare global {
   // eslint-disable-next-line

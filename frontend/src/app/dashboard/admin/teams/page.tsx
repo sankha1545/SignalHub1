@@ -18,6 +18,10 @@ import {
   Target,
   Edit,
   Trash2,
+  MessageSquare,
+  X,
+  Minimize2,
+  Maximize2,
 } from "lucide-react";
 import CreateTeamForm from "@/app/ui/forms/create-team/page";
 import ScheduleMeetingForm from "@/app/ui/forms/Schedule-meeting/page";
@@ -36,10 +40,300 @@ function uidFromTeam(team: any, idx: number) {
   return team?.id ?? `team_tmp_${idx}_${(team?.name ?? "unknown").slice(0, 6)}`;
 }
 
+/* ==================== ChatWidget component ====================
+   - single admin widget instance (one open at a time)
+   - minimized floating panel with Close / Maximize
+   - maximized overlay with full chat + members pane
+   - responsive for small and large screens
+*/
+function ChatWidget({
+  state,
+  onClose,
+  onUpdateState,
+}: {
+  state: { opened: boolean; maximized: boolean; team: any | null } | null;
+  onClose: () => void;
+  onUpdateState: (s: { opened: boolean; maximized: boolean; team: any | null } | null) => void;
+}) {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const team = state?.team ?? null;
+  const opened = !!state?.opened;
+  const maximized = !!state?.maximized;
+
+  // Load recent messages when opened or when maximized/team changes
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      if (!opened || !team) {
+        setMessages([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        // Try API: /api/chats?teamId=...
+        const q = new URLSearchParams({ teamId: team.id });
+        const res = await fetch(`/api/chats?${q.toString()}`, { credentials: "same-origin" });
+        if (res.ok) {
+          const j = await res.json().catch(() => null);
+          // accept several shapes: { ok:true, chats:[{messages:[]}] } or { ok:true, messages: [] }
+          if (j?.ok && Array.isArray(j.chats) && j.chats.length > 0) {
+            const chat = j.chats[0];
+            if (mounted) setMessages((chat.messages ?? []).slice(-200));
+          } else if (j?.ok && Array.isArray(j.messages)) {
+            if (mounted) setMessages(j.messages.slice(-200));
+          } else {
+            // fallback empty
+            if (mounted) setMessages([]);
+          }
+        } else {
+          if (mounted) setMessages([]);
+        }
+      } catch (e) {
+        console.warn("Chat load failed:", e);
+        if (mounted) setMessages([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [opened, team]);
+
+  if (!opened || !team) return null;
+
+  async function sendMessage() {
+    const body = input.trim();
+    if (!body) return;
+    // optimistic append
+    const optimistic = {
+      id: `tmp-${Date.now()}`,
+      body,
+      createdAt: new Date().toISOString(),
+      sender: { id: "admin", name: "You" },
+      direction: "OUTBOUND",
+    };
+    setMessages((m) => [...m, optimistic]);
+    setInput("");
+
+    try {
+      const res = await fetch(`/api/chats`, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teamId: team.id, body }),
+      });
+      if (res.ok) {
+        const j = await res.json().catch(() => null);
+        // if server returns message or messages merge them
+        if (j?.message) {
+          setMessages((m) => [...m.slice(0, -1), j.message]);
+        } else if (Array.isArray(j?.messages)) {
+          setMessages((m) => [...m.slice(0, -1), ...j.messages]);
+        }
+      } else {
+        // try alternative POST to /api/chats/:chatId if team id is used as chatId
+        await fetch(`/api/chats/${encodeURIComponent(team.id)}`, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body }),
+        }).catch(() => null);
+      }
+    } catch (e) {
+      console.warn("send failed:", e);
+    }
+  }
+
+  // UI pieces
+  const MinimizedWidget = (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 12, scale: 0.98 }}
+      className="fixed right-4 bottom-4 z-50 w-80 sm:w-[360px] md:w-96"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white">
+              <MessageSquare className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-medium truncate">{team.name}</div>
+              <div className="text-xs text-slate-500">Team chat</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onUpdateState({ opened: true, maximized: true, team })}
+              title="Maximize"
+              className="p-2 rounded hover:bg-slate-100"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onClose()}
+              title="Close"
+              className="p-2 rounded hover:bg-slate-100"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-3 max-h-48 overflow-auto bg-white">
+          {loading ? (
+            <div className="text-xs text-slate-500">Loading messages…</div>
+          ) : messages.length === 0 ? (
+            <div className="text-xs text-slate-500">No recent messages</div>
+          ) : (
+            <ul className="space-y-2">
+              {messages.slice(-6).map((m, idx) => (
+                <li key={m.id ?? idx} className={`text-sm ${m.direction === "INBOUND" ? "text-slate-700" : "text-right text-slate-800"}`}>
+                  <div className="inline-block max-w-[80%] break-words bg-slate-50 px-3 py-1.5 rounded-md text-xs">
+                    {m.body ?? m.preview ?? m.text}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">{new Date(m.createdAt || Date.now()).toLocaleTimeString()}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="p-3 border-t border-slate-100 bg-white">
+          <div className="flex gap-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              placeholder="Write a message..."
+              className="flex-1 px-3 py-2 rounded-md border border-slate-200 text-sm focus:outline-none"
+            />
+            <button onClick={sendMessage} className="px-3 py-2 rounded-md bg-blue-500 text-white text-sm">Send</button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  const MaximizedOverlay = (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-60 flex items-end sm:items-center justify-center p-4"
+    >
+      <div className="absolute inset-0 bg-black/40" onClick={() => onUpdateState({ opened: true, maximized: false, team })} />
+      <motion.div
+        initial={{ y: 20, scale: 0.98 }}
+        animate={{ y: 0, scale: 1 }}
+        exit={{ y: 12, scale: 0.98 }}
+        transition={{ duration: 0.12 }}
+        className="relative z-70 w-full max-w-5xl h-[80vh] bg-white rounded-2xl shadow-2xl border overflow-hidden flex flex-col"
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-md bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold truncate">{team.name}</div>
+              <div className="text-xs text-slate-500">Team chat — Admin</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onUpdateState({ opened: true, maximized: false, team })}
+              title="Minimize"
+              className="p-2 rounded hover:bg-slate-100"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </button>
+            <button onClick={() => onClose()} title="Close" className="p-2 rounded hover:bg-slate-100">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 overflow-hidden">
+          <div className="md:col-span-2 flex flex-col border rounded-lg overflow-hidden">
+            <div className="flex-1 overflow-auto p-4" style={{ minHeight: 0 }}>
+              {messages.length === 0 ? (
+                <div className="text-sm text-slate-500">No messages yet. Use the composer to send the first message.</div>
+              ) : (
+                <ul className="space-y-3">
+                  {messages.map((m) => (
+                    <li key={m.id} className={`flex ${m.direction === "INBOUND" ? "justify-start" : "justify-end"}`}>
+                      <div className={`${m.direction === "INBOUND" ? "bg-slate-50 text-slate-800" : "bg-blue-500 text-white"} px-4 py-2 rounded-lg max-w-[80%]`}>
+                        {m.body ?? m.text ?? m.preview}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="p-4 border-t bg-white">
+              <div className="flex gap-2 items-center">
+                <textarea
+                  rows={2}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Write a message to the team..."
+                  className="flex-1 p-3 rounded-lg border border-slate-200 resize-none focus:outline-none"
+                />
+                <div className="flex flex-col gap-2">
+                  <button onClick={sendMessage} className="px-4 py-2 rounded-lg bg-blue-600 text-white">Send</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside className="md:col-span-1 border rounded-lg p-3 overflow-auto">
+            <h4 className="text-sm font-semibold mb-2">Members</h4>
+            <ul className="space-y-2">
+              {(team.members ?? []).map((m: any, idx: number) => {
+                const user = m?.user ?? {};
+                return (
+                  <li key={m.id ?? user.id ?? idx} className="flex items-center justify-between">
+                    <div className="min-w-0">
+                      <div className="text-sm truncate">{user.name ?? m.name}</div>
+                      {user.email && <div className="text-xs text-slate-500 truncate">{user.email}</div>}
+                    </div>
+                    <div className="text-xs text-slate-500">{m.role ?? "Member"}</div>
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+
+  return (
+    <AnimatePresence>
+      {!maximized ? MinimizedWidget : MaximizedOverlay}
+    </AnimatePresence>
+  );
+}
+
 /* ----------------- TeamCard ----------------- */
-/* ----------------- TeamCard (fixed layout) ----------------- */
-/* ----------------- TeamCard (ensure action buttons are fully visible) ----------------- */
-const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers }: any) => {
+/* - includes Message button that opens chat widget (through props) */
+/* ----------------- TeamCard (responsive actions + overflow fix) ----------------- */
+const TeamCard = ({ team, delay = 0, onOpenSchedule, onEdit, onDelete, onViewMembers, onMessage }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -53,19 +347,20 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
         setIsHovered(false);
         setMenuOpen(false);
       }}
-    className="relative p-6 pb-8 bg-white rounded-2xl border-none flex flex-col justify-between shadow-md"
->
-      {/* actions menu (absolute, above content) */}
-      <div className="absolute right-3 top-3 z-40">
+      className="relative p-6 pb-8 bg-white rounded-2xl flex flex-col justify-between shadow-md overflow-visible"
+      role="group"
+    >
+      {/* top-right actions menu */}
+      <div className="absolute right-4 top-3 z-40">
         <div className="relative">
           <button
+            type="button"
+            aria-label="Open team menu"
+            className="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200"
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen((s) => !s);
             }}
-            className="p-2 rounded-md hover:bg-slate-100"
-            aria-label="Open team actions"
-            type="button"
           >
             <MoreVertical className="w-5 h-5 text-slate-600" />
           </button>
@@ -76,27 +371,28 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.12 }}
-              className="absolute right-0 mt-2 w-44 bg-white border-none rounded-lg shadow-lg z-50"
+              className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg z-50"
+              onClick={(e) => e.stopPropagation()}
             >
               <button
+                type="button"
+                className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
                 onClick={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
-                  onEdit(team);
+                  onEdit?.(team);
                 }}
-                className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
-                type="button"
               >
                 <Edit className="w-4 h-4" /> Edit
               </button>
               <button
+                type="button"
+                className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-rose-600"
                 onClick={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
-                  onDelete(team);
+                  onDelete?.(team);
                 }}
-                className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-rose-600"
-                type="button"
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
@@ -105,26 +401,24 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
         </div>
       </div>
 
+      {/* content */}
       <div className="relative">
-        {/* header */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex items-center gap-4 w-full">
-            <motion.div
-              className={`w-14 h-14 rounded-xl bg-gradient-to-br ${team.gradient ?? "from-blue-500 to-cyan-500"} flex items-center justify-center shadow-md flex-shrink-0`}
-              animate={isHovered ? { scale: 1.03, rotate: 4 } : { scale: 1, rotate: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <Users className="w-7 h-7 text-white" />
-            </motion.div>
+        <div className="flex items-start gap-4 mb-4">
+          <motion.div
+            className={`w-14 h-14 rounded-xl bg-gradient-to-br ${team.gradient ?? "from-blue-500 to-cyan-500"} flex items-center justify-center shadow-md flex-shrink-0`}
+            animate={isHovered ? { scale: 1.03, rotate: 4 } : { scale: 1, rotate: 0 }}
+            transition={{ duration: 0.22 }}
+            aria-hidden
+          >
+            <Users className="w-7 h-7 text-white" />
+          </motion.div>
 
-            <div className="min-w-0 flex-1 pr-12">
-              <h3 className="text-lg font-semibold text-slate-800 leading-tight break-words">{team.name}</h3>
-              <p className="text-sm text-slate-500 mt-1 break-words">{team.description ?? ""}</p>
-            </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold text-slate-800 leading-tight truncate">{team.name}</h3>
+            <p className="text-sm text-slate-500 mt-1 truncate">{team.description ?? ""}</p>
           </div>
         </div>
 
-        {/* lead & featured */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {team.manager?.name && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium">
@@ -140,7 +434,6 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
           )}
         </div>
 
-        {/* members avatars */}
         <div className="flex -space-x-2 mb-4 flex-wrap">
           {(team.members ?? []).slice(0, 5).map((member: any, idx: number) => {
             const key = member?.user?.id ?? member?.id ?? `m_${idx}`;
@@ -148,12 +441,12 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
             const initials =
               member?.user?.name
                 ? member.user.name.split(" ").map((p: string) => p[0]).slice(0, 2).join("")
-                : member.initials ?? (title ? title.slice(0, 2).toUpperCase() : "U");
+                : (title ? title.slice(0, 2).toUpperCase() : "U");
             return (
               <div
                 key={key}
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700 shadow-sm"
                 title={title}
+                className="w-10 h-10 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-semibold text-slate-700 shadow-sm"
               >
                 {initials}
               </div>
@@ -166,7 +459,6 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
           )}
         </div>
 
-        {/* stats */}
         <div className="grid grid-cols-3 gap-4 mb-4 text-center">
           <div>
             <p className="text-2xl font-bold text-slate-800">{team.members?.length ?? 0}</p>
@@ -183,30 +475,35 @@ const TeamCard = ({ team, delay, onOpenSchedule, onEdit, onDelete, onViewMembers
         </div>
       </div>
 
-      {/* actions — ensure visible and not clipped */}
+      {/* actions area — responsive grid so each action has its own cell (no overlap) */}
       <div className="mt-2 pt-2">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <motion.button
-            onClick={() => onOpenSchedule(team)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 px-4 py-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 whitespace-nowrap"
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-stretch">
+          {/* Primary action: Schedule Meeting */}
+          <button
             type="button"
+            onClick={() => onOpenSchedule?.(team)}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-medium shadow-md hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             <Mail className="w-4 h-4" /> Schedule Meeting
-          </motion.button>
+          </button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition flex items-center justify-center gap-2 whitespace-nowrap"
-            onClick={() => {
-              onViewMembers(team);
-            }}
+          {/* Secondary: View Members */}
+          <button
             type="button"
+            onClick={() => onViewMembers?.(team)}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-200"
           >
             <Settings className="w-4 h-4" /> View Members
-          </motion.button>
+          </button>
+
+          {/* Message action */}
+          <button
+            type="button"
+            onClick={() => onMessage?.(team)}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
+          >
+            <MessageSquare className="w-4 h-4" /> Message
+          </button>
         </div>
       </div>
     </motion.div>
@@ -235,7 +532,7 @@ const StatCard = ({ icon: Icon, label, value, subtitle, gradient, delay }: any) 
   </motion.div>
 );
 
-/* ----------------- Members Modal ----------------- */
+/* ----------------- Members Modal (unchanged) ----------------- */
 function MembersModal({
   open,
   onClose,
@@ -256,7 +553,6 @@ function MembersModal({
   return (
     <Modal open={open} onClose={onClose} ariaLabel={`Members of ${team.name}`} className="max-w-2xl">
       <div className="w-full bg-transparent">
-        {/* Single unified panel — header + content */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-none">
             <div className="flex items-start justify-between gap-4">
@@ -264,12 +560,10 @@ function MembersModal({
                 <h2 className="text-lg font-semibold text-slate-900">{team.name ?? "Team members"}</h2>
                 <p className="text-sm text-slate-500 mt-1">{total} member{total !== 1 ? "s" : ""}</p>
               </div>
-              
             </div>
           </div>
 
           <div className="p-4 space-y-3 max-h-[60vh] overflow-auto">
-            {/* Manager (if any) */}
             {manager && (
               <div className="flex items-center justify-between gap-4 bg-white rounded-lg p-3 border-none shadow-md">
                 <div className="flex items-center gap-3 min-w-0">
@@ -298,7 +592,6 @@ function MembersModal({
               </div>
             )}
 
-            {/* Member list */}
             {members.length === 0 ? (
               <div className="p-4 bg-slate-50 rounded-lg text-sm text-slate-600">No members assigned to this team.</div>
             ) : (
@@ -340,8 +633,6 @@ function MembersModal({
               </ul>
             )}
           </div>
-
-          
         </div>
       </div>
     </Modal>
@@ -362,6 +653,9 @@ export default function TeamsPage() {
   // members modal state
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [selectedTeamForMembers, setSelectedTeamForMembers] = useState<any | null>(null);
+
+  // chat widget (single instance)
+  const [chatState, setChatState] = useState<{ opened: boolean; maximized: boolean; team: any | null } | null>(null);
 
   // data
   const [teams, setTeams] = useState<any[]>([]);
@@ -617,6 +911,27 @@ export default function TeamsPage() {
     }
   }
 
+  /* -- message button handler: open single widget instance, toggle behavior -- */
+  function handleOpenMessage(team: any) {
+    // If widget already open for same team: toggle maximize off -> minimized or close
+    if (chatState && chatState.team?.id === team.id) {
+      // toggle open/close
+      setChatState((s) => (s ? (s.opened ? null : { opened: true, maximized: false, team }) : { opened: true, maximized: false, team }));
+      return;
+    }
+    // open widget minimized by default
+    setChatState({ opened: true, maximized: false, team });
+  }
+
+  function handleCloseChat() {
+    setChatState(null);
+  }
+
+  function handleUpdateChatState(s: { opened: boolean; maximized: boolean; team: any | null } | null) {
+    setChatState(s);
+  }
+
+  /* -- render -- */
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8">
@@ -648,13 +963,21 @@ export default function TeamsPage() {
               />
             </div>
 
-            <motion.button onClick={openCreate} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl flex items-center gap-2">
+            <motion.button onClick={() => setShowCreate(true)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-6 py-3 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium shadow-lg hover:shadow-xl flex items-center gap-2">
               <Plus className="w-4 h-4" /> Create Team
             </motion.button>
           </div>
 
           {/* teams grid */}
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start auto-rows-auto">
+         <div className="
+  grid grid-cols-1 
+  sm:grid-cols-2 
+  lg:grid-cols-2 
+  xl:grid-cols-3 
+  gap-6 
+  items-start 
+  auto-rows-auto
+">
 
             {teamsLoading ? (
               <div className="col-span-full p-6 bg-white rounded-2xl border border-slate-200">Loading teams…</div>
@@ -670,6 +993,7 @@ export default function TeamsPage() {
                   onEdit={handleEdit}
                   onDelete={handleDeleteRequest}
                   onViewMembers={openMembersModalForTeam}
+                  onMessage={handleOpenMessage}
                 />
               ))
             )}
@@ -679,7 +1003,7 @@ export default function TeamsPage() {
         </div>
       </div>
 
-      {/* create / edit modal (kept as-is) */}
+      {/* create / edit modal */}
       <AnimatePresence>
         {(showCreate || editTeam) && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center">
@@ -744,7 +1068,7 @@ export default function TeamsPage() {
         )}
       </AnimatePresence>
 
-      {/* members modal — rendered directly (no extra backdrop wrapper). Modal component provides backdrop + panel */}
+      {/* members modal */}
       <AnimatePresence>
         {showMembersModal && selectedTeamForMembers && (
           <MembersModal
@@ -756,6 +1080,9 @@ export default function TeamsPage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Chat widget (single instance) */}
+      <ChatWidget state={chatState} onClose={handleCloseChat} onUpdateState={handleUpdateChatState} />
     </>
   );
 }

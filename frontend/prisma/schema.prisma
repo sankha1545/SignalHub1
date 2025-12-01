@@ -156,7 +156,8 @@ model User {
   // Chat-specific relations
   chatMemberships ChatMember[] // membership entries
   chatsCreated    Chat[] // chats created by this user (creator)
-  chatMessages    ChatMessage[] @relation("ChatMessagesSent")
+  chatMessages    ChatMessage[]  @relation("ChatMessagesSent")
+  ChatLastRead    ChatLastRead[]
 
   @@index([organizationId])
 }
@@ -412,8 +413,9 @@ model Chat {
   messages ChatMessage[]
 
   lastMessageAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+  ChatLastRead  ChatLastRead[]
 
   @@index([organizationId])
   @@index([teamId])
@@ -446,6 +448,24 @@ model ChatMessage {
 
   @@index([chatId])
   @@index([externalId])
+}
+
+/**
+ * Per-user per-chat last-read marker to calculate unread counts efficiently.
+ * - One row per (chatId, userId)
+ * - Updated whenever a user opens a chat or reads messages.
+ */
+model ChatLastRead {
+  id         String   @id @default(cuid())
+  chatId     String
+  chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt DateTime @default(now())
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@index([chatId])
 }
 
 /**

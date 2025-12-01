@@ -2,6 +2,7 @@
 "[project]/src/lib/socketClient.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// src/lib/socketClient.ts
 __turbopack_context__.s([
     "default",
     ()=>__TURBOPACK__default__export__
@@ -9,20 +10,22 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/socket.io-client/build/esm/index.js [app-client] (ecmascript) <locals>");
 ;
-let socket = null;
-function getSocket() {
-    if (!socket) {
-        socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_SOCKET_URL || "", {
-            path: "/api/socketio",
-            autoConnect: true,
-            transports: [
-                "websocket"
-            ]
-        });
-    }
-    return socket;
-}
-const __TURBOPACK__default__export__ = getSocket();
+const SOCKET_URL = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4001";
+const socket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$socket$2e$io$2d$client$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["io"])(SOCKET_URL, {
+    path: "/api/socketio",
+    transports: [
+        "websocket"
+    ],
+    autoConnect: true
+});
+// Debug logs (optional but VERY useful)
+socket.on("connect", ()=>{
+    console.log("Socket connected:", socket.id);
+});
+socket.on("disconnect", ()=>{
+    console.log("Socket disconnected");
+});
+const __TURBOPACK__default__export__ = socket;
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -77,11 +80,11 @@ _c = TeamChat;
    Small reusable IconButton
    ============================ */ const IconButton = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(6);
-    if ($[0] !== "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41") {
+    if ($[0] !== "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693") {
         for(let $i = 0; $i < 6; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41";
+        $[0] = "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693";
     }
     const { children, ariaLabel, title, onClick } = t0;
     let t1;
@@ -111,11 +114,11 @@ _c = TeamChat;
 _c1 = IconButton;
 const FilterButtons = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(5);
-    if ($[0] !== "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41") {
+    if ($[0] !== "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693") {
         for(let $i = 0; $i < 5; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41";
+        $[0] = "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693";
     }
     const { active, onChange } = t0;
     let t1;
@@ -198,11 +201,11 @@ _c2 = FilterButtons;
    ============================ */ const MessageCard = (t0)=>{
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(54);
-    if ($[0] !== "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41") {
+    if ($[0] !== "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693") {
         for(let $i = 0; $i < 54; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41";
+        $[0] = "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693";
     }
     const { chat, isSelected, onSelect, delay: t1 } = t0;
     const delay = t1 === undefined ? 0 : t1;
@@ -640,11 +643,11 @@ _c3 = MessageCard;
    Helper SLA icon
    ============================ */ const AlertSlaIcon = ()=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(2);
-    if ($[0] !== "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41") {
+    if ($[0] !== "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693") {
         for(let $i = 0; $i < 2; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "8c298f8cc825ef299f370b9137a6f2c7d4d2abd64860f49b404f3800301f2d41";
+        $[0] = "8f04f415c2d385f004db003533c6eef8bf044120709921703eb0ddb695789693";
     }
     let t0;
     if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
@@ -806,8 +809,27 @@ function TeamInboxPage() {
                             }["TeamInboxPage.useEffect.onMessage"]);
                         }
                     }["TeamInboxPage.useEffect.onMessage"];
+                    // Correct Socket.IO event names
                     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("team:created", onTeamCreated);
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("message", onMessage);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:message", {
+                        "TeamInboxPage.useEffect": (payload_2)=>{
+                            const chatId_0 = payload_2?.chatId;
+                            if (!chatId_0) return;
+                            setChats({
+                                "TeamInboxPage.useEffect": (prev_1)=>prev_1.map({
+                                        "TeamInboxPage.useEffect": (c_1)=>{
+                                            if (c_1.id !== chatId_0) return c_1;
+                                            const text = payload_2.message?.content ?? "";
+                                            return {
+                                                ...c_1,
+                                                lastMessagePreview: text.length > 120 ? text.slice(0, 120) + "…" : text,
+                                                unreadCount: (c_1.unreadCount ?? 0) + 1
+                                            };
+                                        }
+                                    }["TeamInboxPage.useEffect"])
+                            }["TeamInboxPage.useEffect"]);
+                        }
+                    }["TeamInboxPage.useEffect"]);
                     return ({
                         "TeamInboxPage.useEffect": ()=>{
                             __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("team:created", onTeamCreated);
@@ -825,9 +847,9 @@ function TeamInboxPage() {
         "TeamInboxPage.useMemo[filteredChats]": ()=>{
             const q = searchQuery.trim().toLowerCase();
             return chats.filter({
-                "TeamInboxPage.useMemo[filteredChats]": (c_1)=>{
-                    const matchesSearch = q === "" || c_1.name.toLowerCase().includes(q) || (c_1.lastMessagePreview ?? "").toLowerCase().includes(q);
-                    const matchesFilter = filter === "all" || filter === "assigned" && (c_1.meta?.assigned === true || c_1.type === "direct" && c_1.meta?.assignedTo) || filter === "unassigned" && !(c_1.meta?.assigned === true || c_1.type === "direct" && c_1.meta?.assignedTo) || filter === "flagged" && c_1.meta?.flagged === true;
+                "TeamInboxPage.useMemo[filteredChats]": (c_2)=>{
+                    const matchesSearch = q === "" || c_2.name.toLowerCase().includes(q) || (c_2.lastMessagePreview ?? "").toLowerCase().includes(q);
+                    const matchesFilter = filter === "all" || filter === "assigned" && (c_2.meta?.assigned === true || c_2.type === "direct" && c_2.meta?.assignedTo) || filter === "unassigned" && !(c_2.meta?.assigned === true || c_2.type === "direct" && c_2.meta?.assignedTo) || filter === "flagged" && c_2.meta?.flagged === true;
                     return matchesSearch && matchesFilter;
                 }
             }["TeamInboxPage.useMemo[filteredChats]"]);
@@ -837,7 +859,7 @@ function TeamInboxPage() {
         searchQuery,
         filter
     ]);
-    const unreadCount = chats.reduce((acc, c_2)=>acc + (c_2.unreadCount ?? 0), 0);
+    const unreadCount = chats.reduce((acc, c_3)=>acc + (c_3.unreadCount ?? 0), 0);
     // action handlers (stubs to preserve original API hooks)
     const handleArchive = (id)=>{
         console.log("Archive", id);
@@ -866,7 +888,7 @@ function TeamInboxPage() {
                                             children: "Team Inbox"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 586,
+                                            lineNumber: 600,
                                             columnNumber: 15
                                         }, this),
                                         unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -880,13 +902,13 @@ function TeamInboxPage() {
                                             children: unreadCount
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 590,
+                                            lineNumber: 604,
                                             columnNumber: 35
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 585,
+                                    lineNumber: 599,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -899,20 +921,20 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 601,
+                                                    lineNumber: 615,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: teamSelect
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 602,
+                                                    lineNumber: 616,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 600,
+                                            lineNumber: 614,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -922,20 +944,20 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 606,
+                                                    lineNumber: 620,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: " assigned"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 607,
+                                                    lineNumber: 621,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 605,
+                                            lineNumber: 619,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -945,32 +967,32 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 611,
+                                                    lineNumber: 625,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: " total"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 612,
+                                                    lineNumber: 626,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 610,
+                                            lineNumber: 624,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 599,
+                                    lineNumber: 613,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 584,
+                            lineNumber: 598,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -978,13 +1000,13 @@ function TeamInboxPage() {
                             children: "Manage incoming customer messages for your team. Use the left pane to pick a team or direct thread."
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 617,
+                            lineNumber: 631,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                    lineNumber: 583,
+                    lineNumber: 597,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1002,7 +1024,7 @@ function TeamInboxPage() {
                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 628,
+                                                lineNumber: 642,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1014,13 +1036,13 @@ function TeamInboxPage() {
                                                 className: "w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 629,
+                                                lineNumber: 643,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 627,
+                                        lineNumber: 641,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1030,12 +1052,12 @@ function TeamInboxPage() {
                                             onChange: (v)=>setFilter(v)
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 633,
+                                            lineNumber: 647,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 632,
+                                        lineNumber: 646,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1043,7 +1065,7 @@ function TeamInboxPage() {
                                         children: "Chats"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 636,
+                                        lineNumber: 650,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1053,14 +1075,14 @@ function TeamInboxPage() {
                                             children: "Loading chats…"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 639,
+                                            lineNumber: 653,
                                             columnNumber: 28
                                         }, this) : error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "text-sm text-rose-600",
                                             children: error
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 639,
+                                            lineNumber: 653,
                                             columnNumber: 99
                                         }, this) : filteredChats.length === 0 ? // Fallback to original message list if no chats (keeps behavior consistent)
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1076,12 +1098,12 @@ function TeamInboxPage() {
                                                                     className: "w-5 h-5 text-slate-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                    lineNumber: 645,
+                                                                    lineNumber: 659,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                lineNumber: 644,
+                                                                lineNumber: 658,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1095,7 +1117,7 @@ function TeamInboxPage() {
                                                                                 children: m.customer
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                                lineNumber: 649,
+                                                                                lineNumber: 663,
                                                                                 columnNumber: 31
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1103,13 +1125,13 @@ function TeamInboxPage() {
                                                                                 children: m.time
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                                lineNumber: 650,
+                                                                                lineNumber: 664,
                                                                                 columnNumber: 31
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                        lineNumber: 648,
+                                                                        lineNumber: 662,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1117,54 +1139,54 @@ function TeamInboxPage() {
                                                                         children: m.preview
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                        lineNumber: 652,
+                                                                        lineNumber: 666,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                                lineNumber: 647,
+                                                                lineNumber: 661,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                        lineNumber: 643,
+                                                        lineNumber: 657,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, m.id, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 642,
+                                                    lineNumber: 656,
                                                     columnNumber: 55
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 641,
+                                            lineNumber: 655,
                                             columnNumber: 15
-                                        }, this) : filteredChats.map((c_3, idx_0)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageCard, {
-                                                chat: c_3,
-                                                isSelected: selectedChatId === c_3.id,
-                                                onSelect: ()=>setSelectedChatId(c_3.id),
+                                        }, this) : filteredChats.map((c_4, idx_0)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageCard, {
+                                                chat: c_4,
+                                                isSelected: selectedChatId === c_4.id,
+                                                onSelect: ()=>setSelectedChatId(c_4.id),
                                                 delay: idx_0 * 0.03
-                                            }, c_3.id, false, {
+                                            }, c_4.id, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 656,
+                                                lineNumber: 670,
                                                 columnNumber: 62
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 638,
+                                        lineNumber: 652,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 626,
+                                lineNumber: 640,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 625,
+                            lineNumber: 639,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1176,12 +1198,12 @@ function TeamInboxPage() {
                                     currentUser: {}
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 666,
+                                    lineNumber: 680,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 663,
+                                lineNumber: 677,
                                 columnNumber: 31
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-full flex flex-col items-center justify-center text-center text-slate-500",
@@ -1192,12 +1214,12 @@ function TeamInboxPage() {
                                             className: "w-8 h-8 text-slate-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 669,
+                                            lineNumber: 683,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 668,
+                                        lineNumber: 682,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1205,7 +1227,7 @@ function TeamInboxPage() {
                                         children: "Select a chat to begin"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 671,
+                                        lineNumber: 685,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1213,35 +1235,35 @@ function TeamInboxPage() {
                                         children: "Pick a team group chat or a direct thread to start messaging."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 672,
+                                        lineNumber: 686,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 667,
+                                lineNumber: 681,
                                 columnNumber: 24
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 662,
+                            lineNumber: 676,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                    lineNumber: 623,
+                    lineNumber: 637,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-            lineNumber: 581,
+            lineNumber: 595,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-        lineNumber: 580,
+        lineNumber: 594,
         columnNumber: 10
     }, this);
 }

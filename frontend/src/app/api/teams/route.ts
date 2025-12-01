@@ -24,7 +24,7 @@ function jsonError(message: string, status = 400) {
 async function tryGetSessionOrganizationId(req: Request): Promise<string | null> {
   try {
     if (typeof getSessionUser === "function") {
-      const session = await getSessionUser(req).catch(() => null);
+      const session = await (getSessionUser as any)(req).catch(() => null);
       if (session?.organizationId) return String(session.organizationId);
     }
   } catch (e: any) {
@@ -64,8 +64,6 @@ export async function GET(req: Request) {
             user: { select: { id: true, name: true, email: true } },
           },
         },
-        // include optional UI metadata fields if they exist in schema
-        // Prisma will ignore unknown fields at runtime; including them here is safe.
       },
     });
 
@@ -76,7 +74,6 @@ export async function GET(req: Request) {
       description: t.description ?? null,
       managerId: (t as any).managerId ?? null,
       manager: t.manager ? { id: t.manager.id, name: t.manager.name, email: t.manager.email } : null,
-      // include metadata fields if present on the object (Prisma includes them when in schema)
       featured: (t as any).featured ?? false,
       gradient: (t as any).gradient ?? null,
       projects: typeof (t as any).projects !== "undefined" ? Number((t as any).projects ?? 0) : null,
@@ -203,7 +200,6 @@ export async function POST(req: Request) {
       let membersCreated = [];
       if (memberIds.length > 0) {
         const createManyData = memberIds.map((uid) => ({ teamId: team.id, userId: uid, role: "EMPLOYEE" }));
-        // createMany with skipDuplicates helps avoid constraint errors if some already exist
         await tx.teamMember.createMany({ data: createManyData, skipDuplicates: true });
         // fetch created/updated member rows with user details
         membersCreated = await tx.teamMember.findMany({
@@ -211,11 +207,6 @@ export async function POST(req: Request) {
           select: { id: true, role: true, user: { select: { id: true, name: true, email: true } } },
         });
       }
-
-      // adhocMembers: frontend-only synthetic members — if you have a table to store them, insert here.
-      // For now we don't persist adhocMembers as users; you can extend schema to store them if required.
-      // Example logic (commented):
-      // if (Array.isArray(adhocMembers) && adhocMembers.length > 0) { ... }
 
       return { team, members: membersCreated };
     });
@@ -258,50 +249,65 @@ export async function POST(req: Request) {
       try {
         // Only attempt if Chat model exists on Prisma client
         if ((prisma as any).chat && (prisma as any).chatMember) {
-          // create chat
+          // create chat (use ChatType.TEAM enum value)
           const chat = await (prisma as any).chat.create({
             data: {
               name: responseTeam.name ?? `Team ${responseTeam.id}`,
-              type: "team",
+              type: "TEAM", // enum value must match prisma schema
               teamId: responseTeam.id,
+              organizationId: responseTeam.organizationId,
+              createdById: undefined,
             },
             select: { id: true, name: true },
           });
 
-          // gather unique user ids to add to chat: manager + memberIds + org admins
+          // gather unique user ids to add to chat: manager + memberIds
           const toAdd = new Set<string>();
           if (managerId) toAdd.add(managerId);
           for (const mid of memberIds) toAdd.add(mid);
 
-          // find org admins (so admin monitors all team chats)
-          const orgAdmins = await prisma.user.findMany({
-            where: { organizationId: responseTeam.organizationId, role: "ADMIN" },
-            select: { id: true, role: true },
-          });
-          for (const a of orgAdmins) toAdd.add(a.id);
-
-          // fetch roles for these users
+          // fetch roles for these users (so we can set ChatMember.role accurately)
           const usersForChat = await prisma.user.findMany({
             where: { id: { in: Array.from(toAdd) } },
             select: { id: true, role: true },
           });
 
-          const chatMembersData = usersForChat.map((u) => ({
-            chatId: chat.id,
-            userId: u.id,
-            role: u.role ?? "EMPLOYEE",
-          }));
+          const chatMembersData = usersForChat.map((u) => {
+            // map User.role -> ChatMember.role (ChatRole enum values)
+            const memberRole = u.role === "MANAGER" ? "MANAGER" : "MEMBER";
+            return {
+              chatId: chat.id,
+              userId: u.id,
+              role: memberRole,
+            };
+          });
 
           if (chatMembersData.length > 0) {
             // create members (skip duplicates so this is safe to call multiple times)
             await (prisma as any).chatMember.createMany({ data: chatMembersData, skipDuplicates: true });
           }
 
-          // Emit socket event (best-effort) - many apps attach io to global object (e.g. global._io)
+          // Emit socket event (best-effort)
           try {
             const io = (global as any).io || (global as any)._io || (global as any).socketServer;
-            if (io && typeof io.emit === "function") {
-              io.emit("team:created", { team: responseTeam, chat: { id: chat.id, name: chat.name } });
+            const payload = { team: responseTeam, chat: { id: chat.id, name: chat.name, teamId: responseTeam.id } };
+
+            if (io && typeof io.to === "function") {
+              // notify team members individually
+              for (const m of chatMembersData) {
+                try {
+                  io.to(`user:${m.userId}`).emit("chat:created", payload);
+                } catch {}
+              }
+              // broadcast to organization room (admins & other listeners)
+              try {
+                io.to(`org:${responseTeam.organizationId}`).emit("chat:created", payload);
+              } catch {
+                // fallback
+                io.emit("chat:created", payload);
+              }
+            } else if (io && typeof io.emit === "function") {
+              io.emit("chat:created", payload);
             }
           } catch (emitErr) {
             console.warn("[api/teams] socket emit failed:", emitErr);

@@ -2,16 +2,15 @@
   "[project]/src/components/chat/ChatList.tsx [app-client] (ecmascript, next/dynamic entry)": {
     "id": "[project]/src/components/chat/ChatList.tsx [app-client] (ecmascript, next/dynamic entry)",
     "files": [
-      "static/chunks/src_lib_socketClient_ts_b3d140ea._.js",
-      "static/chunks/src_components_chat_ChatList_tsx_0ea6e6c6._.js",
-      "static/chunks/src_components_chat_ChatList_tsx_9dbdd7a0._.js"
+      "static/chunks/src_1bc9805c._.js",
+      "static/chunks/src_components_chat_ChatList_tsx_1f9a29f5._.js"
     ]
   },
   "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)": {
     "id": "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)",
     "files": [
-      "static/chunks/src_components_chat_27f8ba2a._.js",
-      "static/chunks/src_components_chat_TeamChat_tsx_9dbdd7a0._.js"
+      "static/chunks/src_e041e6bf._.js",
+      "static/chunks/src_components_chat_TeamChat_tsx_1f9a29f5._.js"
     ]
   }
 }
