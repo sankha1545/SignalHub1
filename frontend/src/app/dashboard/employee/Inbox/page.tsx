@@ -7,24 +7,24 @@ import { motion } from "framer-motion";
 import {
   Search,
   Mail,
-  MailOpen,
   Clock,
   Inbox as InboxIcon,
   User,
-  Users,
-  MessageCircle,
 } from "lucide-react";
 import socketClient from "@/lib/socketClient";
 
-const TeamChat = dynamic(() => import("@/components/chat/TeamChat").then((m) => m.default), { ssr: false });
+const TeamChat = dynamic(
+  () => import("@/components/chat/TeamChat").then((m) => m.default),
+  { ssr: false }
+);
 
 /* -------------------------
    Types
    ------------------------- */
 type ChatSummary = {
   id: string;
-  name: string;
-  type?: "team" | "direct";
+  name: string; // from /api/chats → per-user chat title (other participant for DIRECT)
+  type?: string; // "team" | "direct" | "TEAM" | "DIRECT" etc.
   teamId?: string | null;
   lastMessagePreview?: string | null;
   unreadCount?: number;
@@ -34,8 +34,19 @@ type ChatSummary = {
 /* -------------------------
    Small IconButton
    ------------------------- */
-const IconButton: React.FC<{ children: React.ReactNode; ariaLabel?: string; title?: string; onClick?: (e: React.MouseEvent) => void }> = ({ children, ariaLabel, title, onClick }) => (
-  <button type="button" aria-label={ariaLabel} title={title} onClick={onClick} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">
+const IconButton: React.FC<{
+  children: React.ReactNode;
+  ariaLabel?: string;
+  title?: string;
+  onClick?: (e: React.MouseEvent) => void;
+}> = ({ children, ariaLabel, title, onClick }) => (
+  <button
+    type="button"
+    aria-label={ariaLabel}
+    title={title}
+    onClick={onClick}
+    className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200"
+  >
     {children}
   </button>
 );
@@ -43,8 +54,14 @@ const IconButton: React.FC<{ children: React.ReactNode; ariaLabel?: string; titl
 /* -------------------------
    Chat preview row (compact)
    ------------------------- */
-const ChatRow: React.FC<{ chat: ChatSummary; selected: boolean; onSelect: () => void; delay?: number }> = ({ chat, selected, onSelect, delay = 0 }) => {
+const ChatRow: React.FC<{
+  chat: ChatSummary;
+  selected: boolean;
+  onSelect: () => void;
+  delay?: number;
+}> = ({ chat, selected, onSelect, delay = 0 }) => {
   const [hover, setHover] = useState(false);
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 8 }}
@@ -57,7 +74,9 @@ const ChatRow: React.FC<{ chat: ChatSummary; selected: boolean; onSelect: () => 
       role="button"
       aria-pressed={selected}
       className={`relative p-3 rounded-xl border transition-all duration-150 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-        selected ? "bg-blue-50 border-blue-200 shadow-md" : "bg-white border-slate-200 hover:border-blue-200 hover:shadow-sm"
+        selected
+          ? "bg-blue-50 border-blue-200 shadow-md"
+          : "bg-white border-slate-200 hover:border-blue-200 hover:shadow-sm"
       }`}
     >
       <div className="flex items-start gap-3">
@@ -67,7 +86,10 @@ const ChatRow: React.FC<{ chat: ChatSummary; selected: boolean; onSelect: () => 
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="text-sm truncate font-medium text-slate-800" title={chat.name}>
+            <h3
+              className="text-sm truncate font-medium text-slate-800"
+              title={chat.name}
+            >
               {chat.name}
             </h3>
 
@@ -76,11 +98,18 @@ const ChatRow: React.FC<{ chat: ChatSummary; selected: boolean; onSelect: () => 
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 line-clamp-2">{chat.lastMessagePreview ?? (chat.type === "team" ? "Team chat — no messages yet" : "No messages yet")}</p>
+          <p className="text-xs text-slate-500 line-clamp-2">
+            {chat.lastMessagePreview ??
+              (chat.type?.toLowerCase() === "team"
+                ? "Team chat — no messages yet"
+                : "No messages yet")}
+          </p>
 
           {chat.unreadCount ? (
             <div className="absolute right-3 bottom-3">
-              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">{chat.unreadCount}</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">
+                {chat.unreadCount}
+              </span>
             </div>
           ) : null}
         </div>
@@ -107,7 +136,7 @@ export default function EmployeeInboxPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   // load chats visible to this employee:
-  // expected server behavior: return group team chats for teams the user belongs to + direct thread with manager (meta.isWithManager = true)
+  // server: chats are ACL-filtered; UI additionally only shows employee DMs that are "with manager" via meta.isWithManager
   async function loadChats() {
     setLoading(true);
     setError(null);
@@ -117,18 +146,20 @@ export default function EmployeeInboxPage(): JSX.Element {
       const j = await res.json();
       const payload = (j?.chats ?? []) as ChatSummary[];
 
-      // Server should already filter chats by permissions, but as a UI guard we filter out direct chats that are not 'with manager'
       const visible = payload.filter((c) => {
-        if (c.type === "direct") {
-          // allow direct only if meta.isWithManager === true (server should set this for manager threads)
+        const t = c.type?.toLowerCase();
+        if (t === "direct") {
+          // allow direct only if meta.isWithManager === true
           return Boolean(c.meta?.isWithManager);
         }
-        // show team chats
+        // show team chats (TEAM or team)
         return true;
       });
 
       setChats(visible);
-      if (!selectedChatId && visible.length > 0) setSelectedChatId(visible[0].id);
+      if (!selectedChatId && visible.length > 0) {
+        setSelectedChatId(visible[0].id);
+      }
     } catch (err: any) {
       console.warn("Failed to load chats:", err);
       setError("Could not load chats");
@@ -145,25 +176,48 @@ export default function EmployeeInboxPage(): JSX.Element {
     try {
       if (socketClient && typeof socketClient.on === "function") {
         const onTeamCreated = (payload: any) => {
-          const chat = payload?.chat ?? (payload?.team ? { id: `team-${payload.team.id}`, name: payload.team.name } : null);
+          const chat =
+            payload?.chat ??
+            (payload?.team
+              ? { id: `team-${payload.team.id}`, name: payload.team.name }
+              : null);
           if (!chat) return;
-          // only add team chats if they belong to a team this employee is part of (server should only emit relevant team:created to members, but guard anyway)
+
           setChats((prev) => {
             if (prev.find((c) => c.id === chat.id)) return prev;
-            return [{ id: chat.id, name: chat.name, type: "team", lastMessagePreview: null, unreadCount: 0, teamId: payload?.team?.id ?? null }, ...prev];
+            return [
+              {
+                id: chat.id,
+                name: chat.name,
+                type: "team",
+                lastMessagePreview: null,
+                unreadCount: 0,
+                teamId: payload?.team?.id ?? null,
+              },
+              ...prev,
+            ];
           });
         };
 
         const onMessage = (payload: any) => {
           const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
           if (!chatId) return;
+
           setChats((prev) =>
             prev.map((c) => {
               if (c.id !== chatId) return c;
+              const content = payload?.message?.content as string | undefined;
               return {
                 ...c,
-                lastMessagePreview: payload?.message?.content ? (payload.message.content.length > 120 ? payload.message.content.slice(0, 120) + "…" : payload.message.content) : c.lastMessagePreview,
-                unreadCount: (typeof c.unreadCount === "number" ? c.unreadCount + 1 : 1),
+                lastMessagePreview: content
+                  ? content.length > 120
+                    ? content.slice(0, 120) + "…"
+                    : content
+                  : c.lastMessagePreview,
+                unreadCount:
+                  typeof c.unreadCount === "number"
+                    ? c.unreadCount + 1
+                    : 1,
               };
             })
           );
@@ -185,19 +239,29 @@ export default function EmployeeInboxPage(): JSX.Element {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return chats.filter((c) => {
-      const matchesSearch = q === "" || c.name.toLowerCase().includes(q) || (c.lastMessagePreview ?? "").toLowerCase().includes(q);
-      const matchesFilter = filter === "all" || (filter === "unread" && (c.unreadCount ?? 0) > 0);
+      const matchesSearch =
+        q === "" ||
+        c.name.toLowerCase().includes(q) ||
+        (c.lastMessagePreview ?? "").toLowerCase().includes(q);
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "unread" && (c.unreadCount ?? 0) > 0);
       return matchesSearch && matchesFilter;
     });
   }, [chats, query, filter]);
 
-  const unreadTotal = chats.reduce((s, c) => s + (c.unreadCount ?? 0), 0);
+  const unreadTotal = chats.reduce(
+    (s, c) => s + (c.unreadCount ?? 0),
+    0
+  );
 
-  // UI rule: employees should not open direct chats that are not 'with manager' (UI prevents selection)
+  // UI rule: employees should not open direct chats that are not 'with manager'
   function handleSelectChat(chat: ChatSummary) {
-    if (chat.type === "direct" && !chat.meta?.isWithManager) {
-      // show a short help UI — we use alert here (you can replace with toast/modal)
-      alert("Direct messages between employees are not allowed. You can message your manager or use the team group chat.");
+    const t = chat.type?.toLowerCase();
+    if (t === "direct" && !chat.meta?.isWithManager) {
+      alert(
+        "Direct messages between employees are not allowed. You can message your manager or use the team group chat."
+      );
       return;
     }
     setSelectedChatId(chat.id);
@@ -209,7 +273,11 @@ export default function EmployeeInboxPage(): JSX.Element {
         <header className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-bold">Inbox</h1>
-            {unreadTotal > 0 && <div className="px-3 py-1 bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-bold rounded-full shadow-lg">{unreadTotal}</div>}
+            {unreadTotal > 0 && (
+              <div className="px-3 py-1 bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-bold rounded-full shadow-lg">
+                {unreadTotal}
+              </div>
+            )}
           </div>
 
           <p className="text-sm text-slate-500 flex items-center gap-2">
@@ -218,6 +286,7 @@ export default function EmployeeInboxPage(): JSX.Element {
         </header>
 
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-[320px_1fr]">
+          {/* LEFT PANE: chat list */}
           <div className="p-4 border-b lg:border-b-0 lg:border-r border-slate-200">
             <div className="space-y-3">
               <div className="relative">
@@ -232,15 +301,35 @@ export default function EmployeeInboxPage(): JSX.Element {
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => setFilter("all")} className={`px-3 py-2 rounded-xl text-sm ${filter === "all" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>All</button>
-                <button onClick={() => setFilter("unread")} className={`px-3 py-2 rounded-xl text-sm ${filter === "unread" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600"}`}>Unread</button>
+                <button
+                  onClick={() => setFilter("all")}
+                  className={`px-3 py-2 rounded-xl text-sm ${
+                    filter === "all"
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilter("unread")}
+                  className={`px-3 py-2 rounded-xl text-sm ${
+                    filter === "unread"
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  Unread
+                </button>
               </div>
 
               <div className="text-xs text-slate-500">Chats</div>
 
               <div className="space-y-3 max-h-[60vh] overflow-auto pt-2">
                 {loading ? (
-                  <div className="text-sm text-slate-500">Loading chats…</div>
+                  <div className="text-sm text-slate-500">
+                    Loading chats…
+                  </div>
                 ) : error ? (
                   <div className="text-sm text-rose-600">{error}</div>
                 ) : filtered.length === 0 ? (
@@ -248,18 +337,30 @@ export default function EmployeeInboxPage(): JSX.Element {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                       <InboxIcon className="w-8 h-8 text-slate-400" />
                     </div>
-                    <div className="font-medium text-slate-800 mb-1">No chats found</div>
-                    <div className="text-sm">You will see team chats and messages from your manager here.</div>
+                    <div className="font-medium text-slate-800 mb-1">
+                      No chats found
+                    </div>
+                    <div className="text-sm">
+                      You will see team chats and messages from your manager
+                      here.
+                    </div>
                   </div>
                 ) : (
                   filtered.map((c, idx) => (
-                    <ChatRow key={c.id} chat={c} selected={selectedChatId === c.id} onSelect={() => handleSelectChat(c)} delay={idx * 0.03} />
+                    <ChatRow
+                      key={c.id}
+                      chat={c}
+                      selected={selectedChatId === c.id}
+                      onSelect={() => handleSelectChat(c)}
+                      delay={idx * 0.03}
+                    />
                   ))
                 )}
               </div>
             </div>
           </div>
 
+          {/* RIGHT PANE: chat view */}
           <div className="p-4 min-h-[60vh]">
             {selectedChatId ? (
               <div className="h-full rounded-md border border-slate-100 overflow-hidden">
@@ -272,8 +373,13 @@ export default function EmployeeInboxPage(): JSX.Element {
                 <div className="w-20 h-20 mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                   <InboxIcon className="w-8 h-8 text-slate-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-1">Select a chat</h3>
-                <p className="text-sm">Pick a team group chat or your manager's thread to start messaging.</p>
+                <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                  Select a chat
+                </h3>
+                <p className="text-sm">
+                  Pick a team group chat or your manager&apos;s thread to start
+                  messaging.
+                </p>
               </div>
             )}
           </div>

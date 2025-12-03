@@ -29,9 +29,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
 ;
 ;
 ;
-/* ============================
+/* ==========================
    Dynamic imports (client only)
-   ============================ */ const TeamChat = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$shared$2f$lib$2f$app$2d$dynamic$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(async ()=>{}, {
+   ========================== */ const TeamChat = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$shared$2f$lib$2f$app$2d$dynamic$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(async ()=>{}, {
     loadableGenerated: {
         modules: [
             "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)"
@@ -39,9 +39,35 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
     },
     ssr: false
 });
-/* ============================
-   Small reusable IconButton
-   ============================ */ const IconButton = ({ children, ariaLabel, title, onClick })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+/* ==========================
+   Local persistence & cross-tab events
+   ========================== */ const LOCAL_KEY_STATUS = "chat_status_map_v1";
+function readLocalStatusMap() {
+    try {
+        return JSON.parse(localStorage.getItem(LOCAL_KEY_STATUS) || "{}");
+    } catch  {
+        return {};
+    }
+}
+function writeLocalStatusMap(m) {
+    try {
+        localStorage.setItem(LOCAL_KEY_STATUS, JSON.stringify(m));
+        try {
+            window.dispatchEvent(new CustomEvent("chatStatusUpdate", {
+                detail: {
+                    map: m
+                }
+            }));
+        } catch  {
+        // ignore
+        }
+    } catch  {
+    // ignore
+    }
+}
+/* ==========================
+   Small IconButton
+   ========================== */ const IconButton = ({ children, ariaLabel, title, onClick })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
         type: "button",
         "aria-label": ariaLabel,
         title: title,
@@ -50,12 +76,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
         children: children
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-        lineNumber: 50,
+        lineNumber: 99,
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
-/* ============================
-   Filter Buttons
-   ============================ */ const FilterButtons = ({ active, onChange })=>{
+/* ==========================
+   FilterButtons
+   ========================== */ const FilterButtons = ({ active, onChange })=>{
     const items = [
         {
             key: "all",
@@ -91,33 +117,104 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                         className: "w-4 h-4"
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                        lineNumber: 86,
+                        lineNumber: 140,
                         columnNumber: 25
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         children: it.label
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                        lineNumber: 87,
+                        lineNumber: 141,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, it.key, true, {
                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                lineNumber: 77,
+                lineNumber: 129,
                 columnNumber: 11
             }, ("TURBOPACK compile-time value", void 0));
         })
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-        lineNumber: 73,
+        lineNumber: 125,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-/* ============================
-   MessageCard adapted for chat previews (Manager)
-   ============================ */ const MessageCard = ({ chat, isSelected, onSelect, delay = 0 })=>{
+/* ==========================
+   Helper: derive display name for a chat (consistent with TeamChat)
+   - Prefer other participant's name for direct chat
+   - Fallback to meta/lastMessageSender/chat.name/id
+   ========================== */ function deriveDisplayName(chat, me) {
+    if ((chat.type ?? "").toString().toLowerCase() !== "direct") {
+        return chat.name ?? chat.meta?.name ?? `Chat ${chat.id}`;
+    }
+    const candidates = chat.participants ?? chat.meta?.participants ?? chat.meta?.members ?? chat.meta?.users ?? chat.meta?.participantIds ?? chat.meta?.membersList ?? [];
+    if (Array.isArray(candidates) && candidates.length > 0) {
+        const normalized = candidates.map((p)=>{
+            if (!p) return null;
+            if (typeof p === "string" || typeof p === "number") {
+                return {
+                    id: String(p),
+                    name: String(p)
+                };
+            }
+            return {
+                id: p.id ?? p.userId ?? p._id ?? p.uid ?? (p.user && (p.user.id ?? p.user._id)) ?? null,
+                name: p.name ?? p.displayName ?? p.user?.name ?? (p.email ? p.email.split("@")[0] : null) ?? null
+            };
+        }).filter(Boolean);
+        if (me && me.id != null) {
+            const other = normalized.find((n)=>n.id && String(n.id) !== String(me.id));
+            if (other?.name) return other.name;
+            if (other?.id) return other.id;
+        }
+        const firstNamed = normalized.find((n)=>n && n.name);
+        if (firstNamed) return firstNamed.name;
+    }
+    if (chat.lastMessageSender) return chat.lastMessageSender;
+    return chat.name ?? chat.meta?.name ?? `Chat ${chat.id}`;
+}
+/* ==========================
+   MessageCard (preview)
+   ========================== */ const MessageCard = ({ chat, isSelected, onSelect, delay = 0, chatStatusMap })=>{
     const [hover, setHover] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const statusEntry = chatStatusMap?.[chat.id] ?? null;
+    const status = statusEntry?.status ?? null;
+    const isPending = !!status && status !== "seen";
+    const previewText = chat.lastMessagePreview ?? (chat.type === "team" ? "Team chat — no messages yet" : "No messages yet");
+    const senderName = chat.lastMessageSender ?? null;
+    const previewDisplay = senderName ? `${senderName}: ${previewText}` : previewText;
+    const RenderTicks = ()=>{
+        if (!status) return null;
+        if (status === "sent") return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            title: "Sent",
+            className: "text-xs text-slate-500",
+            children: "✓"
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
+            lineNumber: 233,
+            columnNumber: 9
+        }, ("TURBOPACK compile-time value", void 0));
+        if (status === "delivered") return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            title: "Delivered",
+            className: "text-xs text-slate-500",
+            children: "✓✓"
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
+            lineNumber: 239,
+            columnNumber: 9
+        }, ("TURBOPACK compile-time value", void 0));
+        if (status === "seen") return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            title: "Seen",
+            className: "text-xs text-blue-500",
+            children: "✓✓"
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
+            lineNumber: 245,
+            columnNumber: 9
+        }, ("TURBOPACK compile-time value", void 0));
+        return null;
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].article, {
         initial: {
             opacity: 0,
@@ -148,12 +245,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                             className: "w-5 h-5 text-slate-600"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 122,
+                            lineNumber: 269,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                        lineNumber: 121,
+                        lineNumber: 268,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -166,15 +263,15 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                                         className: "flex items-center gap-2 min-w-0",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "text-sm truncate font-medium text-slate-800",
-                                                title: chat.name,
+                                                className: `text-sm truncate ${isPending ? "font-semibold text-slate-900" : "font-medium text-slate-800"}`,
+                                                title: chat.name ?? undefined,
                                                 children: chat.name
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 128,
+                                                lineNumber: 275,
                                                 columnNumber: 15
                                             }, ("TURBOPACK compile-time value", void 0)),
-                                            chat.unreadCount && chat.unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].span, {
+                                            isPending && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].span, {
                                                 initial: {
                                                     scale: 0
                                                 },
@@ -184,13 +281,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                                                 className: "w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 133,
+                                                lineNumber: 285,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 127,
+                                        lineNumber: 274,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -199,27 +296,27 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                                             className: "w-3 h-3"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 138,
+                                            lineNumber: 294,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 137,
+                                        lineNumber: 293,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 126,
+                                lineNumber: 273,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                className: "text-sm mb-1 truncate text-slate-600",
-                                title: chat.lastMessagePreview ?? "",
-                                children: chat.lastMessagePreview ?? (chat.type === "team" ? "Team chat — no messages yet" : "No messages yet")
+                                className: `text-sm mb-1 truncate ${isPending ? "font-semibold text-slate-700" : "text-slate-600"}`,
+                                title: previewDisplay,
+                                children: previewDisplay
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 142,
+                                lineNumber: 298,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -232,46 +329,53 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                                             children: "Group"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 148,
-                                            columnNumber: 39
+                                            lineNumber: 310,
+                                            columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-slate-50 text-slate-600",
                                             children: "Direct"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 148,
-                                            columnNumber: 161
+                                            lineNumber: 314,
+                                            columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 147,
+                                        lineNumber: 308,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex items-center gap-2 text-xs text-slate-400",
-                                        children: chat.unreadCount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium",
-                                            children: chat.unreadCount
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 152,
-                                            columnNumber: 35
-                                        }, ("TURBOPACK compile-time value", void 0)) : null
-                                    }, void 0, false, {
+                                        children: [
+                                            chat.unreadCount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium",
+                                                children: chat.unreadCount
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
+                                                lineNumber: 322,
+                                                columnNumber: 17
+                                            }, ("TURBOPACK compile-time value", void 0)) : null,
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RenderTicks, {}, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
+                                                lineNumber: 326,
+                                                columnNumber: 15
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 151,
+                                        lineNumber: 320,
                                         columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 146,
+                                lineNumber: 307,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                        lineNumber: 125,
+                        lineNumber: 272,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -289,23 +393,23 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 159,
+                                lineNumber: 337,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 158,
+                            lineNumber: 336,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                        lineNumber: 157,
+                        lineNumber: 331,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                lineNumber: 120,
+                lineNumber: 267,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -329,18 +433,18 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$C
                     }
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                    lineNumber: 166,
+                    lineNumber: 344,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                lineNumber: 164,
+                lineNumber: 342,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-        lineNumber: 106,
+        lineNumber: 253,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -348,17 +452,23 @@ function TeamInboxPage() {
     const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [selectedChatId, setSelectedChatId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [filter, setFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("all");
-    const [teamSelect, setTeamSelect] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("Growth Team");
-    // chats will include both group (type=team) and direct (type=direct) threads relevant to this manager
+    const [teamSelect] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("Growth Team");
     const [chats, setChats] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    // current user (for TeamChat)
     const [currentUser, setCurrentUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    // use chat socket provider
     const chatSocket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$ChatSocketProvider$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useChatSocket"])();
-    // load chats (manager relevant) from API
-    async function loadChats() {
+    const [chatStatusMap, setChatStatusMap] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(()=>readLocalStatusMap());
+    // ref to always have latest chats for openDirectChat listener
+    const chatsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])([]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        chatsRef.current = chats;
+    }, [
+        chats
+    ]);
+    /* -------------------------
+     API: load chats & normalize
+     ------------------------- */ const loadChats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
         setLoading(true);
         setError(null);
         try {
@@ -366,10 +476,25 @@ function TeamInboxPage() {
                 credentials: "same-origin"
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const j = await res.json();
-            const payload = j?.chats ?? [];
-            setChats(payload);
-            if (!selectedChatId && payload.length > 0) setSelectedChatId(payload[0].id);
+            const j = await res.json().catch(()=>({}));
+            const payload = j?.chats ?? j?.items ?? j ?? [];
+            const normalized = payload.map((c)=>{
+                const participants = c.participants ?? c.meta?.participants ?? c.meta?.members ?? null;
+                const lastMessagePreview = c.lastMessagePreview ?? c.meta?.lastMessage?.content ?? c.meta?.lastMessage?.text ?? null;
+                const lastMessageSender = c.lastMessageSender ?? c.meta?.lastMessage?.senderName ?? c.meta?.lastMessage?.from ?? null;
+                const type = c.type ?? c.meta?.type ?? (c.teamId ? "team" : "direct");
+                return {
+                    ...c,
+                    participants,
+                    lastMessagePreview,
+                    lastMessageSender,
+                    type
+                };
+            });
+            setChats(normalized);
+            if (!selectedChatId && normalized.length > 0) {
+                setSelectedChatId(normalized[0].id);
+            }
         } catch (err) {
             console.warn("Failed to load chats:", err);
             setError("Could not load chats");
@@ -377,9 +502,12 @@ function TeamInboxPage() {
         } finally{
             setLoading(false);
         }
-    }
-    // load current user
-    async function loadMe() {
+    }, [
+        selectedChatId
+    ]);
+    /* -------------------------
+     API: load current user
+     ------------------------- */ const loadMe = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
         try {
             const res = await fetch("/api/me", {
                 credentials: "include"
@@ -393,7 +521,7 @@ function TeamInboxPage() {
             if (u && u.id) {
                 setCurrentUser({
                     id: String(u.id),
-                    role: u.role ?? u?.role ?? null,
+                    role: u.role ?? null,
                     name: u.name ?? null,
                     email: u.email ?? null,
                     organizationId: u.organizationId ?? null
@@ -405,11 +533,74 @@ function TeamInboxPage() {
             console.warn("Failed to load /api/me:", e);
             setCurrentUser(null);
         }
-    }
+    }, []);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         loadMe();
-        loadChats();
-        // subscribe to socket events via provider
+        void loadChats();
+        const onStorage = (ev)=>{
+            if (ev.key === LOCAL_KEY_STATUS) setChatStatusMap(readLocalStatusMap());
+        };
+        window.addEventListener("storage", onStorage);
+        const onCustom = ()=>setChatStatusMap(readLocalStatusMap());
+        window.addEventListener("chatStatusUpdate", onCustom);
+        // listen for external requests to open a direct chat (used by People -> Message button)
+        const openHandler = (ev)=>{
+            const d = ev.detail ?? {};
+            const memberId = d?.memberId ?? null;
+            if (!memberId) return;
+            const currentChats = chatsRef.current;
+            const found = currentChats.find((c)=>{
+                if ((c.type ?? "").toString().toLowerCase() !== "direct") return false;
+                const parts = c.participants ?? c.meta?.participants ?? [];
+                if (!Array.isArray(parts)) return false;
+                return parts.some((p)=>{
+                    if (!p) return false;
+                    if (typeof p === "string" || typeof p === "number") return String(p) === String(memberId);
+                    const id = p.id ?? p.userId ?? p._id ?? (p.user && (p.user.id ?? p.user._id));
+                    return id && String(id) === String(memberId);
+                });
+            });
+            if (found) {
+                setSelectedChatId(found.id);
+            } else {
+                window.dispatchEvent(new CustomEvent("createDirectChat", {
+                    detail: {
+                        memberId
+                    }
+                }));
+            }
+        };
+        window.addEventListener("openDirectChat", openHandler);
+        return ()=>{
+            window.removeEventListener("storage", onStorage);
+            window.removeEventListener("chatStatusUpdate", onCustom);
+            window.removeEventListener("openDirectChat", openHandler);
+        };
+    }, [
+        loadChats,
+        loadMe
+    ]); // NOTE: no `chats` here
+    /* -------------------------
+     When me becomes available: resolve direct chat display names
+     ------------------------- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!currentUser) return;
+        setChats((prev)=>prev.map((c)=>{
+                if ((c.type ?? "").toString().toLowerCase() === "direct") {
+                    const name = deriveDisplayName(c, currentUser);
+                    return {
+                        ...c,
+                        name
+                    };
+                }
+                return c;
+            }));
+    }, [
+        currentUser
+    ]);
+    /* -------------------------
+     Socket handlers (team created, chat message, delivered, read)
+     ------------------------- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!chatSocket) return;
         const handleTeamCreated = (payload)=>{
             const newChat = payload?.chat ?? (payload?.team ? {
                 id: payload.team.id,
@@ -425,7 +616,9 @@ function TeamInboxPage() {
                     type: "team",
                     teamId: newChat.teamId ?? null,
                     lastMessagePreview: null,
-                    unreadCount: 0
+                    lastMessageSender: null,
+                    unreadCount: 0,
+                    participants: newChat.participants ?? null
                 };
                 return [
                     inserted,
@@ -433,71 +626,154 @@ function TeamInboxPage() {
                 ];
             });
         };
-        const handleChatMessage = (payload)=>{
-            const chatId = payload?.chatId ?? payload?.chat?.id ?? null;
+        const handleChatMessage = (rawPayload)=>{
+            const payload = rawPayload?.message ? rawPayload : {
+                message: rawPayload.message ?? rawPayload,
+                ...rawPayload
+            };
+            let chatId = payload?.chatId ?? payload?.chat?.id ?? payload?.room ?? payload?.message?.chatId ?? null;
+            if (typeof chatId === "string" && chatId.startsWith("chat:")) {
+                chatId = chatId.slice("chat:".length);
+            }
             if (!chatId) return;
+            const msg = payload?.message ?? payload;
+            const text = msg?.content ?? msg?.text ?? "";
+            const senderName = msg?.sender?.name ?? msg?.senderName ?? msg?.fromName ?? msg?.from ?? null;
             setChats((prev)=>prev.map((c)=>{
-                    if (c.id !== chatId) return c;
-                    const text = payload?.message?.content ?? "";
+                    if (c.id !== String(chatId)) return c;
+                    const preview = text.length > 120 ? text.slice(0, 120) + "…" : text;
+                    let name = c.name;
+                    if ((c.type ?? "").toString().toLowerCase() === "direct") {
+                        if ((!name || name === "Chat" || name.startsWith("Chat ")) && senderName) {
+                            name = senderName;
+                        }
+                        const parts = c.participants ?? c.meta?.participants ?? c.meta?.members ?? null;
+                        if (!name && Array.isArray(parts) && parts.length > 0 && currentUser?.id) {
+                            const other = parts.map((p)=>{
+                                if (!p) return null;
+                                if (typeof p === "string" || typeof p === "number") {
+                                    return {
+                                        id: String(p),
+                                        name: String(p)
+                                    };
+                                }
+                                return {
+                                    id: p.id ?? p.userId ?? p._id ?? null,
+                                    name: p.name ?? p.displayName ?? p.user?.name ?? null
+                                };
+                            }).find((p)=>p && p.id && String(p.id) !== String(currentUser.id));
+                            if (other?.name) name = other.name;
+                        }
+                    }
                     return {
                         ...c,
-                        lastMessagePreview: text.length > 120 ? text.slice(0, 120) + "…" : text,
-                        unreadCount: (c.unreadCount ?? 0) + 1
+                        lastMessagePreview: preview,
+                        lastMessageSender: senderName,
+                        unreadCount: (c.unreadCount ?? 0) + 1,
+                        name
                     };
                 }));
         };
+        const handleDelivered = (payload)=>{
+            const chatId = payload?.chatId ?? payload?.chat?.id ?? payload?.room ?? null;
+            if (!chatId) return;
+            const normalizedId = typeof chatId === "string" && chatId.startsWith("chat:") ? chatId.slice("chat:".length) : String(chatId);
+            const map = readLocalStatusMap();
+            map[normalizedId] = {
+                status: "delivered",
+                updatedAt: Date.now()
+            };
+            writeLocalStatusMap(map);
+            setChatStatusMap({
+                ...map
+            });
+        };
+        const handleRead = (payload)=>{
+            let chatId = payload?.chatId ?? payload?.chat?.id ?? payload?.room ?? null;
+            if (!chatId) return;
+            if (typeof chatId === "string" && chatId.startsWith("chat:")) {
+                chatId = chatId.slice("chat:".length);
+            }
+            // WhatsApp-like: ignore my own read events for tick state
+            const readerId = payload?.userId ?? payload?.user?.id ?? null;
+            if (currentUser && readerId && String(readerId) === String(currentUser.id)) {
+                return;
+            }
+            const map = readLocalStatusMap();
+            map[String(chatId)] = {
+                status: "seen",
+                updatedAt: Date.now()
+            };
+            writeLocalStatusMap(map);
+            setChatStatusMap({
+                ...map
+            });
+            setChats((prev)=>prev.map((c)=>c.id === String(chatId) ? {
+                        ...c,
+                        unreadCount: 0
+                    } : c));
+        };
         try {
             chatSocket.on("team:created", handleTeamCreated);
+            // listen to BOTH events: some flows may emit "chat:message", others just "message"
             chatSocket.on("chat:message", handleChatMessage);
+            chatSocket.on("message", handleChatMessage);
+            chatSocket.on("chat:delivered", handleDelivered);
+            chatSocket.on("chat:read", handleRead);
         } catch (e) {
-            // non-fatal
-            // eslint-disable-next-line no-console
-            console.warn("chatSocket hook registration failed:", e);
+            console.warn("chatSocket registration failed:", e);
         }
-        // cleanup
         return ()=>{
             try {
                 chatSocket.off("team:created", handleTeamCreated);
                 chatSocket.off("chat:message", handleChatMessage);
-            } catch  {}
-        };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        chatSocket
-    ]);
-    // join selected chat room when selectedChatId changes
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (!selectedChatId) return;
-        // join selected chat room
-        (async ()=>{
-            try {
-                await chatSocket.joinChat(selectedChatId);
-            } catch (e) {
+                chatSocket.off("message", handleChatMessage);
+                chatSocket.off("chat:delivered", handleDelivered);
+                chatSocket.off("chat:read", handleRead);
+            } catch  {
             // ignore
             }
-        })();
-        // clear unread count locally for this chat (optionally call API to persist)
+        };
+    }, [
+        chatSocket,
+        currentUser
+    ]);
+    /* -------------------------
+     When selecting a chat: optimistically clear unread + mark seen locally & server
+     ------------------------- */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!selectedChatId) return;
         setChats((prev)=>prev.map((c)=>c.id === selectedChatId ? {
                     ...c,
                     unreadCount: 0
                 } : c));
-        // leave previous chat handled by joinChat calls — if you want to leave others, implement tracking
-        return ()=>{
-            (async ()=>{
-                try {
-                    await chatSocket.leaveChat(selectedChatId);
-                } catch  {}
-            })();
-        };
+        const map = readLocalStatusMap();
+        if (!map[selectedChatId] || map[selectedChatId].status !== "seen") {
+            map[selectedChatId] = {
+                status: "seen",
+                updatedAt: Date.now()
+            };
+            writeLocalStatusMap(map);
+            setChatStatusMap({
+                ...map
+            });
+        }
+        try {
+            void fetch(`/api/chats/${encodeURIComponent(selectedChatId)}/read`, {
+                method: "POST",
+                credentials: "same-origin"
+            });
+        } catch  {
+        // ignore
+        }
     }, [
-        selectedChatId,
-        chatSocket
+        selectedChatId
     ]);
-    // search + filter
-    const filteredChats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
+    /* -------------------------
+     Search + filter
+     ------------------------- */ const filteredChats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
         const q = searchQuery.trim().toLowerCase();
         return chats.filter((c)=>{
-            const matchesSearch = q === "" || c.name.toLowerCase().includes(q) || (c.lastMessagePreview ?? "").toLowerCase().includes(q);
+            const matchesSearch = q === "" || (c.name ?? "").toString().toLowerCase().includes(q) || (c.lastMessagePreview ?? "").toLowerCase().includes(q) || (c.lastMessageSender ?? "").toLowerCase().includes(q);
             const matchesFilter = filter === "all" || filter === "assigned" && (c.meta?.assigned === true || c.type === "direct" && c.meta?.assignedTo) || filter === "unassigned" && !(c.meta?.assigned === true || c.type === "direct" && c.meta?.assignedTo) || filter === "flagged" && c.meta?.flagged === true;
             return matchesSearch && matchesFilter;
         });
@@ -507,14 +783,6 @@ function TeamInboxPage() {
         filter
     ]);
     const unreadCount = chats.reduce((acc, c)=>acc + (c.unreadCount ?? 0), 0);
-    const handleArchive = (id)=>{
-        console.log("Archive", id);
-    // TODO: call API
-    };
-    const handleDelete = (id)=>{
-        console.log("Delete", id);
-    // TODO: confirmation + API
-    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
         className: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -534,7 +802,7 @@ function TeamInboxPage() {
                                             children: "Team Inbox"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 358,
+                                            lineNumber: 775,
                                             columnNumber: 15
                                         }, this),
                                         unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -548,13 +816,13 @@ function TeamInboxPage() {
                                             children: unreadCount
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 363,
+                                            lineNumber: 780,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 357,
+                                    lineNumber: 774,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -567,20 +835,20 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 371,
+                                                    lineNumber: 792,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: teamSelect
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 372,
+                                                    lineNumber: 793,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 370,
+                                            lineNumber: 791,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -590,20 +858,20 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 376,
+                                                    lineNumber: 797,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    children: " assigned"
+                                                    children: "assigned"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 377,
+                                                    lineNumber: 798,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 375,
+                                            lineNumber: 796,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -613,46 +881,46 @@ function TeamInboxPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 381,
+                                                    lineNumber: 802,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    children: " total"
+                                                    children: "total"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                    lineNumber: 382,
+                                                    lineNumber: 803,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 380,
+                                            lineNumber: 801,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 369,
+                                    lineNumber: 790,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 356,
+                            lineNumber: 773,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                             className: "text-sm text-slate-500 mt-2",
-                            children: "Manage incoming customer messages for your team. Use the left pane to pick a team or direct thread."
+                            children: "Manage incoming customer messages for your team. Outgoing messages show a tick state and a blue-dot until seen."
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 387,
+                            lineNumber: 808,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                    lineNumber: 355,
+                    lineNumber: 772,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -670,7 +938,7 @@ function TeamInboxPage() {
                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 396,
+                                                lineNumber: 820,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -682,13 +950,13 @@ function TeamInboxPage() {
                                                 className: "w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 397,
+                                                lineNumber: 821,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 395,
+                                        lineNumber: 819,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -698,12 +966,12 @@ function TeamInboxPage() {
                                             onChange: (v)=>setFilter(v)
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 408,
+                                            lineNumber: 832,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 407,
+                                        lineNumber: 831,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -711,7 +979,7 @@ function TeamInboxPage() {
                                         children: "Chats"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 411,
+                                        lineNumber: 838,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -721,46 +989,54 @@ function TeamInboxPage() {
                                             children: "Loading chats…"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 415,
+                                            lineNumber: 842,
                                             columnNumber: 19
                                         }, this) : error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "text-sm text-rose-600",
                                             children: error
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 417,
+                                            lineNumber: 844,
                                             columnNumber: 19
                                         }, this) : filteredChats.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "py-8 text-center text-sm text-slate-500",
                                             children: "No chats found — create a team or start a direct chat to begin."
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 419,
+                                            lineNumber: 846,
                                             columnNumber: 19
-                                        }, this) : filteredChats.map((c, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageCard, {
-                                                chat: c,
+                                        }, this) : filteredChats.map((c, idx)=>{
+                                            const display = c.name ?? (currentUser ? deriveDisplayName(c, currentUser) : c.name ?? "Chat");
+                                            const normalized = {
+                                                ...c,
+                                                name: display
+                                            };
+                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageCard, {
+                                                chat: normalized,
                                                 isSelected: selectedChatId === c.id,
                                                 onSelect: ()=>setSelectedChatId(c.id),
-                                                delay: idx * 0.03
+                                                delay: idx * 0.03,
+                                                chatStatusMap: chatStatusMap
                                             }, c.id, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                                lineNumber: 424,
-                                                columnNumber: 21
-                                            }, this))
+                                                lineNumber: 858,
+                                                columnNumber: 23
+                                            }, this);
+                                        })
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 413,
+                                        lineNumber: 840,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 394,
+                                lineNumber: 818,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 393,
+                            lineNumber: 817,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -774,12 +1050,12 @@ function TeamInboxPage() {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                    lineNumber: 437,
+                                    lineNumber: 878,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 434,
+                                lineNumber: 876,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-full flex flex-col items-center justify-center text-center text-slate-500",
@@ -790,12 +1066,12 @@ function TeamInboxPage() {
                                             className: "w-8 h-8 text-slate-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                            lineNumber: 442,
+                                            lineNumber: 886,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 441,
+                                        lineNumber: 885,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -803,7 +1079,7 @@ function TeamInboxPage() {
                                         children: "Select a chat to begin"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 444,
+                                        lineNumber: 888,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -811,35 +1087,35 @@ function TeamInboxPage() {
                                         children: "Pick a team group chat or a direct thread to start messaging."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                        lineNumber: 445,
+                                        lineNumber: 891,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                                lineNumber: 440,
+                                lineNumber: 884,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                            lineNumber: 432,
+                            lineNumber: 874,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-                    lineNumber: 391,
+                    lineNumber: 815,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-            lineNumber: 353,
+            lineNumber: 770,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/manager/TeamInbox/page.tsx",
-        lineNumber: 352,
+        lineNumber: 769,
         columnNumber: 5
     }, this);
 }

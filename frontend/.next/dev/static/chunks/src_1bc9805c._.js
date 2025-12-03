@@ -338,185 +338,254 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+function normalizeMembers(raw) {
+    if (!raw) return undefined;
+    const arr = Array.isArray(raw) ? raw : [];
+    const mapped = arr.map((m)=>{
+        if (!m) return null;
+        // backend normalizeChat gives: { id, name, email, role }
+        const id = m.id ?? m.userId ?? m.user?.id ?? m.user?._id ?? null;
+        const name = m.name ?? m.displayName ?? m.user?.name ?? null;
+        const email = m.email ?? m.user?.email ?? null;
+        const role = m.role ?? m.user?.role ?? null;
+        if (!id) return null;
+        return {
+            id: String(id),
+            name,
+            email,
+            role
+        };
+    }).filter(Boolean);
+    return mapped.length ? mapped : undefined;
+}
+/**
+ * Derive a per-user display name:
+ * - DIRECT / PRIVATE → show the "other person" for this user
+ * - TEAM / GROUP    → server name or Team <id>
+ * - fallback        → "Chat <id>"
+ */ function deriveDisplayName(chat, me) {
+    const rawType = (chat.type ?? "").toString().toLowerCase();
+    const serverName = chat.name ?? chat.meta?.name ?? "";
+    const isGeneric = !serverName || serverName === "Chat" || serverName.startsWith("Chat ");
+    const isDirect = rawType === "direct" || rawType === "private" || rawType === "dm";
+    if (isDirect) {
+        const candidates = chat.members ?? normalizeMembers(chat.meta?.members) ?? normalizeMembers(chat.meta?.participants);
+        if (candidates && candidates.length > 0 && me?.id) {
+            const other = candidates.find((p)=>String(p.id) !== String(me.id));
+            if (other) {
+                if (other.name) return other.name;
+                if (other.email) return other.email;
+            }
+        }
+        if (!isGeneric && serverName) return serverName;
+        return "Direct chat";
+    }
+    const isTeamOrGroup = rawType === "team" || rawType === "group";
+    if (!isGeneric && serverName) return serverName;
+    if (isTeamOrGroup) {
+        return chat.name ? chat.name : `Team ${chat.teamId ?? chat.id}`;
+    }
+    return serverName || `Chat ${chat.id}`;
+}
 function ChatRow(t0) {
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(27);
-    if ($[0] !== "d7bea6b5a241a5f275e72ceae7019f269583df00d75e93a250efcfff9677c845") {
-        for(let $i = 0; $i < 27; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(32);
+    if ($[0] !== "6305101dddfc9c780744998068d26d948c582ba5a751eba5dfada188d7ac0e39") {
+        for(let $i = 0; $i < 32; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "d7bea6b5a241a5f275e72ceae7019f269583df00d75e93a250efcfff9677c845";
+        $[0] = "6305101dddfc9c780744998068d26d948c582ba5a751eba5dfada188d7ac0e39";
     }
-    const { chat, onOpen } = t0;
-    let t1;
-    if ($[1] !== chat.id || $[2] !== onOpen) {
-        t1 = ({
+    const { chat, onOpen, currentUser } = t0;
+    const t1 = chat.type ?? "";
+    let t2;
+    if ($[1] !== t1) {
+        const typeLabel = t1.toString().toUpperCase();
+        t2 = typeLabel.includes("GROUP") || typeLabel.includes("TEAM");
+        $[1] = t1;
+        $[2] = t2;
+    } else {
+        t2 = $[2];
+    }
+    const isGroupLike = t2;
+    let t3;
+    if ($[3] !== chat || $[4] !== currentUser) {
+        t3 = deriveDisplayName(chat, currentUser);
+        $[3] = chat;
+        $[4] = currentUser;
+        $[5] = t3;
+    } else {
+        t3 = $[5];
+    }
+    const displayName = t3;
+    let t4;
+    if ($[6] !== chat.id || $[7] !== onOpen) {
+        t4 = ({
             "ChatRow[<button>.onClick]": ()=>onOpen(chat.id)
         })["ChatRow[<button>.onClick]"];
-        $[1] = chat.id;
-        $[2] = onOpen;
-        $[3] = t1;
+        $[6] = chat.id;
+        $[7] = onOpen;
+        $[8] = t4;
     } else {
-        t1 = $[3];
+        t4 = $[8];
     }
-    let t2;
-    if ($[4] !== chat.type) {
-        t2 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    let t5;
+    if ($[9] !== isGroupLike) {
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden",
-            children: String(chat.type ?? "").toUpperCase().includes("GROUP") || String(chat.type ?? "").toUpperCase().includes("TEAM") ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            children: isGroupLike ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 children: "👥"
             }, void 0, false, {
                 fileName: "[project]/src/components/chat/ChatList.tsx",
-                lineNumber: 47,
-                columnNumber: 228
+                lineNumber: 126,
+                columnNumber: 126
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 children: "💬"
             }, void 0, false, {
                 fileName: "[project]/src/components/chat/ChatList.tsx",
-                lineNumber: 47,
-                columnNumber: 246
+                lineNumber: 126,
+                columnNumber: 144
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 47,
+            lineNumber: 126,
             columnNumber: 10
         }, this);
-        $[4] = chat.type;
-        $[5] = t2;
+        $[9] = isGroupLike;
+        $[10] = t5;
     } else {
-        t2 = $[5];
-    }
-    const t3 = chat.name ?? (String(chat.type ?? "").toUpperCase().includes("PRIVATE") ? "Direct" : "Group");
-    let t4;
-    if ($[6] !== t3) {
-        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "font-medium text-sm",
-            children: t3
-        }, void 0, false, {
-            fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 56,
-            columnNumber: 10
-        }, this);
-        $[6] = t3;
-        $[7] = t4;
-    } else {
-        t4 = $[7];
-    }
-    let t5;
-    if ($[8] !== chat.lastMessage) {
-        t5 = chat.lastMessage ? new Date(chat.lastMessage.createdAt).toLocaleTimeString() : "";
-        $[8] = chat.lastMessage;
-        $[9] = t5;
-    } else {
-        t5 = $[9];
+        t5 = $[10];
     }
     let t6;
-    if ($[10] !== t5) {
+    if ($[11] !== displayName) {
         t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "text-xs text-gray-500",
-            children: t5
+            className: "font-medium text-sm truncate",
+            children: displayName
         }, void 0, false, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 72,
+            lineNumber: 134,
             columnNumber: 10
         }, this);
-        $[10] = t5;
-        $[11] = t6;
+        $[11] = displayName;
+        $[12] = t6;
     } else {
-        t6 = $[11];
+        t6 = $[12];
     }
     let t7;
-    if ($[12] !== t4 || $[13] !== t6) {
-        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "flex justify-between",
-            children: [
-                t4,
-                t6
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 80,
-            columnNumber: 10
-        }, this);
-        $[12] = t4;
-        $[13] = t6;
+    if ($[13] !== chat.lastMessage) {
+        t7 = chat.lastMessage ? new Date(chat.lastMessage.createdAt).toLocaleTimeString() : "";
+        $[13] = chat.lastMessage;
         $[14] = t7;
     } else {
         t7 = $[14];
     }
-    const t8 = chat.lastMessage?.content ?? "No messages yet";
-    let t9;
-    if ($[15] !== t8) {
-        t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "text-xs text-gray-600 truncate",
-            children: t8
+    let t8;
+    if ($[15] !== t7) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "text-xs text-gray-500",
+            children: t7
         }, void 0, false, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 90,
+            lineNumber: 150,
             columnNumber: 10
         }, this);
-        $[15] = t8;
-        $[16] = t9;
+        $[15] = t7;
+        $[16] = t8;
     } else {
-        t9 = $[16];
+        t8 = $[16];
     }
-    let t10;
-    if ($[17] !== t7 || $[18] !== t9) {
-        t10 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "flex-1",
+    let t9;
+    if ($[17] !== t6 || $[18] !== t8) {
+        t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex justify-between",
             children: [
-                t7,
-                t9
+                t6,
+                t8
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 98,
-            columnNumber: 11
+            lineNumber: 158,
+            columnNumber: 10
         }, this);
-        $[17] = t7;
-        $[18] = t9;
-        $[19] = t10;
+        $[17] = t6;
+        $[18] = t8;
+        $[19] = t9;
     } else {
-        t10 = $[19];
+        t9 = $[19];
     }
+    const t10 = chat.lastMessage?.content ?? "No messages yet";
     let t11;
-    if ($[20] !== chat.unreadCount) {
-        t11 = chat.unreadCount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "ml-3 text-sm px-2 py-1 bg-blue-600 text-white rounded-full",
-            children: chat.unreadCount
+    if ($[20] !== t10) {
+        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "text-xs text-gray-600 truncate",
+            children: t10
         }, void 0, false, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 107,
-            columnNumber: 30
-        }, this) : null;
-        $[20] = chat.unreadCount;
+            lineNumber: 168,
+            columnNumber: 11
+        }, this);
+        $[20] = t10;
         $[21] = t11;
     } else {
         t11 = $[21];
     }
     let t12;
-    if ($[22] !== t1 || $[23] !== t10 || $[24] !== t11 || $[25] !== t2) {
-        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-            className: "w-full text-left p-3 hover:bg-slate-50 flex items-center gap-3",
-            onClick: t1,
+    if ($[22] !== t11 || $[23] !== t9) {
+        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex-1",
             children: [
-                t2,
-                t10,
+                t9,
                 t11
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/chat/ChatList.tsx",
-            lineNumber: 115,
+            lineNumber: 176,
             columnNumber: 11
         }, this);
-        $[22] = t1;
-        $[23] = t10;
-        $[24] = t11;
-        $[25] = t2;
-        $[26] = t12;
+        $[22] = t11;
+        $[23] = t9;
+        $[24] = t12;
     } else {
-        t12 = $[26];
+        t12 = $[24];
     }
-    return t12;
+    let t13;
+    if ($[25] !== chat.unreadCount) {
+        t13 = chat.unreadCount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "ml-3 text-sm px-2 py-1 bg-blue-600 text-white rounded-full",
+            children: chat.unreadCount
+        }, void 0, false, {
+            fileName: "[project]/src/components/chat/ChatList.tsx",
+            lineNumber: 185,
+            columnNumber: 30
+        }, this) : null;
+        $[25] = chat.unreadCount;
+        $[26] = t13;
+    } else {
+        t13 = $[26];
+    }
+    let t14;
+    if ($[27] !== t12 || $[28] !== t13 || $[29] !== t4 || $[30] !== t5) {
+        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            className: "w-full text-left p-3 hover:bg-slate-50 flex items-center gap-3",
+            onClick: t4,
+            children: [
+                t5,
+                t12,
+                t13
+            ]
+        }, void 0, true, {
+            fileName: "[project]/src/components/chat/ChatList.tsx",
+            lineNumber: 193,
+            columnNumber: 11
+        }, this);
+        $[27] = t12;
+        $[28] = t13;
+        $[29] = t4;
+        $[30] = t5;
+        $[31] = t14;
+    } else {
+        t14 = $[31];
+    }
+    return t14;
 }
 _c = ChatRow;
 function ChatList({ onOpen }) {
@@ -532,19 +601,51 @@ function ChatList({ onOpen }) {
     const [chats, setChats] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [currentUser, setCurrentUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    // load current user (for "other person" name)
+    const loadMe = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ChatList.useCallback[loadMe]": async ()=>{
+            try {
+                const res = await fetch("/api/me", {
+                    credentials: "same-origin"
+                });
+                if (!res.ok) return;
+                const j = await res.json().catch({
+                    "ChatList.useCallback[loadMe]": ()=>({})
+                }["ChatList.useCallback[loadMe]"]);
+                const u = j?.user ?? null;
+                if (u && u.id) {
+                    setCurrentUser({
+                        id: String(u.id),
+                        name: u.name ?? null,
+                        email: u.email ?? null,
+                        role: u.role ?? null
+                    });
+                }
+            } catch  {
+            // non-fatal
+            }
+        }
+    }["ChatList.useCallback[loadMe]"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ChatList.useEffect": ()=>{
+            loadMe();
+        }
+    }["ChatList.useEffect"], [
+        loadMe
+    ]);
     // load chats from api (same endpoint pages use)
     const loadChats = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatList.useCallback[loadChats]": async ()=>{
             setLoading(true);
             setError(null);
             try {
-                const res = await fetch("/api/chats", {
+                const res_0 = await fetch("/api/chats", {
                     credentials: "same-origin"
                 });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j = await res.json();
-                const payload = j?.chats ?? [];
-                // normalize to LocalChat
+                if (!res_0.ok) throw new Error(`HTTP ${res_0.status}`);
+                const j_0 = await res_0.json();
+                const payload = j_0?.chats ?? [];
                 const normalized = payload.map({
                     "ChatList.useCallback[loadChats].normalized": (c)=>({
                             id: c.id,
@@ -559,7 +660,8 @@ function ChatList({ onOpen }) {
                             } : null,
                             unreadCount: typeof c.unreadCount === "number" ? c.unreadCount : 0,
                             teamId: c.teamId ?? null,
-                            meta: c.meta ?? null
+                            meta: c.meta ?? c ?? null,
+                            members: normalizeMembers(c.members ?? c.participants) ?? null
                         })
                 }["ChatList.useCallback[loadChats].normalized"]);
                 setChats(normalized);
@@ -575,7 +677,6 @@ function ChatList({ onOpen }) {
         "ChatList.useEffect": ()=>{
             // If a ChatProvider is present and exposes chats, use it as source of truth
             if (chatProvider && Array.isArray(chatProvider.chats) && typeof chatProvider.loading !== "undefined") {
-                // map provider chats to our local shape for socket merging
                 const mapped = (chatProvider.chats ?? []).map({
                     "ChatList.useEffect.mapped": (c_0)=>({
                             id: c_0.id,
@@ -587,7 +688,8 @@ function ChatList({ onOpen }) {
                             } : null,
                             unreadCount: typeof c_0.unreadCount === "number" ? c_0.unreadCount : 0,
                             teamId: c_0.teamId ?? null,
-                            meta: c_0.meta ?? null
+                            meta: c_0.meta ?? c_0 ?? null,
+                            members: normalizeMembers(c_0.members ?? c_0.participants) ?? null
                         })
                 }["ChatList.useEffect.mapped"]);
                 setChats(mapped);
@@ -610,7 +712,8 @@ function ChatList({ onOpen }) {
                     const chatPayload = payload_0?.chat ?? (payload_0?.team ? {
                         id: payload_0.team.id,
                         name: payload_0.team.name,
-                        teamId: payload_0.team.id
+                        teamId: payload_0.team.id,
+                        members: payload_0.team.members ?? payload_0.chat?.members ?? null
                     } : null);
                     if (!chatPayload) return;
                     setChats({
@@ -624,7 +727,8 @@ function ChatList({ onOpen }) {
                                 type: "GROUP",
                                 lastMessage: null,
                                 unreadCount: 0,
-                                teamId: chatPayload.teamId ?? null
+                                teamId: chatPayload.teamId ?? null,
+                                members: normalizeMembers(chatPayload.members) ?? null
                             };
                             return [
                                 newRow,
@@ -640,6 +744,8 @@ function ChatList({ onOpen }) {
                     if (!chatId) return;
                     const text = payload_1?.message?.content ?? payload_1?.content ?? "";
                     const createdAt = payload_1?.message?.createdAt ?? new Date().toISOString();
+                    const membersFromPayload = payload_1?.chat?.members ?? payload_1?.chat?.participants ?? null;
+                    // update existing chat
                     setChats({
                         "ChatList.useEffect.handleChatMessage": (prev_0)=>prev_0.map({
                                 "ChatList.useEffect.handleChatMessage": (c_1)=>{
@@ -650,12 +756,13 @@ function ChatList({ onOpen }) {
                                             content: text,
                                             createdAt
                                         },
-                                        unreadCount: (c_1.unreadCount ?? 0) + 1
+                                        unreadCount: (c_1.unreadCount ?? 0) + 1,
+                                        members: c_1.members ?? normalizeMembers(membersFromPayload) ?? null
                                     };
                                 }
                             }["ChatList.useEffect.handleChatMessage"])
                     }["ChatList.useEffect.handleChatMessage"]);
-                    // if chat not present, optionally add a stub (helps admins monitoring)
+                    // if chat not present, add a stub
                     setChats({
                         "ChatList.useEffect.handleChatMessage": (prev_1)=>{
                             if (prev_1.find({
@@ -670,7 +777,9 @@ function ChatList({ onOpen }) {
                                     createdAt
                                 },
                                 unreadCount: 1,
-                                teamId: payload_1?.chat?.teamId ?? null
+                                teamId: payload_1?.chat?.teamId ?? null,
+                                meta: payload_1?.chat ?? null,
+                                members: normalizeMembers(membersFromPayload) ?? null
                             };
                             return [
                                 stub,
@@ -696,7 +805,6 @@ function ChatList({ onOpen }) {
     const handleOpen = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatList.useCallback[handleOpen]": async (id)=>{
             try {
-                // join the chat room so this client receives real-time messages for it
                 try {
                     await socket.joinChat?.(id);
                 } catch  {}
@@ -708,17 +816,13 @@ function ChatList({ onOpen }) {
                     chatProvider.openChat(id);
                     return;
                 }
-                // fallback: navigate to a route (if you use routes like /dashboard/chat/[id])
                 if ("TURBOPACK compile-time truthy", 1) {
                     try {
-                        const base = window.location.pathname.split("/dashboard")[0] || "";
-                        // Do not assume routing scheme — only attempt safe history push
                         window.history.pushState({}, "", `${window.location.pathname}?chatId=${encodeURIComponent(id)}`);
-                    // leave it to the parent to detect query param and open. This is a safe fallback.
                     } catch  {}
                 }
-            } catch (e) {
-            // ignore individual failures
+            } catch  {
+            // ignore
             }
         }
     }["ChatList.useCallback[handleOpen]"], [
@@ -731,34 +835,43 @@ function ChatList({ onOpen }) {
         children: "Loading chats…"
     }, void 0, false, {
         fileName: "[project]/src/components/chat/ChatList.tsx",
-        lineNumber: 309,
+        lineNumber: 416,
         columnNumber: 23
+    }, this);
+    if (error) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "p-4 text-sm text-red-600",
+        children: error
+    }, void 0, false, {
+        fileName: "[project]/src/components/chat/ChatList.tsx",
+        lineNumber: 419,
+        columnNumber: 21
     }, this);
     if (!chats.length) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "p-4 text-sm text-gray-600",
         children: "No chats yet"
     }, void 0, false, {
         fileName: "[project]/src/components/chat/ChatList.tsx",
-        lineNumber: 310,
+        lineNumber: 422,
         columnNumber: 29
     }, this);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "divide-y border-r",
         children: chats.map((c_3)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ChatRow, {
                 chat: c_3,
-                onOpen: handleOpen
+                onOpen: handleOpen,
+                currentUser: currentUser
             }, c_3.id, false, {
                 fileName: "[project]/src/components/chat/ChatList.tsx",
-                lineNumber: 312,
+                lineNumber: 426,
                 columnNumber: 25
             }, this))
     }, void 0, false, {
         fileName: "[project]/src/components/chat/ChatList.tsx",
-        lineNumber: 311,
+        lineNumber: 425,
         columnNumber: 10
     }, this);
 }
-_s(ChatList, "m7qaJknBOW8WhgDezDSQ57oBw6Y=", false, function() {
+_s(ChatList, "rRTjAAQ8U9TmZ5vfKfBgkwrINaw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$ChatSocketProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useChatSocket"]
     ];

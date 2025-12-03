@@ -802,7 +802,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user.js [app-client] (ecmascript) <export default as User>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/users.js [app-client] (ecmascript) <export default as Users>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check.js [app-client] (ecmascript) <export default as CheckCircle2>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Star$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/star.js [app-client] (ecmascript) <export default as Star>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$ellipsis$2d$vertical$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MoreVertical$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/ellipsis-vertical.js [app-client] (ecmascript) <export default as MoreVertical>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/mail.js [app-client] (ecmascript) <export default as Mail>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/phone.js [app-client] (ecmascript) <export default as Phone>");
@@ -811,16 +810,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__UserCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user-check.js [app-client] (ecmascript) <export default as UserCheck>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$plus$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__UserPlus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user-plus.js [app-client] (ecmascript) <export default as UserPlus>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.js [app-client] (ecmascript) <export default as X>");
-/**
- * Imports:
- * - CardSquare: square box-like card with avatar ring (from your ui)
- * - Modal: accessible modal primitive
- *
- * Make sure components/ui/card exports CardSquare as shown previously.
- */ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/card.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/card.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/modal.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$shared$2f$lib$2f$app$2d$dynamic$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/shared/lib/app-dynamic.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 ;
-var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
+;
+var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
@@ -828,15 +824,27 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
+;
+;
+// TeamChat is client-only (heavy + socket)
+const TeamChat = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$shared$2f$lib$2f$app$2d$dynamic$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"])(()=>__turbopack_context__.A("[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry, async loader)").then((m)=>m.default), {
+    loadableGenerated: {
+        modules: [
+            "[project]/src/components/chat/TeamChat.tsx [app-client] (ecmascript, next/dynamic entry)"
+        ]
+    },
+    ssr: false
+});
+_c = TeamChat;
 /* ============================
    Small accessible IconButton
    ============================ */ const IconButton = (t0)=>{
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(7);
-    if ($[0] !== "45564a07a31b4ccfcd155f1f559fe57fd98c254a406898b3a15094c2e3326251") {
+    if ($[0] !== "e4f8f7f2fa8a0da143f17d6a8688a5fc243b32c93fe6f70e2b47d628be21768a") {
         for(let $i = 0; $i < 7; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "45564a07a31b4ccfcd155f1f559fe57fd98c254a406898b3a15094c2e3326251";
+        $[0] = "e4f8f7f2fa8a0da143f17d6a8688a5fc243b32c93fe6f70e2b47d628be21768a";
     }
     const { children, ariaLabel, title, onClick, className: t1 } = t0;
     const className = t1 === undefined ? "" : t1;
@@ -852,7 +860,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
             children: children
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-            lineNumber: 70,
+            lineNumber: 69,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
         $[1] = ariaLabel;
@@ -866,20 +874,20 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
     }
     return t3;
 };
-_c = IconButton;
+_c1 = IconButton;
 /* ============================
-   Modal to show person details
-   - same structure as before, adapted to work with CardSquare triggers
+   Person Modal (details + actions)
+   - includes Message button which opens a chat modal
    ============================ */ const PersonModal = (t0)=>{
     _s();
-    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(15);
-    if ($[0] !== "45564a07a31b4ccfcd155f1f559fe57fd98c254a406898b3a15094c2e3326251") {
-        for(let $i = 0; $i < 15; $i += 1){
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(16);
+    if ($[0] !== "e4f8f7f2fa8a0da143f17d6a8688a5fc243b32c93fe6f70e2b47d628be21768a") {
+        for(let $i = 0; $i < 16; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "45564a07a31b4ccfcd155f1f559fe57fd98c254a406898b3a15094c2e3326251";
+        $[0] = "e4f8f7f2fa8a0da143f17d6a8688a5fc243b32c93fe6f70e2b47d628be21768a";
     }
-    const { person, open, onClose, initialFocusRef } = t0;
+    const { person, open, onClose, onMessageClick, initialFocusRef } = t0;
     const closeButtonRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     let t1;
     let t2;
@@ -941,7 +949,7 @@ _c = IconButton;
         return null;
     }
     let t5;
-    if ($[9] !== onClose || $[10] !== open || $[11] !== person) {
+    if ($[9] !== onClose || $[10] !== onMessageClick || $[11] !== open || $[12] !== person) {
         t5 = open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Modal"], {
             onClose: onClose,
             ariaLabel: `Details for ${person.name}`,
@@ -975,12 +983,12 @@ _c = IconButton;
                                             className: `w-6 h-6 ${person.presence === "online" ? "text-white" : "text-slate-500"}`
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                            lineNumber: 173,
+                                            lineNumber: 174,
                                             columnNumber: 383
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 174,
                                         columnNumber: 208
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -990,7 +998,7 @@ _c = IconButton;
                                                 children: person.name
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 494
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -998,19 +1006,19 @@ _c = IconButton;
                                                 children: person.role
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 567
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 174,
                                         columnNumber: 489
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 173,
+                                lineNumber: 174,
                                 columnNumber: 167
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1024,23 +1032,23 @@ _c = IconButton;
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 174,
                                         columnNumber: 773
                                     }, ("TURBOPACK compile-time value", void 0))
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 174,
                                     columnNumber: 679
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 173,
+                                lineNumber: 174,
                                 columnNumber: 638
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                        lineNumber: 173,
+                        lineNumber: 174,
                         columnNumber: 86
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1056,7 +1064,7 @@ _c = IconButton;
                                                 children: "Contact"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 918
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1069,20 +1077,20 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1057
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: person.email ?? "\u2014"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1104
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1016
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1092,20 +1100,20 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1195
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: person.phone ?? "\u2014"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1243
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1149
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1115,32 +1123,32 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1334
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: person.location ?? "\u2014"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1378
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1288
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 971
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 174,
                                         columnNumber: 913
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1150,7 +1158,7 @@ _c = IconButton;
                                                 children: "Work"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 1443
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1163,20 +1171,20 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1579
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: person.role
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1623
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1538
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1186,7 +1194,7 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1701
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1196,13 +1204,13 @@ _c = IconButton;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1748
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1655
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1212,41 +1220,41 @@ _c = IconButton;
                                                                 className: "w-4 h-4 text-slate-400"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1848
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: [
-                                                                    person.tasksAssigned,
+                                                                    person.tasksAssigned ?? 0,
                                                                     " tasks assigned"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
+                                                                lineNumber: 174,
                                                                 columnNumber: 1896
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 1802
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
+                                                lineNumber: 174,
                                                 columnNumber: 1493
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
+                                        lineNumber: 174,
                                         columnNumber: 1438
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 173,
+                                lineNumber: 174,
                                 columnNumber: 886
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1259,8 +1267,8 @@ _c = IconButton;
                                                 children: "Activity & metrics"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
-                                                columnNumber: 2002
+                                                lineNumber: 174,
+                                                columnNumber: 2007
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "mt-1 text-sm text-slate-800 space-y-2",
@@ -1273,8 +1281,8 @@ _c = IconButton;
                                                                 children: "Response rate"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2176
+                                                                lineNumber: 174,
+                                                                columnNumber: 2181
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "font-medium",
@@ -1284,14 +1292,14 @@ _c = IconButton;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2235
+                                                                lineNumber: 174,
+                                                                columnNumber: 2240
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 2125
+                                                        lineNumber: 174,
+                                                        columnNumber: 2130
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "flex items-center justify-between",
@@ -1301,22 +1309,22 @@ _c = IconButton;
                                                                 children: "Presence"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2353
+                                                                lineNumber: 174,
+                                                                columnNumber: 2358
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "font-medium capitalize",
                                                                 children: person.presence
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2407
+                                                                lineNumber: 174,
+                                                                columnNumber: 2412
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 2302
+                                                        lineNumber: 174,
+                                                        columnNumber: 2307
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     person.label && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "flex items-center justify-between",
@@ -1326,34 +1334,34 @@ _c = IconButton;
                                                                 children: "Tag"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2544
+                                                                lineNumber: 174,
+                                                                columnNumber: 2549
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: `px-2 py-0.5 rounded-md text-xs font-medium ${person.label.colorClass}`,
                                                                 children: person.label.text
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2593
+                                                                lineNumber: 174,
+                                                                columnNumber: 2598
                                                             }, ("TURBOPACK compile-time value", void 0))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 2493
+                                                        lineNumber: 174,
+                                                        columnNumber: 2498
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
-                                                columnNumber: 2070
+                                                lineNumber: 174,
+                                                columnNumber: 2075
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
-                                        columnNumber: 1997
+                                        lineNumber: 174,
+                                        columnNumber: 2002
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: [
@@ -1362,30 +1370,30 @@ _c = IconButton;
                                                 children: "Actions"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
-                                                columnNumber: 2731
+                                                lineNumber: 174,
+                                                columnNumber: 2736
                                             }, ("TURBOPACK compile-time value", void 0)),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "mt-2 flex items-center gap-2",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         type: "button",
-                                                        onClick: ()=>console.log("Message", person.id),
+                                                        onClick: ()=>onMessageClick(person),
                                                         className: "px-3 py-2 rounded-lg bg-slate-100 text-sm flex items-center gap-2 hover:bg-slate-200",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 2999
+                                                                lineNumber: 174,
+                                                                columnNumber: 2993
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             "Message"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 2830
+                                                        lineNumber: 174,
+                                                        columnNumber: 2835
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         type: "button",
@@ -1396,15 +1404,15 @@ _c = IconButton;
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 173,
-                                                                columnNumber: 3213
+                                                                lineNumber: 174,
+                                                                columnNumber: 3207
                                                             }, ("TURBOPACK compile-time value", void 0)),
                                                             "Call"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 3047
+                                                        lineNumber: 174,
+                                                        columnNumber: 3041
                                                     }, ("TURBOPACK compile-time value", void 0)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         type: "button",
@@ -1415,36 +1423,36 @@ _c = IconButton;
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                            lineNumber: 173,
-                                                            columnNumber: 3412
+                                                            lineNumber: 174,
+                                                            columnNumber: 3406
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 173,
-                                                        columnNumber: 3259
+                                                        lineNumber: 174,
+                                                        columnNumber: 3253
                                                     }, ("TURBOPACK compile-time value", void 0))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 173,
-                                                columnNumber: 2784
+                                                lineNumber: 174,
+                                                columnNumber: 2789
                                             }, ("TURBOPACK compile-time value", void 0))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 173,
-                                        columnNumber: 2726
+                                        lineNumber: 174,
+                                        columnNumber: 2731
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 173,
-                                columnNumber: 1970
+                                lineNumber: 174,
+                                columnNumber: 1975
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                        lineNumber: 173,
+                        lineNumber: 174,
                         columnNumber: 827
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1457,133 +1465,534 @@ _c = IconButton;
                             children: "Close"
                         }, void 0, false, {
                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                            lineNumber: 173,
-                            columnNumber: 3539
+                            lineNumber: 174,
+                            columnNumber: 3533
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                        lineNumber: 173,
-                        columnNumber: 3481
+                        lineNumber: 174,
+                        columnNumber: 3475
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                lineNumber: 162,
+                lineNumber: 163,
                 columnNumber: 84
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-            lineNumber: 162,
+            lineNumber: 163,
             columnNumber: 18
         }, ("TURBOPACK compile-time value", void 0));
         $[9] = onClose;
-        $[10] = open;
-        $[11] = person;
-        $[12] = t5;
+        $[10] = onMessageClick;
+        $[11] = open;
+        $[12] = person;
+        $[13] = t5;
     } else {
-        t5 = $[12];
+        t5 = $[13];
     }
     let t6;
-    if ($[13] !== t5) {
+    if ($[14] !== t5) {
         t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
             children: t5
         }, void 0, false, {
             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-            lineNumber: 183,
+            lineNumber: 185,
             columnNumber: 10
         }, ("TURBOPACK compile-time value", void 0));
-        $[13] = t5;
-        $[14] = t6;
+        $[14] = t5;
+        $[15] = t6;
     } else {
-        t6 = $[14];
+        t6 = $[15];
     }
     return t6;
 };
 _s(PersonModal, "zOMdpLpexCdljRWmzOWSNGpfgkM=");
-_c1 = PersonModal;
-function ManagerPeoplePage() {
+_c2 = PersonModal;
+/* ============================
+   Message Modal: opens a TeamChat for a direct chat (manager <-> member)
+   - ensures direct chat exists (tries to find, else POST /api/chats to create)
+   ============================ */ const MessageModal = ({ open, onClose, memberId, memberName, currentUser })=>{
     _s1();
+    const [chatId, setChatId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [errorText, setErrorText] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const mountedRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(true);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "MessageModal.useEffect": ()=>{
+            mountedRef.current = true;
+            return ({
+                "MessageModal.useEffect": ()=>{
+                    mountedRef.current = false;
+                }
+            })["MessageModal.useEffect"];
+        }
+    }["MessageModal.useEffect"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "MessageModal.useEffect": ()=>{
+            if (!open) {
+                setChatId(null);
+                return;
+            }
+            if (!memberId) return;
+            let cancelled = false;
+            // inside MessageModal useEffect — replace the existing ensureChat function with this version
+            const ensureChat = {
+                "MessageModal.useEffect.ensureChat": async ()=>{
+                    setLoading(true);
+                    setErrorText(null);
+                    try {
+                        // 1) Try to find an existing direct chat
+                        try {
+                            const qRes = await fetch(`/api/chats`, {
+                                credentials: "same-origin"
+                            });
+                            if (qRes.ok) {
+                                const j = await qRes.json().catch({
+                                    "MessageModal.useEffect.ensureChat": ()=>({})
+                                }["MessageModal.useEffect.ensureChat"]);
+                                const list = j?.chats ?? j?.items ?? j ?? [];
+                                const found = list.find({
+                                    "MessageModal.useEffect.ensureChat": (c)=>{
+                                        if (!c) return false;
+                                        const t = (c.type ?? c.chatType ?? "").toString().toLowerCase();
+                                        if ([
+                                            "direct",
+                                            "dm",
+                                            "one_to_one",
+                                            "direct_message"
+                                        ].includes(t)) return true;
+                                        const members = c.members ?? c.participants ?? c.userIds ?? c.memberIds ?? [];
+                                        if (Array.isArray(members) && members.includes(memberId) && members.length <= 2) return true;
+                                        return false;
+                                    }
+                                }["MessageModal.useEffect.ensureChat"]) ?? null;
+                                if (found) {
+                                    const id = found.id ?? found.chatId ?? found._id ?? null;
+                                    if (id) {
+                                        setChatId(String(id));
+                                        setLoading(false);
+                                        return;
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("chat list check failed:", e);
+                        }
+                        // 2) Try several possible payload shapes and log/display server response when they fail
+                        const attempts = [
+                            {
+                                body: {
+                                    type: "direct",
+                                    memberId
+                                },
+                                label: "type:direct + memberId"
+                            },
+                            {
+                                body: {
+                                    type: "direct",
+                                    userId: memberId
+                                },
+                                label: "type:direct + userId"
+                            },
+                            {
+                                body: {
+                                    userIds: [
+                                        memberId
+                                    ]
+                                },
+                                label: "userIds: [memberId]"
+                            },
+                            {
+                                body: {
+                                    memberIds: [
+                                        memberId
+                                    ]
+                                },
+                                label: "memberIds: [memberId]"
+                            },
+                            {
+                                body: {
+                                    participantIds: [
+                                        memberId
+                                    ]
+                                },
+                                label: "participantIds: [memberId]"
+                            },
+                            {
+                                body: {
+                                    directTo: memberId
+                                },
+                                label: "directTo: memberId"
+                            }
+                        ];
+                        for (const a of attempts){
+                            try {
+                                const res = await fetch("/api/chats", {
+                                    method: "POST",
+                                    credentials: "same-origin",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify(a.body)
+                                });
+                                if (res.ok) {
+                                    const j = await res.json().catch({
+                                        "MessageModal.useEffect.ensureChat": ()=>({})
+                                    }["MessageModal.useEffect.ensureChat"]);
+                                    const created = j?.chat ?? j?.message ?? j ?? {};
+                                    const id = created.id ?? created.chatId ?? created._id ?? null;
+                                    if (id) {
+                                        setChatId(String(id));
+                                        setLoading(false);
+                                        return;
+                                    }
+                                } else {
+                                    const txt = await res.text().catch({
+                                        "MessageModal.useEffect.ensureChat": ()=>""
+                                    }["MessageModal.useEffect.ensureChat"]);
+                                    console.warn(`[create chat attempt "${a.label}" returned ${res.status}]`, txt);
+                                    setErrorText(`Attempt "${a.label}" → ${res.status}: ${txt}`);
+                                }
+                            } catch (e) {
+                                console.warn(`create attempt "${a.label}" failed:`, e);
+                                setErrorText(`Attempt "${a.label}" failed: ${String(e?.message ?? e)}`);
+                            }
+                        }
+                        // nothing succeeded
+                        setChatId(null);
+                    } finally{
+                        setLoading(false);
+                    }
+                }
+            }["MessageModal.useEffect.ensureChat"];
+            void ensureChat();
+            return ({
+                "MessageModal.useEffect": ()=>{
+                    cancelled = true;
+                }
+            })["MessageModal.useEffect"];
+        }
+    }["MessageModal.useEffect"], [
+        open,
+        memberId
+    ]);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
+        children: open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Modal"], {
+            onClose: onClose,
+            ariaLabel: `Chat with ${memberName ?? "member"}`,
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
+                initial: {
+                    opacity: 0,
+                    y: 8
+                },
+                animate: {
+                    opacity: 1,
+                    y: 0
+                },
+                exit: {
+                    opacity: 0,
+                    y: 8
+                },
+                transition: {
+                    duration: 0.14
+                },
+                className: "max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center justify-between p-3 border-b border-slate-100",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"], {
+                                            className: "w-5 h-5 text-slate-600"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                            lineNumber: 357,
+                                            columnNumber: 19
+                                        }, ("TURBOPACK compile-time value", void 0))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                        lineNumber: 356,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-sm font-medium text-slate-900",
+                                                children: [
+                                                    "Chat with ",
+                                                    memberName ?? "member"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                                lineNumber: 360,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-xs text-slate-500",
+                                                children: chatId ? `Chat: ${chatId}` : "Preparing chat…"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                                lineNumber: 361,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                        lineNumber: 359,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                lineNumber: 355,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-2",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    type: "button",
+                                    onClick: onClose,
+                                    className: "px-3 py-1 rounded-md bg-slate-50 hover:bg-slate-100",
+                                    children: "Close"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                    lineNumber: 366,
+                                    columnNumber: 17
+                                }, ("TURBOPACK compile-time value", void 0))
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                lineNumber: 365,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                        lineNumber: 354,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-4 min-h-[320px]",
+                        children: loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "text-sm text-slate-500",
+                            children: "Preparing chat…"
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                            lineNumber: 373,
+                            columnNumber: 26
+                        }, ("TURBOPACK compile-time value", void 0)) : chatId ? // render TeamChat for this chatId
+                        // @ts-ignore (dynamic import client-only)
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "h-[60vh]",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TeamChat, {
+                                chatId: chatId,
+                                currentUser: currentUser ? {
+                                    id: currentUser.id,
+                                    name: currentUser.name
+                                } : {
+                                    id: "me"
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                lineNumber: 377,
+                                columnNumber: 19
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                            lineNumber: 376,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "text-sm text-rose-600",
+                            children: "Couldn't create chat automatically. Please try again or contact your administrator."
+                        }, void 0, false, {
+                            fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                            lineNumber: 383,
+                            columnNumber: 26
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                        lineNumber: 372,
+                        columnNumber: 13
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                lineNumber: 342,
+                columnNumber: 11
+            }, ("TURBOPACK compile-time value", void 0))
+        }, void 0, false, {
+            fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+            lineNumber: 341,
+            columnNumber: 16
+        }, ("TURBOPACK compile-time value", void 0))
+    }, void 0, false, {
+        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+        lineNumber: 340,
+        columnNumber: 10
+    }, ("TURBOPACK compile-time value", void 0));
+};
+_s1(MessageModal, "T4NJBkkphBX9PgVVZiSS71vRC2I=");
+_c3 = MessageModal;
+function ManagerPeoplePage() {
+    _s2();
     const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [filter, setFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("all");
     const [team, setTeam] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Growth Team");
+    const [people, setPeople] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [selectedPerson, setSelectedPerson] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isModalOpen, setIsModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const lastTriggerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // stable mock people
-    const people = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "ManagerPeoplePage.useMemo[people]": ()=>[
-                {
-                    id: 301,
-                    name: "Ravi Kumar",
-                    role: "Team Lead",
-                    presence: "online",
-                    email: "ravi.kumar@example.com",
-                    phone: "+91 98765 43210",
-                    location: "Bengaluru, India",
-                    tasksAssigned: 6,
-                    respondRate: 92,
-                    hiredAt: "Mar 2021",
-                    starred: true,
-                    label: {
-                        text: "On-call",
-                        colorClass: "bg-emerald-50 text-emerald-700"
-                    }
-                },
-                {
-                    id: 302,
-                    name: "Meera Singh",
-                    role: "Engineer",
-                    presence: "away",
-                    email: "meera.singh@example.com",
-                    phone: "+91 91234 56789",
-                    location: "Kolkata, India",
-                    tasksAssigned: 4,
-                    respondRate: 87,
-                    hiredAt: "Jul 2022",
-                    starred: false,
-                    label: {
-                        text: "Mentor",
-                        colorClass: "bg-blue-50 text-blue-700"
-                    }
-                },
-                {
-                    id: 303,
-                    name: "Thomas Green",
-                    role: "Support",
-                    presence: "offline",
-                    email: "thomas.green@example.com",
-                    phone: null,
-                    location: "Remote — UK",
-                    tasksAssigned: 9,
-                    respondRate: 74,
-                    hiredAt: "Jan 2020",
-                    starred: false
-                },
-                {
-                    id: 304,
-                    name: "Nisha Patel",
-                    role: "Sales",
-                    presence: "online",
-                    email: "nisha.patel@example.com",
-                    phone: "+91 99876 54321",
-                    location: "Mumbai, India",
-                    tasksAssigned: 2,
-                    respondRate: 98,
-                    hiredAt: "Oct 2023",
-                    starred: false,
-                    label: {
-                        text: "Top performer",
-                        colorClass: "bg-amber-50 text-amber-700"
+    // message modal state
+    const [messageModalOpen, setMessageModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [messageTargetId, setMessageTargetId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [messageTargetName, setMessageTargetName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    // fetch current user (manager) to pass to TeamChat
+    const [me, setMe] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ManagerPeoplePage.useEffect": ()=>{
+            ({
+                "ManagerPeoplePage.useEffect": async ()=>{
+                    try {
+                        const r = await fetch("/api/me", {
+                            credentials: "same-origin"
+                        });
+                        if (!r.ok) return;
+                        const j = await r.json().catch({
+                            "ManagerPeoplePage.useEffect": ()=>({})
+                        }["ManagerPeoplePage.useEffect"]);
+                        const user = j?.user ?? j ?? null;
+                        if (user?.id) setMe({
+                            id: String(user.id),
+                            name: user.name ?? undefined
+                        });
+                    } catch  {
+                    // ignore
                     }
                 }
-            ]
-    }["ManagerPeoplePage.useMemo[people]"], []);
+            })["ManagerPeoplePage.useEffect"]();
+        }
+    }["ManagerPeoplePage.useEffect"], []);
+    // load teams -> pick team by name -> fetch team details to populate people
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ManagerPeoplePage.useEffect": ()=>{
+            let cancelled = false;
+            const load = {
+                "ManagerPeoplePage.useEffect.load": async ()=>{
+                    setLoading(true);
+                    setError(null);
+                    try {
+                        // 1) fetch teams list
+                        const res = await fetch("/api/teams", {
+                            credentials: "same-origin"
+                        });
+                        if (!res.ok) throw new Error(`teams fetch failed ${res.status}`);
+                        const j_0 = await res.json().catch({
+                            "ManagerPeoplePage.useEffect.load": ()=>({})
+                        }["ManagerPeoplePage.useEffect.load"]);
+                        const list = j_0?.teams ?? j_0?.items ?? j_0 ?? [];
+                        // 2) find team by name (fallback to first)
+                        const foundTeam = list.find({
+                            "ManagerPeoplePage.useEffect.load": (t)=>String(t.name || "").toLowerCase() === team.toLowerCase()
+                        }["ManagerPeoplePage.useEffect.load"]) ?? list[0] ?? null;
+                        if (!foundTeam) {
+                            // no teams — show empty
+                            if (!cancelled) setPeople([]);
+                            return;
+                        }
+                        const teamId = foundTeam.id ?? foundTeam.teamId ?? foundTeam._id ?? null;
+                        if (!teamId) {
+                            if (!cancelled) setPeople([]);
+                            return;
+                        }
+                        // 3) fetch team details
+                        const detailRes = await fetch(`/api/teams/${encodeURIComponent(teamId)}`, {
+                            credentials: "same-origin"
+                        });
+                        if (!detailRes.ok) {
+                            // attempt to parse body for helpful info
+                            const errText = await detailRes.text().catch({
+                                "ManagerPeoplePage.useEffect.load": ()=>""
+                            }["ManagerPeoplePage.useEffect.load"]);
+                            throw new Error(`team detail failed ${detailRes.status} ${errText}`);
+                        }
+                        const dj = await detailRes.json().catch({
+                            "ManagerPeoplePage.useEffect.load": ()=>({})
+                        }["ManagerPeoplePage.useEffect.load"]);
+                        const teamObj = dj?.team ?? dj ?? {};
+                        // 4) map members to Person[] — use defensive keys that match your API
+                        const members = (teamObj.members ?? []).map({
+                            "ManagerPeoplePage.useEffect.load.members": (m)=>{
+                                // team route normalized shape (see your teams/[id] route) uses fields:
+                                // { teamMemberId, userId, name, email, role }
+                                const id = m.userId ?? m.user?.id ?? m.userId ?? m.id ?? null;
+                                const name = m.name ?? m.user?.name ?? (m.user ? `${m.user.name}` : null) ?? `User ${id}`;
+                                return {
+                                    id: String(id ?? ""),
+                                    name: name ?? "Unknown",
+                                    role: m.role ?? m.user?.role ?? "Employee",
+                                    presence: "offline",
+                                    email: m.email ?? m.user?.email ?? null,
+                                    phone: null,
+                                    location: null,
+                                    tasksAssigned: 0,
+                                    respondRate: 0,
+                                    hiredAt: null,
+                                    starred: false,
+                                    label: null
+                                };
+                            }
+                        }["ManagerPeoplePage.useEffect.load.members"]);
+                        if (!cancelled) setPeople(members);
+                    } catch (err) {
+                        console.warn("Failed to load people:", err);
+                        if (!cancelled) setError("Failed to load team members");
+                    } finally{
+                        if (!cancelled) setLoading(false);
+                    }
+                }
+            }["ManagerPeoplePage.useEffect.load"];
+            void load();
+            return ({
+                "ManagerPeoplePage.useEffect": ()=>{
+                    cancelled = true;
+                }
+            })["ManagerPeoplePage.useEffect"];
+        }
+    }["ManagerPeoplePage.useEffect"], [
+        team
+    ]);
+    // click handlers
+    const openPersonModal = (person, triggerRef)=>{
+        setSelectedPerson(person);
+        setIsModalOpen(true);
+        if (triggerRef?.current) lastTriggerRef.current = triggerRef.current;
+    };
+    const closePersonModal = ()=>{
+        setIsModalOpen(false);
+        setSelectedPerson(null);
+    };
+    // when user clicks "Message" on the PersonModal, open message modal (ensures chat then renders TeamChat)
+    const handleMessageClick = (person_0)=>{
+        // store target info and open modal which will create/fetch chat
+        setMessageTargetId(person_0.id);
+        setMessageTargetName(person_0.name);
+        setMessageModalOpen(true);
+    };
+    // search + filter
     const filtered = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "ManagerPeoplePage.useMemo[filtered]": ()=>{
             const q = searchQuery.trim().toLowerCase();
             return people.filter({
                 "ManagerPeoplePage.useMemo[filtered]": (p)=>{
-                    const matchesSearch = q === "" || p.name.toLowerCase().includes(q) || (p.email ?? "").toLowerCase().includes(q) || p.role.toLowerCase().includes(q);
+                    const matchesSearch = q === "" || p.name.toLowerCase().includes(q) || (p.email ?? "").toLowerCase().includes(q) || String(p.role ?? "").toLowerCase().includes(q);
                     const matchesFilter = filter === "all" || filter === "online" && p.presence === "online" || filter === "offline" && p.presence === "offline" || filter === "role" && p.role === "Team Lead";
                     return matchesSearch && matchesFilter;
                 }
@@ -1602,17 +2011,6 @@ function ManagerPeoplePage() {
     people.forEach((p_2)=>{
         if (!cardRefs.current.has(p_2.id)) cardRefs.current.set(p_2.id, /*#__PURE__*/ __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].createRef());
     });
-    // open modal with person details and remember trigger (ref)
-    const openPersonModal = (person, triggerRef)=>{
-        setSelectedPerson(person);
-        setIsModalOpen(true);
-        if (triggerRef?.current) lastTriggerRef.current = triggerRef.current;
-    };
-    const closePersonModal = ()=>{
-        setIsModalOpen(false);
-        setSelectedPerson(null);
-    // focus restored by PersonModal effect using lastTriggerRef (passed as initialFocusRef)
-    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
         className: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8",
         children: [
@@ -1633,7 +2031,7 @@ function ManagerPeoplePage() {
                                                 children: "People"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 554,
                                                 columnNumber: 15
                                             }, this),
                                             onlineCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1647,13 +2045,13 @@ function ManagerPeoplePage() {
                                                 children: onlineCount
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 304,
+                                                lineNumber: 558,
                                                 columnNumber: 35
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 553,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1666,20 +2064,20 @@ function ManagerPeoplePage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 315,
+                                                        lineNumber: 569,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: team
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 316,
+                                                        lineNumber: 570,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 314,
+                                                lineNumber: 568,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1689,7 +2087,7 @@ function ManagerPeoplePage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 320,
+                                                        lineNumber: 574,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1699,13 +2097,13 @@ function ManagerPeoplePage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 321,
+                                                        lineNumber: 575,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 319,
+                                                lineNumber: 573,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1715,7 +2113,7 @@ function ManagerPeoplePage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 325,
+                                                        lineNumber: 579,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1725,39 +2123,39 @@ function ManagerPeoplePage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 326,
+                                                        lineNumber: 580,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 324,
+                                                lineNumber: 578,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 313,
+                                        lineNumber: 567,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 298,
+                                lineNumber: 552,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-sm text-slate-500 mt-2",
-                                children: "Browse and manage your team members. Click a card to view full details."
+                                children: "Browse and message members of your team. Click a card to view details or message directly."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 331,
+                                lineNumber: 585,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                        lineNumber: 297,
+                        lineNumber: 551,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1776,7 +2174,7 @@ function ManagerPeoplePage() {
                                                         className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 340,
+                                                        lineNumber: 594,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1788,13 +2186,13 @@ function ManagerPeoplePage() {
                                                         className: "w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-150"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 341,
+                                                        lineNumber: 595,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 339,
+                                                lineNumber: 593,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1809,7 +2207,7 @@ function ManagerPeoplePage() {
                                                             children: "All"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                            lineNumber: 346,
+                                                            lineNumber: 600,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1819,7 +2217,7 @@ function ManagerPeoplePage() {
                                                             children: "Online"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                            lineNumber: 349,
+                                                            lineNumber: 603,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1829,18 +2227,18 @@ function ManagerPeoplePage() {
                                                             children: "Offline"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                            lineNumber: 352,
+                                                            lineNumber: 606,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                    lineNumber: 345,
+                                                    lineNumber: 599,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 344,
+                                                lineNumber: 598,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1852,7 +2250,7 @@ function ManagerPeoplePage() {
                                                         children: "Choose team"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 359,
+                                                        lineNumber: 613,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1865,27 +2263,27 @@ function ManagerPeoplePage() {
                                                                 children: "Growth Team"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 363,
+                                                                lineNumber: 617,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                                 children: "Support Team"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 364,
+                                                                lineNumber: 618,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                                 children: "Product Team"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                                lineNumber: 365,
+                                                                lineNumber: 619,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 362,
+                                                        lineNumber: 616,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1893,23 +2291,24 @@ function ManagerPeoplePage() {
                                                         className: "px-4 py-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-medium text-sm shadow-lg hover:opacity-95",
                                                         onClick: ()=>{
                                                             console.log("Invite new member");
+                                                            router.push("/auth/invite");
                                                         },
                                                         children: "Invite"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 368,
+                                                        lineNumber: 622,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 358,
+                                                lineNumber: 612,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 338,
+                                        lineNumber: 592,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1922,7 +2321,7 @@ function ManagerPeoplePage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 378,
+                                                        lineNumber: 633,
                                                         columnNumber: 17
                                                     }, this),
                                                     people.length,
@@ -1930,7 +2329,7 @@ function ManagerPeoplePage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 377,
+                                                lineNumber: 632,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1940,7 +2339,7 @@ function ManagerPeoplePage() {
                                                         className: "w-4 h-4 text-blue-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 382,
+                                                        lineNumber: 637,
                                                         columnNumber: 17
                                                     }, this),
                                                     onlineCount,
@@ -1948,67 +2347,67 @@ function ManagerPeoplePage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 381,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "flex items-center gap-2",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Star$3e$__["Star"], {
-                                                        className: "w-4 h-4 text-yellow-500"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                        lineNumber: 386,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    people.filter((p_3)=>p_3.starred).length,
-                                                    " starred"
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 385,
+                                                lineNumber: 636,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                        lineNumber: 376,
+                                        lineNumber: 631,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 337,
+                                lineNumber: 591,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "p-4 sm:p-6",
-                                children: filtered.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "py-10 text-center text-sm text-slate-500",
+                                    children: "Loading members…"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                    lineNumber: 645,
+                                    columnNumber: 24
+                                }, this) : error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "py-10 text-center text-sm text-rose-600",
+                                    children: error
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                                    lineNumber: 645,
+                                    columnNumber: 115
+                                }, this) : filtered.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
-                                    children: filtered.map((person_0)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: filtered.map((person_1)=>{
+                                        const ref = cardRefs.current.get(person_1.id) ?? /*#__PURE__*/ __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].createRef();
+                                        cardRefs.current.set(person_1.id, ref);
+                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "w-full",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardSquare"], {
-                                                name: person_0.name,
-                                                subtitle: person_0.role,
+                                                name: person_1.name,
+                                                subtitle: person_1.role,
                                                 avatarUrl: null,
                                                 size: "md",
                                                 asChild: false,
-                                                onClick: ()=>openPersonModal(person_0, cardRefs.current.get(person_0.id)),
+                                                onClick: ()=>openPersonModal(person_1, ref),
                                                 className: "w-full"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 396,
-                                                columnNumber: 21
+                                                lineNumber: 650,
+                                                columnNumber: 23
                                             }, this)
-                                        }, person_0.id, false, {
+                                        }, person_1.id, false, {
                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                            lineNumber: 395,
-                                            columnNumber: 43
-                                        }, this))
+                                            lineNumber: 649,
+                                            columnNumber: 22
+                                        }, this);
+                                    })
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                    lineNumber: 394,
-                                    columnNumber: 36
+                                    lineNumber: 645,
+                                    columnNumber: 210
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "py-16 text-center",
                                     children: [
@@ -2018,12 +2417,12 @@ function ManagerPeoplePage() {
                                                 className: "w-8 h-8 text-slate-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                                lineNumber: 403,
+                                                lineNumber: 655,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                            lineNumber: 402,
+                                            lineNumber: 654,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2031,7 +2430,7 @@ function ManagerPeoplePage() {
                                             children: "No members found"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                            lineNumber: 405,
+                                            lineNumber: 657,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2039,55 +2438,73 @@ function ManagerPeoplePage() {
                                             children: "Try adjusting your search, filters, or team selection"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                            lineNumber: 406,
+                                            lineNumber: 658,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                    lineNumber: 401,
+                                    lineNumber: 653,
                                     columnNumber: 24
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                                lineNumber: 393,
+                                lineNumber: 644,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                        lineNumber: 335,
+                        lineNumber: 589,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                lineNumber: 295,
+                lineNumber: 549,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(PersonModal, {
                 person: selectedPerson,
                 open: isModalOpen,
                 onClose: closePersonModal,
+                onMessageClick: handleMessageClick,
                 initialFocusRef: lastTriggerRef
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-                lineNumber: 413,
+                lineNumber: 665,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageModal, {
+                open: messageModalOpen,
+                onClose: ()=>setMessageModalOpen(false),
+                memberId: messageTargetId,
+                memberName: messageTargetName ?? undefined,
+                currentUser: me
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
+                lineNumber: 668,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/dashboard/manager/People/page.tsx",
-        lineNumber: 294,
+        lineNumber: 548,
         columnNumber: 10
     }, this);
 }
-_s1(ManagerPeoplePage, "hacPTiRr5m1TJ5l40WxxcBft0FI=");
-_c2 = ManagerPeoplePage;
-var _c, _c1, _c2;
-__turbopack_context__.k.register(_c, "IconButton");
-__turbopack_context__.k.register(_c1, "PersonModal");
-__turbopack_context__.k.register(_c2, "ManagerPeoplePage");
+_s2(ManagerPeoplePage, "AmNPELRGqNjJQ87MZxHP1b0/BPU=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
+_c4 = ManagerPeoplePage;
+var _c, _c1, _c2, _c3, _c4;
+__turbopack_context__.k.register(_c, "TeamChat");
+__turbopack_context__.k.register(_c1, "IconButton");
+__turbopack_context__.k.register(_c2, "PersonModal");
+__turbopack_context__.k.register(_c3, "MessageModal");
+__turbopack_context__.k.register(_c4, "ManagerPeoplePage");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

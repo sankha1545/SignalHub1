@@ -439,7 +439,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
  * - PATCH upserts profile, disallows changing email via this endpoint.
  */ const COOKIE_NAME = "session";
 const JWT_SECRET = process.env.JWT_SECRET || "";
-/** Safe JSON parse for request bodies */ async function jsonSafe(req) {
+/* -------------------------------------------------------
+   Helpers
+------------------------------------------------------- */ /** Safe JSON parse for request bodies */ async function jsonSafe(req) {
     try {
         return await req.json();
     } catch  {
@@ -448,7 +450,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
 }
 /** Resolve session user with multiple fallbacks */ async function resolveSessionUser(req) {
     try {
-        // 1) helper
+        // 1) next-auth helper
         try {
             const s = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
             if (s && s.id) return s;
@@ -533,7 +535,6 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
             }
         })();
         // 2) teams where user is a teamMember
-        // IMPORTANT: use `select` to request both relation (team) and scalar (role).
         const memberTeamsPromise = (async ()=>{
             try {
                 const memberRows = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].teamMember.findMany({
@@ -575,7 +576,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
             managedTeamsPromise,
             memberTeamsPromise
         ]);
-        // Deduplicate preferring manager
+        // Deduplicate preferring MANAGER
         const map = new Map();
         for (const t of memberTeams){
             map.set(t.id, {
@@ -704,6 +705,7 @@ async function PATCH(req) {
         }
         const body = await jsonSafe(req);
         console.info("PATCH /api/me payload keys:", typeof body === "object" ? Object.keys(body) : typeof body);
+        // Email cannot be changed here
         if (typeof body.email === "string" && body.email.trim().length > 0) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: false,
@@ -715,24 +717,30 @@ async function PATCH(req) {
         const name = typeof body.name === "string" ? body.name.trim() : undefined;
         const phone = typeof body.phone === "string" ? body.phone.trim() : undefined;
         const incomingProfile = body.profile && typeof body.profile === "object" ? body.profile : {};
-        if (!name || name.length === 0) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            error: "Name is required"
-        }, {
-            status: 400
-        });
-        if (name.length > 200) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            error: "Name too long"
-        }, {
-            status: 400
-        });
-        if (phone && phone.length > 40) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            error: "Phone too long"
-        }, {
-            status: 400
-        });
+        if (!name || name.length === 0) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Name is required"
+            }, {
+                status: 400
+            });
+        }
+        if (name.length > 200) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Name too long"
+            }, {
+                status: 400
+            });
+        }
+        if (phone && phone.length > 40) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                error: "Phone too long"
+            }, {
+                status: 400
+            });
+        }
         const profileUpdates = {
             displayName: typeof incomingProfile.displayName === "string" ? incomingProfile.displayName.trim() : undefined,
             avatarUrl: typeof incomingProfile.avatarUrl === "string" ? incomingProfile.avatarUrl.trim() : undefined,
@@ -740,11 +748,21 @@ async function PATCH(req) {
             phoneNumber: typeof incomingProfile.phoneNumber === "string" ? incomingProfile.phoneNumber.trim() : phone ?? undefined
         };
         const metadata = {};
-        if (typeof incomingProfile.country === "string") metadata.country = incomingProfile.country.trim();
-        if (typeof incomingProfile.region === "string") metadata.region = incomingProfile.region.trim();
-        if (typeof incomingProfile.district === "string") metadata.district = incomingProfile.district.trim();
-        if (typeof incomingProfile.postalCode === "string") metadata.postalCode = incomingProfile.postalCode.trim();
-        if (typeof incomingProfile.language === "string") metadata.language = incomingProfile.language.trim();
+        if (typeof incomingProfile.country === "string") {
+            metadata.country = incomingProfile.country.trim();
+        }
+        if (typeof incomingProfile.region === "string") {
+            metadata.region = incomingProfile.region.trim();
+        }
+        if (typeof incomingProfile.district === "string") {
+            metadata.district = incomingProfile.district.trim();
+        }
+        if (typeof incomingProfile.postalCode === "string") {
+            metadata.postalCode = incomingProfile.postalCode.trim();
+        }
+        if (typeof incomingProfile.language === "string") {
+            metadata.language = incomingProfile.language.trim();
+        }
         let existingMetadata = {};
         try {
             const existingProfileRow = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].profile.findUnique({
@@ -827,7 +845,9 @@ async function PATCH(req) {
         });
     } catch (err) {
         console.error("PATCH /api/me error:", err?.message ?? err, err?.stack ?? "");
-        if (err?.code) console.error("Prisma error code:", err.code, "meta:", err.meta ?? null);
+        if (err?.code) {
+            console.error("Prisma error code:", err.code, "meta:", err.meta ?? null);
+        }
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
             error: "Internal server error"

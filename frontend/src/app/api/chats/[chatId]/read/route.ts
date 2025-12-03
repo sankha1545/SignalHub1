@@ -6,19 +6,24 @@ import { getSessionUser } from "@/lib/auth";
 /**
  * Mark chat as read for current user.
  * - Updates chatMember.meta.lastReadAt = now (merges existing meta JSON)
- * - If chatMember row doesn't exist for this user, creates it (role MEMBER)
- * - Emits socket event "chat:read" to the chat room and to the org
+ * - If chatMember row doesn't exist for this user, creates it (role = user's role or EMPLOYEE)
+ * - Emits socket events:
+ *      - "chat:read" to chat:<chatId> and org:<orgId>
+ *      - "chat:read:ack" to user:<userId>
  *
  * Response:
  *  { ok: true, chatId, userId, lastReadAt }
  */
 
+/* -----------------------------------------------------------
+   Session Resolution (simple, via getSessionUser)
+----------------------------------------------------------- */
 async function resolveSessionUser(req: Request) {
   try {
     if (typeof getSessionUser === "function") {
       return await getSessionUser(req);
     }
-  } catch (e) {
+  } catch {
     // fall through
   }
   return null;
@@ -28,7 +33,13 @@ function jsonError(message: string, status = 400) {
   return NextResponse.json({ ok: false, message }, { status });
 }
 
-export async function POST(req: Request, ctx: { params: Promise<{ chatId?: string }> }) {
+/* -----------------------------------------------------------
+   POST /api/chats/[chatId]/read
+----------------------------------------------------------- */
+export async function POST(
+  req: Request,
+  ctx: { params: Promise<{ chatId?: string }> }
+) {
   try {
     // App Router: ctx.params is a Promise — await it
     const params = await ctx.params;
@@ -36,20 +47,34 @@ export async function POST(req: Request, ctx: { params: Promise<{ chatId?: strin
     if (!chatId) return jsonError("chatId required", 400);
 
     const session = await resolveSessionUser(req);
-    if (!session || !session.id) return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
+    if (!session || !session.id) {
+      return NextResponse.json(
+        { ok: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     const userId = String(session.id);
 
     // Ensure chat exists and get organization id
-    const chat = await prisma.chat.findUnique({ where: { id: chatId }, select: { id: true, organizationId: true } });
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      select: { id: true, organizationId: true },
+    });
     if (!chat) return jsonError("Chat not found", 404);
 
     // Ensure user belongs to same org
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, organizationId: true, role: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, organizationId: true, role: true },
+    });
     if (!user) return jsonError("User not found", 404);
-    if (user.organizationId !== chat.organizationId) return jsonError("Forbidden", 403);
+    if (user.organizationId !== chat.organizationId) {
+      return jsonError("Forbidden", 403);
+    }
 
     const now = new Date();
+    const nowIso = now.toISOString();
 
     // Upsert chatMember row and merge meta.lastReadAt
     const existing = await prisma.chatMember.findFirst({
@@ -59,7 +84,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ chatId?: strin
 
     if (existing) {
       const prevMeta = existing.meta ?? {};
-      const newMeta = { ...prevMeta, lastReadAt: now.toISOString() };
+      const newMeta = { ...prevMeta, lastReadAt: nowIso };
       await prisma.chatMember.update({
         where: { id: existing.id },
         data: { meta: newMeta },
@@ -71,41 +96,63 @@ export async function POST(req: Request, ctx: { params: Promise<{ chatId?: strin
           chat: { connect: { id: chatId } },
           user: { connect: { id: userId } },
           role: (user.role ?? "EMPLOYEE") as any,
-          meta: { lastReadAt: now.toISOString() },
+          meta: { lastReadAt: nowIso },
         },
       });
     }
 
     // Emit socket event to chat room + org room + personal room (best-effort)
     try {
-      const io = (global as any).io || (global as any)._io || (global as any).socketServer;
+      const io =
+        (global as any).io ||
+        (global as any)._io ||
+        (global as any).socketServer;
+
       if (io && typeof io.to === "function") {
-        // use consistent room naming: chat:<id>
+        const readPayload = { chatId, userId, lastReadAt: nowIso };
+
+        // chat room
         try {
-          io.to(`chat:${chatId}`).emit("chat:read", { chatId, userId, lastReadAt: now.toISOString() });
-        } catch (e) {
-          // fallback to emitting without room if needed
-          try { io.emit("chat:read", { chatId, userId, lastReadAt: now.toISOString() }); } catch {}
+          io.to(`chat:${chatId}`).emit("chat:read", readPayload);
+        } catch {
+          // fallback to global emit
+          try {
+            io.emit("chat:read", readPayload);
+          } catch {}
         }
 
-        // emit to org room so admin dashboards can update if they watch org room
+        // org room (admin dashboards, analytics, etc.)
         try {
-          io.to(`org:${chat.organizationId}`).emit("chat:read", { chatId, userId, lastReadAt: now.toISOString() });
+          if (chat.organizationId) {
+            io.to(`org:${chat.organizationId}`).emit("chat:read", readPayload);
+          }
         } catch {}
 
-        // also emit to user's personal socket room in case other tabs/sessions care
+        // user's personal room (other tabs / sessions)
         try {
-          io.to(`user:${userId}`).emit("chat:read:ack", { chatId, lastReadAt: now.toISOString() });
+          io.to(`user:${userId}`).emit("chat:read:ack", {
+            chatId,
+            lastReadAt: nowIso,
+          });
         } catch {}
       }
     } catch (e) {
       console.warn("[api/chats/[chatId]/read] socket emit failed:", e);
     }
 
-    return NextResponse.json({ ok: true, chatId, userId, lastReadAt: now.toISOString() }, { status: 200 });
+    return NextResponse.json(
+      { ok: true, chatId, userId, lastReadAt: nowIso },
+      { status: 200 }
+    );
   } catch (err: any) {
     console.error("[api/chats/[chatId]/read] error:", err);
     const isDev = process.env.NODE_ENV !== "production";
-    return NextResponse.json({ ok: false, message: isDev ? String(err?.message ?? err) : "Server error" }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        message: isDev ? String(err?.message ?? err) : "Server error",
+      },
+      { status: 500 }
+    );
   }
 }

@@ -415,8 +415,12 @@ async function getSessionUser(req) {
 
 // src/app/api/chats/[chatId]/route.ts
 __turbopack_context__.s([
+    "DELETE",
+    ()=>DELETE,
     "GET",
     ()=>GET,
+    "PATCH",
+    ()=>PATCH,
     "POST",
     ()=>POST
 ]);
@@ -432,6 +436,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken
 ;
 const JWT_SECRET = process.env.JWT_SECRET || "";
 const DEFAULT_PAGE_SIZE = 50;
+const EDIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 /* -----------------------------------------------------------
    Safe JSON parser
 ----------------------------------------------------------- */ async function safeJson(req) {
@@ -550,31 +555,44 @@ const DEFAULT_PAGE_SIZE = 50;
         console.warn("[chat] markChatRead failed:", e);
     }
 }
+function withinEditWindow(createdAt) {
+    if (!createdAt) return false;
+    const now = Date.now();
+    const ts = createdAt.getTime();
+    if (Number.isNaN(ts)) return false;
+    return now - ts <= EDIT_WINDOW_MS;
+}
 async function GET(req, ctx) {
     try {
         const params = await ctx.params;
         const chatId = params?.chatId;
-        if (!chatId) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "chatId required"
-        }, {
-            status: 400
-        });
+        if (!chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "chatId required"
+            }, {
+                status: 400
+            });
+        }
         const session = await resolveSessionUser(req);
-        if (!session) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Unauthorized"
-        }, {
-            status: 401
-        });
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Unauthorized"
+            }, {
+                status: 401
+            });
+        }
         const userId = String(session.id);
         const allowed = await authorizeForChat(userId, session.role ?? null, chatId);
-        if (!allowed) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Forbidden"
-        }, {
-            status: 403
-        });
+        if (!allowed) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Forbidden"
+            }, {
+                status: 403
+            });
+        }
         // pagination
         const url = new URL(req.url);
         let limit = Number(url.searchParams.get("limit"));
@@ -644,36 +662,44 @@ async function POST(req, ctx) {
     try {
         const params = await ctx.params;
         const chatId = params?.chatId;
-        if (!chatId) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "chatId required"
-        }, {
-            status: 400
-        });
+        if (!chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "chatId required"
+            }, {
+                status: 400
+            });
+        }
         const session = await resolveSessionUser(req);
-        if (!session) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Unauthorized"
-        }, {
-            status: 401
-        });
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Unauthorized"
+            }, {
+                status: 401
+            });
+        }
         const userId = String(session.id);
         const userRole = session.role ?? null;
         const allowed = await authorizeForChat(userId, userRole, chatId);
-        if (!allowed) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Forbidden"
-        }, {
-            status: 403
-        });
+        if (!allowed) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Forbidden"
+            }, {
+                status: 403
+            });
+        }
         const body = await safeJson(req);
         const content = typeof body.content === "string" ? body.content.trim() : "";
-        if (!content) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Message content required"
-        }, {
-            status: 400
-        });
+        if (!content) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Message content required"
+            }, {
+                status: 400
+            });
+        }
         const metadata = typeof body.metadata === "object" ? body.metadata : undefined;
         const externalId = typeof body.externalId === "string" ? body.externalId : undefined;
         // Persist message and update chat metadata atomically
@@ -704,7 +730,7 @@ async function POST(req, ctx) {
                     lastMessageAt: new Date()
                 }
             });
-            // upsert ChatLastRead for sender (so sender doesn't see their own message as unread)
+            // upsert ChatLastRead for sender
             try {
                 if (__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatLastRead) {
                     await tx.chatLastRead.upsert({
@@ -745,9 +771,7 @@ async function POST(req, ctx) {
                 } : null
             }
         };
-        // Broadcast via socket.io (best-effort). Use standard rooms:
-        // - chat:<chatId> (room for chat)
-        // - user:<userId> (personal rooms) — notify all current chat members (query required)
+        // Broadcast via socket.io (best-effort)
         (async ()=>{
             try {
                 const io = globalThis.io || globalThis._io || globalThis.socketServer;
@@ -757,13 +781,12 @@ async function POST(req, ctx) {
                     try {
                         io.to(`chat:${chatId}`).emit("chat:message", payload);
                     } catch (e) {
-                        // fallback
                         try {
                             io.emit("chat:message", payload);
                         } catch  {}
                     }
                 }
-                // notify each member individually (helps deliver desktop/notification flows)
+                // notify each member individually
                 const chatMembers = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findMany({
                     where: {
                         chatId
@@ -774,8 +797,11 @@ async function POST(req, ctx) {
                 });
                 for (const cm of chatMembers){
                     try {
-                        if (typeof io.to === "function") io.to(`user:${cm.userId}`).emit("chat:message", payload);
-                        else if (typeof io.emit === "function") io.emit("chat:message", payload);
+                        if (typeof io.to === "function") {
+                            io.to(`user:${cm.userId}`).emit("chat:message", payload);
+                        } else if (typeof io.emit === "function") {
+                            io.emit("chat:message", payload);
+                        }
                     } catch  {}
                 }
                 // Also emit to org room (optional)
@@ -790,7 +816,9 @@ async function POST(req, ctx) {
                     });
                     if (chat?.organizationId) {
                         try {
-                            if (typeof io.to === "function") io.to(`org:${chat.organizationId}`).emit("chat:message", payload);
+                            if (typeof io.to === "function") {
+                                io.to(`org:${chat.organizationId}`).emit("chat:message", payload);
+                            }
                         } catch  {}
                     }
                 } catch  {}
@@ -806,6 +834,354 @@ async function POST(req, ctx) {
         });
     } catch (err) {
         console.error("POST /api/chats/[chatId] error:", err);
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            message: "Internal Server Error"
+        }, {
+            status: 500
+        });
+    }
+}
+async function PATCH(req, ctx) {
+    try {
+        const params = await ctx.params;
+        const chatId = params?.chatId;
+        if (!chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "chatId required"
+            }, {
+                status: 400
+            });
+        }
+        const session = await resolveSessionUser(req);
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Unauthorized"
+            }, {
+                status: 401
+            });
+        }
+        const userId = String(session.id);
+        const body = await safeJson(req);
+        const messageId = typeof body.messageId === "string" ? body.messageId : null;
+        const newContentRaw = typeof body.content === "string" ? body.content : null;
+        if (!messageId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "messageId is required"
+            }, {
+                status: 400
+            });
+        }
+        if (!newContentRaw) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "content is required"
+            }, {
+                status: 400
+            });
+        }
+        // load message
+        const msg = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMessage.findUnique({
+            where: {
+                id: messageId
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        if (!msg || msg.chatId !== chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Message not found"
+            }, {
+                status: 404
+            });
+        }
+        // only sender can edit
+        if (msg.senderId !== userId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Only the sender can edit this message"
+            }, {
+                status: 403
+            });
+        }
+        // limit time window
+        if (!withinEditWindow(msg.createdAt)) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Edit window has expired (15 minutes)"
+            }, {
+                status: 403
+            });
+        }
+        const newContent = newContentRaw.trim();
+        if (!newContent) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Content cannot be empty"
+            }, {
+                status: 400
+            });
+        }
+        const currentMeta = msg.metadata ?? {};
+        const updatedMeta = {
+            ...currentMeta,
+            edited: true,
+            editedAt: new Date().toISOString()
+        };
+        const updated = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMessage.update({
+            where: {
+                id: messageId
+            },
+            data: {
+                content: newContent,
+                metadata: updatedMeta
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        const payload = {
+            chatId,
+            action: "edit",
+            message: {
+                id: updated.id,
+                chatId: updated.chatId,
+                content: updated.content,
+                metadata: updated.metadata ?? null,
+                externalId: updated.externalId ?? null,
+                createdAt: updated.createdAt?.toISOString?.() ?? null,
+                sender: updated.sender ? {
+                    id: updated.sender.id,
+                    name: updated.sender.name,
+                    email: updated.sender.email
+                } : null
+            }
+        };
+        // broadcast update
+        (async ()=>{
+            try {
+                const io = globalThis.io || globalThis._io || globalThis.socketServer;
+                if (!io) return;
+                if (typeof io.to === "function") {
+                    try {
+                        io.to(`chat:${chatId}`).emit("chat:message:updated", payload);
+                    } catch (e) {
+                        try {
+                            io.emit("chat:message:updated", payload);
+                        } catch  {}
+                    }
+                }
+                const chatMembers = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findMany({
+                    where: {
+                        chatId
+                    },
+                    select: {
+                        userId: true
+                    }
+                });
+                for (const cm of chatMembers){
+                    try {
+                        if (typeof io.to === "function") {
+                            io.to(`user:${cm.userId}`).emit("chat:message:updated", payload);
+                        } else if (typeof io.emit === "function") {
+                            io.emit("chat:message:updated", payload);
+                        }
+                    } catch  {}
+                }
+            } catch (e) {
+                console.warn("Socket edit broadcast failed (ignored):", e);
+            }
+        })();
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: true,
+            message: payload.message
+        }, {
+            status: 200
+        });
+    } catch (err) {
+        console.error("PATCH /api/chats/[chatId] error:", err);
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: false,
+            message: "Internal Server Error"
+        }, {
+            status: 500
+        });
+    }
+}
+async function DELETE(req, ctx) {
+    try {
+        const params = await ctx.params;
+        const chatId = params?.chatId;
+        if (!chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "chatId required"
+            }, {
+                status: 400
+            });
+        }
+        const session = await resolveSessionUser(req);
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Unauthorized"
+            }, {
+                status: 401
+            });
+        }
+        const userId = String(session.id);
+        const body = await safeJson(req);
+        const messageId = typeof body.messageId === "string" ? body.messageId : null;
+        if (!messageId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "messageId is required"
+            }, {
+                status: 400
+            });
+        }
+        const msg = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMessage.findUnique({
+            where: {
+                id: messageId
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        if (!msg || msg.chatId !== chatId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Message not found"
+            }, {
+                status: 404
+            });
+        }
+        // only sender can delete
+        if (msg.senderId !== userId) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Only the sender can delete this message"
+            }, {
+                status: 403
+            });
+        }
+        // limit time window
+        if (!withinEditWindow(msg.createdAt)) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Delete window has expired (15 minutes)"
+            }, {
+                status: 403
+            });
+        }
+        const currentMeta = msg.metadata ?? {};
+        const deletedMeta = {
+            ...currentMeta,
+            deletedForEveryone: true,
+            deletedAt: new Date().toISOString(),
+            deletedBy: userId
+        };
+        const updated = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMessage.update({
+            where: {
+                id: messageId
+            },
+            data: {
+                // Keep content empty; frontend will look at metadata.deletedForEveryone
+                content: "",
+                metadata: deletedMeta
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        const payload = {
+            chatId,
+            action: "delete",
+            message: {
+                id: updated.id,
+                chatId: updated.chatId,
+                content: updated.content,
+                metadata: updated.metadata ?? null,
+                externalId: updated.externalId ?? null,
+                createdAt: updated.createdAt?.toISOString?.() ?? null,
+                sender: updated.sender ? {
+                    id: updated.sender.id,
+                    name: updated.sender.name,
+                    email: updated.sender.email
+                } : null
+            }
+        };
+        (async ()=>{
+            try {
+                const io = globalThis.io || globalThis._io || globalThis.socketServer;
+                if (!io) return;
+                if (typeof io.to === "function") {
+                    try {
+                        io.to(`chat:${chatId}`).emit("chat:message:updated", payload);
+                    } catch (e) {
+                        try {
+                            io.emit("chat:message:updated", payload);
+                        } catch  {}
+                    }
+                }
+                const chatMembers = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findMany({
+                    where: {
+                        chatId
+                    },
+                    select: {
+                        userId: true
+                    }
+                });
+                for (const cm of chatMembers){
+                    try {
+                        if (typeof io.to === "function") {
+                            io.to(`user:${cm.userId}`).emit("chat:message:updated", payload);
+                        } else if (typeof io.emit === "function") {
+                            io.emit("chat:message:updated", payload);
+                        }
+                    } catch  {}
+                }
+            } catch (e) {
+                console.warn("Socket delete broadcast failed (ignored):", e);
+            }
+        })();
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+            ok: true,
+            message: payload.message
+        }, {
+            status: 200
+        });
+    } catch (err) {
+        console.error("DELETE /api/chats/[chatId] error:", err);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: false,
             message: "Internal Server Error"

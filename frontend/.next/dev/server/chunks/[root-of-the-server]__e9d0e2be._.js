@@ -1065,18 +1065,34 @@ async function DELETE(req, context) {
         if (!team) return jsonError("Team not found", 404);
         if (sessionOrg && team.organizationId !== sessionOrg) return jsonError("Unauthorized for this organization", 403);
         // Delete members then team to avoid FK problems
-        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].$transaction(async (tx)=>{
-            await tx.teamMember.deleteMany({
-                where: {
-                    teamId: id
-                }
+        // Delete members then team to avoid FK problems (idempotent)
+        try {
+            const txResult = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].$transaction(async (tx)=>{
+                // remove team members (safe)
+                await tx.teamMember.deleteMany({
+                    where: {
+                        teamId: id
+                    }
+                });
+                // attempt to delete the team without throwing if already missing
+                const deleted = await tx.team.deleteMany({
+                    where: {
+                        id
+                    }
+                });
+                return {
+                    deletedCount: deleted.count ?? 0
+                };
             });
-            await tx.team.delete({
-                where: {
-                    id
-                }
-            });
-        });
+            if ((txResult?.deletedCount ?? 0) === 0) {
+                // Team was not present (already deleted) -> return 404 to the client
+                return jsonError("Team not found", 404);
+            }
+        } catch (e) {
+            // if anything unexpected happens, log and propagate to outer handler
+            console.error("[api/teams/[id]][DELETE] transaction failed:", e);
+            throw e;
+        }
         // best-effort: cleanup or archive the related chat for this team
         (async ()=>{
             try {

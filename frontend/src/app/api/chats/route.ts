@@ -35,7 +35,9 @@ async function resolveSessionUser(req: Request) {
 
   // #2 bearer
   try {
-    const auth = req.headers.get("authorization") ?? req.headers.get("Authorization");
+    const auth =
+      req.headers.get("authorization") ??
+      req.headers.get("Authorization");
     if (auth?.toLowerCase().startsWith("bearer ")) {
       const token = auth.slice(7).trim();
       if (token && JWT_SECRET) {
@@ -63,7 +65,11 @@ async function resolveSessionUser(req: Request) {
  * ADMIN → always pass
  * Manager or Member of team → pass
  */
-async function authorizeTeamAccess(userId: string, userRole: string | null, teamId: string) {
+async function authorizeTeamAccess(
+  userId: string,
+  userRole: string | null,
+  teamId: string
+) {
   if (userRole === "ADMIN") return true;
 
   const team = await prisma.team.findUnique({
@@ -86,22 +92,74 @@ async function authorizeTeamAccess(userId: string, userRole: string | null, team
 }
 
 /**
- * Normalize a chat for frontend use
- * Hides admin ChatMember rows when chat.type is TEAM so admin does not appear in the member list.
+ * Normalize a chat for frontend use.
+ *
+ * NEW BEHAVIOUR:
+ * - For DIRECT chats (or 2-member chats), we derive the `name` as:
+ *     "other participant's name/email" for the given currentUserId.
+ *   This gives you the classic DM UX: in my inbox I see *your* name,
+ *   in your inbox you see *my* name.
+ *
+ * For TEAM chats:
+ * - We keep the existing behavior: chat.name or `Team: {team.name}`.
+ *
+ * Also:
+ * - Hides admin ChatMember rows when chat.type is TEAM so admin does not
+ *   appear in the member list (existing behavior preserved).
  */
-function normalizeChat(chat: any) {
-  const isTeam = String(chat.type).toUpperCase() === "TEAM";
+function normalizeChat(chat: any, currentUserId?: string | null) {
+  const type = String(chat.type || "").toUpperCase();
+  const isTeam = type === "TEAM";
+
+  let name: string;
+
+  if (isTeam) {
+    // TEAM CHAT: keep original behavior
+    name =
+      chat.name ??
+      (chat.team ? `Team: ${chat.team.name}` : "Chat");
+  } else {
+    // DIRECT / PRIVATE / OTHERS
+    // Base name (if any explicit name)
+    name = chat.name ?? "Chat";
+
+    // If we know who is asking (currentUserId) and we have members, derive
+    // a more user-friendly title as "other participant's name/email".
+    if (currentUserId && Array.isArray(chat.members)) {
+      const others = chat.members.filter(
+        (m: any) =>
+          m?.user?.id &&
+          String(m.user.id) !== String(currentUserId)
+      );
+      const primaryOther = others[0]?.user;
+
+      if (primaryOther) {
+        name =
+          primaryOther.name ||
+          primaryOther.email ||
+          name; // fallback to existing name if nothing
+      }
+    }
+  }
+
   return {
     id: chat.id,
-    name: chat.name ?? (chat.team ? `Team: ${chat.team.name}` : "Chat"),
+    name,
     type: chat.type,
     teamId: chat.teamId ?? null,
-    createdBy: chat.createdBy ? { id: chat.createdBy.id, name: chat.createdBy.name } : null,
+    createdBy: chat.createdBy
+      ? { id: chat.createdBy.id, name: chat.createdBy.name }
+      : null,
     members:
       (chat.members ?? [])
         .filter((m: any) => {
-          // For team chats, do not expose ChatMember rows with role ADMIN (these are implicit admin access)
-          if (isTeam && String(m.role).toUpperCase() === "ADMIN") return false;
+          // For team chats, do not expose ChatMember rows with role ADMIN
+          // (these are implicit admin access)
+          if (
+            isTeam &&
+            String(m.role).toUpperCase() === "ADMIN"
+          )
+            return false;
           return !!(m.user && m.user.id);
         })
         .map((m: any) => ({
@@ -110,7 +168,8 @@ function normalizeChat(chat: any) {
           email: m.user.email,
           role: m.role,
         })) ?? [],
-    lastMessageAt: chat.lastMessageAt?.toISOString?.() ?? null,
+    lastMessageAt:
+      chat.lastMessageAt?.toISOString?.() ?? null,
     createdAt: chat.createdAt?.toISOString?.() ?? null,
   };
 }
@@ -125,7 +184,10 @@ export async function GET(req: Request) {
   try {
     const session = await resolveSessionUser(req);
     if (!session) {
-      return NextResponse.json({ ok: false, error: "Unauthorized", chats: [] }, { status: 401 });
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized", chats: [] },
+        { status: 401 }
+      );
     }
 
     const userId = String(session.id);
@@ -144,26 +206,49 @@ export async function GET(req: Request) {
         include: {
           members: {
             include: {
-              user: { select: { id: true, name: true, email: true } },
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
             },
           },
           team: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
+          createdBy: {
+            select: { id: true, name: true },
+          },
         },
       });
 
       // If not found, return null
       if (!chat) {
-        return NextResponse.json({ ok: true, chat: null }, { status: 200 });
+        return NextResponse.json(
+          { ok: true, chat: null },
+          { status: 200 }
+        );
       }
 
       // Authorization: admins can view; others must be team members or manager
-      const allowed = (userRole === "ADMIN") || (await authorizeTeamAccess(userId, userRole, teamId));
+      const allowed =
+        userRole === "ADMIN" ||
+        (await authorizeTeamAccess(
+          userId,
+          userRole,
+          teamId
+        ));
       if (!allowed) {
-        return NextResponse.json({ ok: false, error: "Forbidden", chat: null }, { status: 403 });
+        return NextResponse.json(
+          { ok: false, error: "Forbidden", chat: null },
+          { status: 403 }
+        );
       }
 
-      return NextResponse.json({ ok: true, chat: normalizeChat(chat) }, { status: 200 });
+      return NextResponse.json(
+        { ok: true, chat: normalizeChat(chat, userId) },
+        { status: 200 }
+      );
     }
 
     /* ----------------------------------------------
@@ -173,50 +258,98 @@ export async function GET(req: Request) {
     if (userRole === "ADMIN") {
       // Admin: return all TEAM chats in org + any DIRECT/PRIVATE chats where admin is a member
       if (!orgId) {
-        return NextResponse.json({ ok: true, chats: [] }, { status: 200 });
+        return NextResponse.json(
+          { ok: true, chats: [] },
+          { status: 200 }
+        );
       }
 
       // fetch team chats in org
       const teamChats = await prisma.chat.findMany({
         where: { organizationId: orgId, type: "TEAM" },
         include: {
-          members: { include: { user: { select: { id: true, name: true, email: true } } } },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
           team: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
+          createdBy: {
+            select: { id: true, name: true },
+          },
         },
         orderBy: { lastMessageAt: "desc" },
       });
 
       // fetch direct/private chats where admin is a member
-      const directMembership = await prisma.chatMember.findMany({ where: { userId }, select: { chatId: true } });
-      const directChatIds = directMembership.map((m) => m.chatId);
+      const directMembership =
+        await prisma.chatMember.findMany({
+          where: { userId },
+          select: { chatId: true },
+        });
+      const directChatIds = directMembership.map(
+        (m) => m.chatId
+      );
 
-      const directChats = directChatIds.length > 0
-        ? await prisma.chat.findMany({
-            where: { id: { in: directChatIds } },
-            include: {
-              members: { include: { user: { select: { id: true, name: true, email: true } } } },
-              team: { select: { id: true, name: true } },
-              createdBy: { select: { id: true, name: true } },
-            },
-            orderBy: { lastMessageAt: "desc" },
-          })
-        : [];
+      const directChats =
+        directChatIds.length > 0
+          ? await prisma.chat.findMany({
+              where: { id: { in: directChatIds } },
+              include: {
+                members: {
+                  include: {
+                    user: {
+                      select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+                team: {
+                  select: { id: true, name: true },
+                },
+                createdBy: {
+                  select: { id: true, name: true },
+                },
+              },
+              orderBy: { lastMessageAt: "desc" },
+            })
+          : [];
 
       // merge and normalize (teamChats first)
-      const merged = [...teamChats, ...directChats].map(normalizeChat);
+      const merged = [...teamChats, ...directChats].map(
+        (c) => normalizeChat(c, userId)
+      );
 
       // dedupe by id (teamChats + direct could overlap in edge cases)
       const byId = new Map<string, any>();
       for (const c of merged) byId.set(c.id, c);
 
-      return NextResponse.json({ ok: true, chats: Array.from(byId.values()) }, { status: 200 });
+      return NextResponse.json(
+        { ok: true, chats: Array.from(byId.values()) },
+        { status: 200 }
+      );
     } else {
       // Non-admin: list chats where the user is a ChatMember
-      const membership = await prisma.chatMember.findMany({ where: { userId }, select: { chatId: true } });
+      const membership =
+        await prisma.chatMember.findMany({
+          where: { userId },
+          select: { chatId: true },
+        });
 
       if (membership.length === 0) {
-        return NextResponse.json({ ok: true, chats: [] }, { status: 200 });
+        return NextResponse.json(
+          { ok: true, chats: [] },
+          { status: 200 }
+        );
       }
 
       const chatIds = membership.map((m) => m.chatId);
@@ -224,18 +357,41 @@ export async function GET(req: Request) {
       const chats = await prisma.chat.findMany({
         where: { id: { in: chatIds } },
         include: {
-          members: { include: { user: { select: { id: true, name: true, email: true } } } },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
           team: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
+          createdBy: {
+            select: { id: true, name: true },
+          },
         },
         orderBy: { lastMessageAt: "desc" },
       });
 
-      return NextResponse.json({ ok: true, chats: chats.map(normalizeChat) }, { status: 200 });
+      return NextResponse.json(
+        {
+          ok: true,
+          chats: chats.map((c) =>
+            normalizeChat(c, userId)
+          ),
+        },
+        { status: 200 }
+      );
     }
   } catch (err) {
     console.error("GET /api/chats error:", err);
-    return NextResponse.json({ ok: false, error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -250,7 +406,9 @@ export async function GET(req: Request) {
      }
 ------------------------------------------------------- */
 
-function mapUserRoleToChatRole(userRole: string | null | undefined) {
+function mapUserRoleToChatRole(
+  userRole: string | null | undefined
+) {
   if (userRole === "MANAGER") return "MANAGER";
   return "MEMBER";
 }
@@ -259,7 +417,14 @@ export async function POST(req: Request) {
   try {
     const session = await resolveSessionUser(req);
     if (!session) {
-      return NextResponse.json({ ok: false, error: "Unauthorized", chat: null }, { status: 401 });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Unauthorized",
+          chat: null,
+        },
+        { status: 401 }
+      );
     }
 
     const userId = String(session.id);
@@ -267,54 +432,123 @@ export async function POST(req: Request) {
     const orgId = session.organizationId ?? null;
 
     const body = await safeJson(req);
-    const name = typeof body.name === "string" ? body.name.trim() : undefined;
-    const teamId = typeof body.teamId === "string" ? body.teamId.trim() : undefined;
+    const name =
+      typeof body.name === "string"
+        ? body.name.trim()
+        : undefined;
+    const teamId =
+      typeof body.teamId === "string"
+        ? body.teamId.trim()
+        : undefined;
 
-    let memberIds: string[] = Array.isArray(body.memberIds) ? body.memberIds.filter((x: any) => typeof x === "string") : [];
+    let memberIds: string[] = Array.isArray(body.memberIds)
+      ? body.memberIds.filter(
+          (x: any) => typeof x === "string"
+        )
+      : [];
 
     /* ----------------------------------------------
        TEAM CHAT
     ---------------------------------------------- */
     if (teamId) {
       // check team exists
-      const team = await prisma.team.findUnique({ where: { id: teamId }, select: { id: true, organizationId: true } });
+      const team = await prisma.team.findUnique({
+        where: { id: teamId },
+        select: { id: true, organizationId: true },
+      });
       if (!team) {
-        return NextResponse.json({ ok: false, error: "Team not found" }, { status: 404 });
+        return NextResponse.json(
+          { ok: false, error: "Team not found" },
+          { status: 404 }
+        );
       }
+
       // authorize
-      const allowed = await authorizeTeamAccess(userId, userRole, teamId);
+      const allowed = await authorizeTeamAccess(
+        userId,
+        userRole,
+        teamId
+      );
       if (!allowed) {
-        return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+        return NextResponse.json(
+          { ok: false, error: "Forbidden" },
+          { status: 403 }
+        );
       }
 
       // If chat exists, return it
-      const existingTeamChat = await prisma.chat.findFirst({
-        where: { teamId },
-        include: {
-          members: { include: { user: { select: { id: true, name: true, email: true } } } },
-          team: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
-        },
-      });
+      const existingTeamChat =
+        await prisma.chat.findFirst({
+          where: { teamId },
+          include: {
+            members: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+            team: {
+              select: { id: true, name: true },
+            },
+            createdBy: {
+              select: { id: true, name: true },
+            },
+          },
+        });
 
       if (existingTeamChat) {
-        return NextResponse.json({ ok: true, created: false, chat: normalizeChat(existingTeamChat) }, { status: 200 });
+        return NextResponse.json(
+          {
+            ok: true,
+            created: false,
+            chat: normalizeChat(
+              existingTeamChat,
+              userId
+            ),
+          },
+          { status: 200 }
+        );
       }
 
       // Get all team members (user ids) and include requester
-      const teamMembers = await prisma.teamMember.findMany({ where: { teamId }, select: { userId: true } });
-      const toAdd = Array.from(new Set([...(teamMembers.map((m) => m.userId || "")), userId].filter(Boolean)));
+      const teamMembers =
+        await prisma.teamMember.findMany({
+          where: { teamId },
+          select: { userId: true },
+        });
+      const toAdd = Array.from(
+        new Set(
+          [
+            ...teamMembers.map((m) => m.userId || ""),
+            userId,
+          ].filter(Boolean)
+        )
+      );
 
-      // Remove org admins from membership list — admins have implicit access and should not be ChatMembers on team chats
-      const users = await prisma.user.findMany({ where: { id: { in: toAdd } }, select: { id: true, role: true } });
-      const filtered = users.filter((u) => String(u.role).toUpperCase() !== "ADMIN");
+      // Remove org admins from membership list — admins have implicit access
+      // and should not be ChatMembers on team chats
+      const users = await prisma.user.findMany({
+        where: { id: { in: toAdd } },
+        select: { id: true, role: true },
+      });
+      const filtered = users.filter(
+        (u) =>
+          String(u.role).toUpperCase() !== "ADMIN"
+      );
 
       // create chat and chat members
       const chat = await prisma.chat.create({
         data: {
           name: name ?? null,
           type: "TEAM",
-          organization: orgId ? { connect: { id: orgId } } : undefined,
+          organization: orgId
+            ? { connect: { id: orgId } }
+            : undefined,
           team: { connect: { id: teamId } },
           createdBy: { connect: { id: userId } },
           members: {
@@ -325,31 +559,75 @@ export async function POST(req: Request) {
           },
         },
         include: {
-          members: { include: { user: { select: { id: true, name: true, email: true } } } },
-          team: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          team: {
+            select: { id: true, name: true },
+          },
+          createdBy: {
+            select: { id: true, name: true },
+          },
         },
       });
 
       // emit chat:created to members & org room (best-effort)
       (async () => {
         try {
-          const io = (global as any).io || (global as any)._io || (global as any).socketServer;
-          const payload = { chat: { id: chat.id, name: chat.name, teamId: teamId }, teamId, organizationId: orgId };
+          const io =
+            (global as any).io ||
+            (global as any)._io ||
+            (global as any).socketServer;
+          const payload = {
+            chat: {
+              id: chat.id,
+              name: chat.name,
+              teamId: teamId,
+            },
+            teamId,
+            organizationId: orgId,
+          };
           if (io && typeof io.to === "function") {
             for (const m of filtered) {
-              io.to(`user:${m.id}`).emit("chat:created", payload);
+              io.to(`user:${m.id}`).emit(
+                "chat:created",
+                payload
+              );
             }
-            io.to(`org:${orgId}`).emit("chat:created", payload);
-          } else if (io && typeof io.emit === "function") {
+            io.to(`org:${orgId}`).emit(
+              "chat:created",
+              payload
+            );
+          } else if (
+            io &&
+            typeof io.emit === "function"
+          ) {
             io.emit("chat:created", payload);
           }
         } catch (e) {
-          console.warn("[api/chats] emit chat:created failed:", e);
+          console.warn(
+            "[api/chats] emit chat:created failed:",
+            e
+          );
         }
       })();
 
-      return NextResponse.json({ ok: true, created: true, chat: normalizeChat(chat) }, { status: 201 });
+      return NextResponse.json(
+        {
+          ok: true,
+          created: true,
+          chat: normalizeChat(chat, userId),
+        },
+        { status: 201 }
+      );
     }
 
     /* ----------------------------------------------
@@ -361,28 +639,58 @@ export async function POST(req: Request) {
     ---------------------------------------------- */
 
     // dedupe and include requester
-    const uniqueMemberIds = Array.from(new Set([...memberIds, userId]));
+    const uniqueMemberIds = Array.from(
+      new Set([...memberIds, userId])
+    );
 
     // must have at least one other user to chat with
     if (uniqueMemberIds.length < 2) {
-      return NextResponse.json({ ok: false, error: "At least one other member required" }, { status: 400 });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "At least one other member required",
+        },
+        { status: 400 }
+      );
     }
 
     // Load users for ACL checks
-    const otherIds = uniqueMemberIds.filter((id) => id !== userId);
-    const otherUsers = await prisma.user.findMany({ where: { id: { in: otherIds } }, select: { id: true, role: true, organizationId: true } });
+    const otherIds = uniqueMemberIds.filter(
+      (id) => id !== userId
+    );
+    const otherUsers = await prisma.user.findMany({
+      where: { id: { in: otherIds } },
+      select: {
+        id: true,
+        role: true,
+        organizationId: true,
+      },
+    });
 
     // ensure all targets exist and belong to same org
     const foundIds = new Set(otherUsers.map((u) => u.id));
     for (const tid of otherIds) {
       if (!foundIds.has(tid)) {
-        return NextResponse.json({ ok: false, error: `User not found: ${tid}` }, { status: 404 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `User not found: ${tid}`,
+          },
+          { status: 404 }
+        );
       }
     }
     // ensure same organization
     for (const u of otherUsers) {
       if (orgId && u.organizationId !== orgId) {
-        return NextResponse.json({ ok: false, error: "All chat participants must belong to your organization" }, { status: 400 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "All chat participants must belong to your organization",
+          },
+          { status: 400 }
+        );
       }
     }
 
@@ -393,59 +701,174 @@ export async function POST(req: Request) {
       if (userRole === "ADMIN") {
         // admin can talk to MANAGER/ADMIN; cannot privately message EMPLOYEE
         if (tgtRole === "EMPLOYEE") {
-          return NextResponse.json({ ok: false, error: "Admin cannot privately message an employee" }, { status: 403 });
+          return NextResponse.json(
+            {
+              ok: false,
+              error:
+                "Admin cannot privately message an employee",
+            },
+            { status: 403 }
+          );
         }
       } else if (userRole === "MANAGER") {
         if (tgtRole === "EMPLOYEE") {
           // allow only if that employee is part of one of the manager's teams
-          const isInManagerTeam = await prisma.teamMember.findFirst({
-            where: {
-              userId: target.id,
-              team: { managerId: userId },
-            },
-            select: { id: true },
-          });
+          const isInManagerTeam =
+            await prisma.teamMember.findFirst({
+              where: {
+                userId: target.id,
+                team: { managerId: userId },
+              },
+              select: { id: true },
+            });
           if (!isInManagerTeam) {
-            return NextResponse.json({ ok: false, error: "Managers can message an employee only if the employee belongs to their team" }, { status: 403 });
+            return NextResponse.json(
+              {
+                ok: false,
+                error:
+                  "Managers can message an employee only if the employee belongs to their team",
+              },
+              { status: 403 }
+            );
           }
         }
         // manager->manager and manager->admin allowed
       } else {
         // EMPLOYEE
         if (tgtRole === "ADMIN") {
-          // employees can message admin? original design: employees cannot message other team managers? Your spec: "employees will be able to communicate within each other of that particular group or team in which they are assigned and with their respective manager." — they can message their manager but not admin.
-          return NextResponse.json({ ok: false, error: "Employees cannot message admin directly" }, { status: 403 });
+          // employees cannot message admin directly
+          return NextResponse.json(
+            {
+              ok: false,
+              error:
+                "Employees cannot message admin directly",
+            },
+            { status: 403 }
+          );
         }
         // If target is manager: ensure manager is manager of employee's team
         if (tgtRole === "MANAGER") {
-          const managerIsOfEmployee = await prisma.teamMember.findFirst({
-            where: { userId, team: { managerId: target.id } }, // is employee a member of a team managed by target?
-            select: { id: true },
-          });
+          const managerIsOfEmployee =
+            await prisma.teamMember.findFirst({
+              where: {
+                userId,
+                team: { managerId: target.id },
+              }, // is employee a member of a team managed by target?
+              select: { id: true },
+            });
           if (!managerIsOfEmployee) {
-            return NextResponse.json({ ok: false, error: "Employee can message only their manager" }, { status: 403 });
+            return NextResponse.json(
+              {
+                ok: false,
+                error:
+                  "Employee can message only their manager",
+              },
+              { status: 403 }
+            );
           }
         }
         // If target is employee: ensure both are in same team
         if (tgtRole === "EMPLOYEE") {
-          const commonTeam = await prisma.teamMember.findFirst({
-            where: {
-              userId: target.id,
-              team: { members: { some: { userId } } },
-            },
-            select: { id: true },
-          });
-          // simpler query: check if there exists a TeamMember row for employee target with team that also has a member userId
-          // fallback: check team intersection
+          const commonTeam =
+            await prisma.teamMember.findFirst({
+              where: {
+                userId: target.id,
+                team: {
+                  members: {
+                    some: { userId },
+                  },
+                },
+              },
+              select: { id: true },
+            });
           if (!commonTeam) {
-            return NextResponse.json({ ok: false, error: "Employees can message only members of their team" }, { status: 403 });
+            return NextResponse.json(
+              {
+                ok: false,
+                error:
+                  "Employees can message only members of their team",
+              },
+              { status: 403 }
+            );
           }
         }
       }
     }
 
-    // Passed ACL checks — create chat
-    // For simplicity we create a chat with all participants as ChatMembers; map roles appropriately; do not mark admins as ChatMember for team chats (there is no team here).
+    /* ----------------------------------------------
+       DEDUPE DIRECT CHATS:
+       if a DIRECT chat already exists with exactly
+       these participants, reuse it instead of creating
+       a duplicate.
+    ---------------------------------------------- */
+
+    const existingDirectCandidates =
+      await prisma.chat.findMany({
+        where: {
+          type: "DIRECT",
+          members: {
+            some: {
+              userId: { in: uniqueMemberIds },
+            },
+          },
+        },
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          team: {
+            select: { id: true, name: true },
+          },
+          createdBy: {
+            select: { id: true, name: true },
+          },
+        },
+      });
+
+    const existingDirect = existingDirectCandidates.find(
+      (c: any) => {
+        const memberIdsInChat = (c.members ?? [])
+          .map(
+            (m: any) =>
+              m.userId ??
+              m.user?.id ??
+              null
+          )
+          .filter(Boolean) as string[];
+
+        if (
+          memberIdsInChat.length !==
+          uniqueMemberIds.length
+        )
+          return false;
+
+        return uniqueMemberIds.every((id) =>
+          memberIdsInChat.includes(id)
+        );
+      }
+    );
+
+    if (existingDirect) {
+      return NextResponse.json(
+        {
+          ok: true,
+          created: false,
+          chat: normalizeChat(existingDirect, userId),
+        },
+        { status: 200 }
+      );
+    }
+
+    // Passed ACL checks and no existing chat — create new chat
+    // For simplicity we create a chat with all participants as ChatMembers; map roles appropriately.
     const participants = await prisma.user.findMany({
       where: { id: { in: uniqueMemberIds } },
       select: { id: true, role: true },
@@ -455,7 +878,9 @@ export async function POST(req: Request) {
       data: {
         name: name ?? null,
         type: "DIRECT",
-        organization: orgId ? { connect: { id: orgId } } : undefined,
+        organization: orgId
+          ? { connect: { id: orgId } }
+          : undefined,
         createdBy: { connect: { id: userId } },
         members: {
           create: participants.map((p) => ({
@@ -465,32 +890,77 @@ export async function POST(req: Request) {
         },
       },
       include: {
-        members: { include: { user: { select: { id: true, name: true, email: true } } } },
-        createdBy: { select: { id: true, name: true } },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        createdBy: {
+          select: { id: true, name: true },
+        },
       },
     });
 
     // emit chat:created to participants & org room (best-effort)
     (async () => {
       try {
-        const io = (global as any).io || (global as any)._io || (global as any).socketServer;
-        const payload = { chat: { id: chat.id, name: chat.name }, organizationId: orgId };
+        const io =
+          (global as any).io ||
+          (global as any)._io ||
+          (global as any).socketServer;
+        const payload = {
+          chat: { id: chat.id, name: chat.name },
+          organizationId: orgId,
+        };
         if (io && typeof io.to === "function") {
           for (const p of participants) {
-            io.to(`user:${p.id}`).emit("chat:created", payload);
+            io.to(`user:${p.id}`).emit(
+              "chat:created",
+              payload
+            );
           }
-          if (orgId) io.to(`org:${orgId}`).emit("chat:created", payload);
-        } else if (io && typeof io.emit === "function") {
+          if (orgId)
+            io.to(`org:${orgId}`).emit(
+              "chat:created",
+              payload
+            );
+        } else if (
+          io &&
+          typeof io.emit === "function"
+        ) {
           io.emit("chat:created", payload);
         }
       } catch (e) {
-        console.warn("[api/chats] emit chat:created failed:", e);
+        console.warn(
+          "[api/chats] emit chat:created failed:",
+          e
+        );
       }
     })();
 
-    return NextResponse.json({ ok: true, created: true, chat: normalizeChat(chat) }, { status: 201 });
+    return NextResponse.json(
+      {
+        ok: true,
+        created: true,
+        chat: normalizeChat(chat, userId),
+      },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("POST /api/chats error:", err);
-    return NextResponse.json({ ok: false, error: "Internal Server Error", chat: null }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Internal Server Error",
+        chat: null,
+      },
+      { status: 500 }
+    );
   }
 }

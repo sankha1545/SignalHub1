@@ -839,7 +839,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/socketClient.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$chat$2f$ComposeBox$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/chat/ComposeBox.tsx [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$ChatSocketProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/dashboard/ChatSocketProvider.tsx [app-client] (ecmascript)"); // your provider path
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$ChatSocketProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/dashboard/ChatSocketProvider.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -847,172 +847,456 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+const genLocalId = (prefix = "local-")=>`${prefix}${Math.random().toString(36).slice(2, 9)}`;
+/** Robust display name derivation for header */ function deriveChatDisplayName(info, me) {
+    if (!info) return "Chat";
+    const t = info.type?.toString().toLowerCase();
+    const serverName = (info.name ?? info.meta?.teamName ?? info.meta?.name ?? "") || "";
+    const isGenericServerName = serverName.trim() === "" || serverName === "Chat" || serverName.startsWith("Chat ");
+    // DIRECT: prefer other participant
+    if (t === "direct") {
+        const participants = info.participants ?? info.meta?.participants ?? info.meta?.members;
+        if (participants && participants.length > 0 && me?.id != null) {
+            const other = participants.find((p)=>p && String(p.id) !== String(me.id));
+            if (other?.name) return other.name;
+            if (other?.email) return other.email;
+        }
+        // last message sender
+        const lastSender = info.meta?.lastMessage?.senderName ?? info.meta?.lastMessage?.sender?.name ?? null;
+        if (lastSender) return lastSender;
+        if (!isGenericServerName && serverName) return serverName;
+        return "Direct chat";
+    }
+    // TEAM / group
+    if (!isGenericServerName && serverName) return serverName;
+    return `Team ${info.id ?? ""}`;
+}
 function TeamChat({ chatId, currentUser }) {
     _s();
     const [messages, setMessages] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [info, setInfo] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    const [sending, setSending] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [typingUsers, setTypingUsers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const listRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // prefer provider socket
+    // edit/delete UI state
+    const [editingMessageId, setEditingMessageId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [editingDraft, setEditingDraft] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [hiddenForClient, setHiddenForClient] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
+    // try provider socket first
     let chatSocket = null;
     try {
         chatSocket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$ChatSocketProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useChatSocket"])();
     } catch  {
         chatSocket = null;
     }
-    // seen IDs to avoid duplicates
+    // dedupe & scroll helpers
     const seenIdsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(new Set());
-    // helper: mark chat read (best-effort)
-    const markRead = async ()=>{
-        try {
-            await fetch(`/api/chats/${encodeURIComponent(chatId)}/read`, {
-                method: "POST",
-                credentials: "same-origin"
-            });
-        } catch (err) {
-            // non-fatal
-            console.warn("markRead failed:", err);
+    const localToServerIdRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])({});
+    const isNearBottomRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(true);
+    const mountedRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(true);
+    const markRead = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "TeamChat.useCallback[markRead]": async ()=>{
+            try {
+                await fetch(`/api/chats/${encodeURIComponent(chatId)}/read`, {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+            } catch  {
+            // best-effort
+            }
         }
-    };
-    // load history and join room
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+    }["TeamChat.useCallback[markRead]"], [
+        chatId
+    ]);
+    /* ------------------------
+     load chat info + history
+     ------------------------ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TeamChat.useEffect": ()=>{
-            let mounted = true;
-            const fetchHistory = {
-                "TeamChat.useEffect.fetchHistory": async ()=>{
+            mountedRef.current = true;
+            const controller = new AbortController();
+            const load = {
+                "TeamChat.useEffect.load": async ()=>{
                     setLoading(true);
                     try {
+                        // 1) messages from /api/chats/[chatId]
                         const res = await fetch(`/api/chats/${encodeURIComponent(chatId)}`, {
-                            credentials: "same-origin"
+                            credentials: "same-origin",
+                            signal: controller.signal
                         });
-                        if (!mounted) return;
-                        const j = await res.json().catch({
-                            "TeamChat.useEffect.fetchHistory": ()=>({})
-                        }["TeamChat.useEffect.fetchHistory"]);
-                        const msgs = j?.messages ?? [];
-                        seenIdsRef.current = new Set(msgs.map({
-                            "TeamChat.useEffect.fetchHistory": (m)=>m.id
-                        }["TeamChat.useEffect.fetchHistory"]));
-                        if (mounted) setMessages(msgs);
-                        // mark read after loading
+                        let json = {};
+                        if (res.ok) {
+                            json = await res.json().catch({
+                                "TeamChat.useEffect.load": ()=>({})
+                            }["TeamChat.useEffect.load"]);
+                        } else {
+                            try {
+                                json = await res.json().catch({
+                                    "TeamChat.useEffect.load": ()=>({})
+                                }["TeamChat.useEffect.load"]);
+                            } catch  {
+                                json = {};
+                            }
+                        }
+                        const msgs = json?.messages ?? json?.messages_list ?? json?.items ?? json?.rows ?? [];
+                        const normalized = (Array.isArray(msgs) ? msgs : []).map({
+                            "TeamChat.useEffect.load.normalized": (m)=>{
+                                const id = m?.id ?? m?.externalId ?? m?.messageId ?? genLocalId("srv-");
+                                seenIdsRef.current.add(String(id));
+                                return {
+                                    ...m,
+                                    id: String(id)
+                                };
+                            }
+                        }["TeamChat.useEffect.load.normalized"]);
+                        if (!mountedRef.current) return;
+                        setMessages(normalized);
+                        // 2) chat meta from /api/chats (chat list)
+                        try {
+                            const metaRes = await fetch("/api/chats", {
+                                credentials: "same-origin",
+                                signal: controller.signal
+                            });
+                            if (metaRes.ok) {
+                                const metaJson = await metaRes.json().catch({
+                                    "TeamChat.useEffect.load": ()=>({})
+                                }["TeamChat.useEffect.load"]);
+                                const list = metaJson?.chats ?? metaJson?.items ?? [];
+                                const found = (Array.isArray(list) ? list : []).find({
+                                    "TeamChat.useEffect.load.found": (c)=>String(c.id) === String(chatId)
+                                }["TeamChat.useEffect.load.found"]);
+                                if (found) {
+                                    const participants = Array.isArray(found.members) ? found.members.map({
+                                        "TeamChat.useEffect.load": (m_0)=>({
+                                                id: m_0.id,
+                                                name: m_0.name,
+                                                email: m_0.email,
+                                                role: m_0.role ?? null
+                                            })
+                                    }["TeamChat.useEffect.load"]) : undefined;
+                                    const chatInfo = {
+                                        id: String(found.id),
+                                        name: found.name ?? null,
+                                        type: found.type ?? null,
+                                        participants,
+                                        meta: found
+                                    };
+                                    setInfo(chatInfo);
+                                } else {
+                                    // fallback if not in list
+                                    setInfo({
+                                        "TeamChat.useEffect.load": (prev_0)=>prev_0 ?? {
+                                                id: chatId,
+                                                name: json?.name ?? null,
+                                                type: json?.type ?? null,
+                                                participants: json?.participants ?? json?.members ?? json?.users ?? undefined,
+                                                meta: json ?? null
+                                            }
+                                    }["TeamChat.useEffect.load"]);
+                                }
+                            } else {
+                                // meta call failed — keep whatever we might have from json
+                                setInfo({
+                                    "TeamChat.useEffect.load": (prev_1)=>prev_1 ?? {
+                                            id: chatId,
+                                            name: json?.name ?? null,
+                                            type: json?.type ?? null,
+                                            participants: json?.participants ?? json?.members ?? json?.users ?? undefined,
+                                            meta: json ?? null
+                                        }
+                                }["TeamChat.useEffect.load"]);
+                            }
+                        } catch  {
+                            // ignore meta fetch errors
+                            setInfo({
+                                "TeamChat.useEffect.load": (prev)=>prev ?? {
+                                        id: chatId,
+                                        name: json?.name ?? null,
+                                        type: json?.type ?? null,
+                                        participants: json?.participants ?? json?.members ?? json?.users ?? undefined,
+                                        meta: json ?? null
+                                    }
+                            }["TeamChat.useEffect.load"]);
+                        }
+                        // mark read
                         void markRead();
                     } catch (err) {
-                        console.warn("Failed to load chat history:", err);
+                        if (err?.name === "AbortError") return;
+                        console.warn("TeamChat load error:", err);
                     } finally{
-                        if (mounted) setLoading(false);
+                        if (mountedRef.current) setLoading(false);
                     }
                 }
-            }["TeamChat.useEffect.fetchHistory"];
-            fetchHistory();
-            // join via provider or fallback
+            }["TeamChat.useEffect.load"];
+            void load();
+            // join room
             ({
                 "TeamChat.useEffect": async ()=>{
                     try {
                         if (chatSocket && typeof chatSocket.joinChat === "function") {
                             await chatSocket.joinChat(chatId);
-                        } else {
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit?.("join-room", chatId);
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit?.("join", chatId);
+                        } else if (__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit === "function") {
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("join-room", chatId);
                         }
-                    } catch (err) {
-                        console.warn("join chat failed:", err);
+                    } catch  {
+                    // ignore join errors (best-effort)
                     }
                 }
             })["TeamChat.useEffect"]();
             return ({
                 "TeamChat.useEffect": ()=>{
-                    mounted = false;
+                    mountedRef.current = false;
+                    controller.abort();
                     try {
                         if (chatSocket && typeof chatSocket.leaveChat === "function") {
                             chatSocket.leaveChat(chatId).catch({
                                 "TeamChat.useEffect": ()=>{}
                             }["TeamChat.useEffect"]);
-                        } else {
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit?.("leave-room", chatId);
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit?.("leave", chatId);
+                        } else if (__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit === "function") {
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("leave-room", chatId);
                         }
-                    } catch (err) {
-                    // ignore
-                    }
+                    } catch  {}
                 }
             })["TeamChat.useEffect"];
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         }
     }["TeamChat.useEffect"], [
-        chatId
+        chatId,
+        chatSocket,
+        markRead
     ]);
-    // socket message & read listeners
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+    /* ------------------------
+     socket subscriptions
+     ------------------------ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TeamChat.useEffect": ()=>{
-            const handler = {
-                "TeamChat.useEffect.handler": (payload)=>{
+            if (!chatSocket && (!__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"] || typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on !== "function")) return;
+            const handleMessage = {
+                "TeamChat.useEffect.handleMessage": (payload)=>{
                     try {
-                        // server may send { chatId, message } or the message directly
-                        const incomingChatId = payload?.chatId ?? payload?.message?.chatId ?? payload?.message?.chat_id;
-                        const msg = payload?.message ?? (payload?.id ? payload : null);
+                        let incomingChatId = payload?.chatId ?? payload?.room ?? payload?.message?.chatId ?? payload?.chat?.id ?? null;
+                        // normalize room like "chat:<id>" → "<id>"
+                        if (typeof incomingChatId === "string" && incomingChatId.startsWith("chat:")) {
+                            incomingChatId = incomingChatId.slice("chat:".length);
+                        }
+                        if (incomingChatId && String(incomingChatId) !== String(chatId)) return;
+                        const msg = payload?.message ?? payload;
                         if (!msg) return;
-                        if (incomingChatId && incomingChatId !== chatId) return;
-                        // dedupe
-                        if (msg.id && seenIdsRef.current.has(msg.id)) return;
-                        if (msg.id) seenIdsRef.current.add(msg.id);
+                        const serverId = msg?.id ?? msg?.externalId ?? msg?.messageId ?? null;
+                        const content = msg?.content ?? msg?.text ?? "";
+                        const sender = msg?.sender ?? msg?.from ?? msg?.user ?? null;
+                        const createdAt = msg?.createdAt ?? msg?.ts ?? msg?.created_at ?? new Date().toISOString();
+                        if (serverId && seenIdsRef.current.has(String(serverId))) return;
                         setMessages({
-                            "TeamChat.useEffect.handler": (prev)=>{
-                                // replace optimistic if matching by content + sender
-                                const optimisticIndex = prev.findIndex({
-                                    "TeamChat.useEffect.handler.optimisticIndex": (p)=>typeof p.id === "string" && p.id.startsWith("local-") && p.content === msg.content && p.sender?.id === msg.sender?.id
-                                }["TeamChat.useEffect.handler.optimisticIndex"]);
-                                if (optimisticIndex >= 0) {
+                            "TeamChat.useEffect.handleMessage": (prev_2)=>{
+                                const optimisticIdx = prev_2.findIndex({
+                                    "TeamChat.useEffect.handleMessage.optimisticIdx": (p)=>{
+                                        if (!p) return false;
+                                        if (typeof p.id === "string" && p.id.startsWith("local-") && serverId) {
+                                            if (p.content === content && (p.sender?.id && sender?.id && String(p.sender.id) === String(sender.id) || p.sender?.name && sender?.name && p.sender.name === sender.name)) return true;
+                                        }
+                                        return typeof p.id === "string" && p.id.startsWith("local-") && p.content === content && p.sender?.name && sender?.name && p.sender.name === sender.name;
+                                    }
+                                }["TeamChat.useEffect.handleMessage.optimisticIdx"]);
+                                if (optimisticIdx >= 0 && serverId) {
                                     const copy = [
-                                        ...prev
+                                        ...prev_2
                                     ];
-                                    // delete old local id from seen set
-                                    const oldId = copy[optimisticIndex].id;
-                                    copy[optimisticIndex] = msg;
-                                    if (oldId) seenIdsRef.current.delete(oldId);
-                                    if (msg.id) seenIdsRef.current.add(msg.id);
+                                    const oldLocalId = copy[optimisticIdx].id;
+                                    const newMsg = {
+                                        ...msg,
+                                        id: String(serverId),
+                                        content,
+                                        createdAt,
+                                        sender: sender ? {
+                                            id: sender.id ?? sender.userId ?? sender,
+                                            name: sender.name ?? sender.fullName ?? null
+                                        } : null,
+                                        metadata: msg?.metadata ?? msg?.meta ?? undefined,
+                                        attachments: msg?.attachments ?? msg?.files ?? undefined
+                                    };
+                                    copy[optimisticIdx] = newMsg;
+                                    if (oldLocalId) {
+                                        seenIdsRef.current.delete(oldLocalId);
+                                        localToServerIdRef.current[oldLocalId] = String(serverId);
+                                    }
+                                    seenIdsRef.current.add(String(serverId));
                                     return copy;
                                 }
+                                const idToUse = serverId ? String(serverId) : genLocalId("local-");
+                                seenIdsRef.current.add(idToUse);
+                                const appended = {
+                                    id: idToUse,
+                                    chatId,
+                                    content,
+                                    sender: sender ? {
+                                        id: sender.id ?? sender.userId ?? sender,
+                                        name: sender.name ?? sender.fullName ?? null
+                                    } : null,
+                                    attachments: msg?.attachments ?? msg?.files ?? undefined,
+                                    createdAt,
+                                    metadata: msg?.metadata ?? msg?.meta ?? undefined
+                                };
                                 return [
-                                    ...prev,
-                                    msg
+                                    ...prev_2,
+                                    appended
                                 ];
                             }
-                        }["TeamChat.useEffect.handler"]);
+                        }["TeamChat.useEffect.handleMessage"]);
+                        // ensure participants include sender (helps header name + inbox)
+                        if (sender) {
+                            setInfo({
+                                "TeamChat.useEffect.handleMessage": (prev_3)=>{
+                                    if (!prev_3) return prev_3;
+                                    const existing = prev_3.participants ?? [];
+                                    const existingIds = new Set(existing.map({
+                                        "TeamChat.useEffect.handleMessage": (p_0)=>String(p_0?.id)
+                                    }["TeamChat.useEffect.handleMessage"]));
+                                    const senderId = sender?.id ?? sender?.userId ?? sender;
+                                    if (senderId && !existingIds.has(String(senderId))) {
+                                        const added = [
+                                            ...existing,
+                                            {
+                                                id: senderId,
+                                                name: sender?.name ?? null,
+                                                email: sender?.email ?? null
+                                            }
+                                        ];
+                                        return {
+                                            ...prev_3,
+                                            participants: added,
+                                            meta: {
+                                                ...prev_3.meta,
+                                                lastMessage: msg
+                                            }
+                                        };
+                                    }
+                                    return {
+                                        ...prev_3,
+                                        meta: {
+                                            ...prev_3.meta,
+                                            lastMessage: msg
+                                        }
+                                    };
+                                }
+                            }["TeamChat.useEffect.handleMessage"]);
+                        }
                     } catch (e) {
-                        console.warn("socket handler err:", e);
+                        console.warn("incoming message handling error:", e);
                     }
                 }
-            }["TeamChat.useEffect.handler"];
-            const readHandler = {
-                "TeamChat.useEffect.readHandler": (payload)=>{
-                // payload may contain read receipts; currently no UI update, but kept for extension
-                // e.g. { chatId, userId, lastReadAt }
+            }["TeamChat.useEffect.handleMessage"];
+            const handleTyping = {
+                "TeamChat.useEffect.handleTyping": (payload_0)=>{
+                    try {
+                        let whichChat = payload_0?.chatId ?? payload_0?.room ?? null;
+                        if (typeof whichChat === "string" && whichChat.startsWith("chat:")) {
+                            whichChat = whichChat.slice("chat:".length);
+                        }
+                        if (!whichChat || String(whichChat) !== String(chatId)) return;
+                        const user = payload_0?.user ?? payload_0?.userId ?? payload_0?.sender ?? null;
+                        const userId = user && (typeof user === "string" ? user : user.id ?? user.userId ?? null);
+                        if (!userId) return;
+                        setTypingUsers({
+                            "TeamChat.useEffect.handleTyping": (prev_4)=>({
+                                    ...prev_4,
+                                    [String(userId)]: true
+                                })
+                        }["TeamChat.useEffect.handleTyping"]);
+                        window.setTimeout({
+                            "TeamChat.useEffect.handleTyping": ()=>{
+                                setTypingUsers({
+                                    "TeamChat.useEffect.handleTyping": (prev_5)=>{
+                                        const copy_0 = {
+                                            ...prev_5
+                                        };
+                                        delete copy_0[String(userId)];
+                                        return copy_0;
+                                    }
+                                }["TeamChat.useEffect.handleTyping"]);
+                            }
+                        }["TeamChat.useEffect.handleTyping"], 1800);
+                    } catch  {}
                 }
-            }["TeamChat.useEffect.readHandler"];
+            }["TeamChat.useEffect.handleTyping"];
+            // Handle remote edits/deletes from backend:
+            // backend emits: "chat:message:updated" { chatId, action: "edit" | "delete", message: {...} }
+            const handleMessageUpdated = {
+                "TeamChat.useEffect.handleMessageUpdated": (payload_1)=>{
+                    try {
+                        let incomingChatId_0 = payload_1?.chatId ?? payload_1?.message?.chatId ?? null;
+                        if (typeof incomingChatId_0 === "string" && incomingChatId_0.startsWith("chat:")) {
+                            incomingChatId_0 = incomingChatId_0.slice("chat:".length);
+                        }
+                        if (incomingChatId_0 && String(incomingChatId_0) !== String(chatId)) return;
+                        const action = payload_1?.action ?? null;
+                        const msg_0 = payload_1?.message ?? null;
+                        if (!msg_0 || !msg_0.id) return;
+                        const serverId_0 = String(msg_0.id);
+                        setMessages({
+                            "TeamChat.useEffect.handleMessageUpdated": (prev_6)=>prev_6.map({
+                                    "TeamChat.useEffect.handleMessageUpdated": (m_1)=>{
+                                        if (String(m_1.id) !== serverId_0) return m_1;
+                                        const base = {
+                                            ...m_1,
+                                            content: msg_0.content ?? m_1.content,
+                                            metadata: msg_0.metadata ?? m_1.metadata ?? {},
+                                            externalId: msg_0.externalId ?? m_1.externalId,
+                                            createdAt: msg_0.createdAt ?? m_1.createdAt ?? new Date().toISOString(),
+                                            sender: msg_0.sender ?? m_1.sender ?? null
+                                        };
+                                        if (action === "delete") {
+                                            const isDeletedForAll = !!base.metadata?.deletedForEveryone || !!base.metadata?.deletedForAll;
+                                            if (isDeletedForAll) {
+                                                return {
+                                                    ...base,
+                                                    content: "This message was deleted"
+                                                };
+                                            }
+                                        }
+                                        if (action === "edit") {
+                                            return {
+                                                ...base,
+                                                metadata: {
+                                                    ...base.metadata,
+                                                    edited: true
+                                                }
+                                            };
+                                        }
+                                        return base;
+                                    }
+                                }["TeamChat.useEffect.handleMessageUpdated"])
+                        }["TeamChat.useEffect.handleMessageUpdated"]);
+                    } catch (e_0) {
+                        console.warn("message updated handler error:", e_0);
+                    }
+                }
+            }["TeamChat.useEffect.handleMessageUpdated"];
             try {
                 if (chatSocket && typeof chatSocket.on === "function") {
-                    chatSocket.on("chat:message", handler);
-                    chatSocket.on("message", handler);
-                    chatSocket.on("chat:read", readHandler);
+                    chatSocket.on("chat:message", handleMessage);
+                    chatSocket.on("message", handleMessage);
+                    chatSocket.on("typing", handleTyping);
+                    chatSocket.on("chat:message:updated", handleMessageUpdated);
                 } else {
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:message", handler);
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("message", handler);
-                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:read", readHandler);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:message", handleMessage);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("message", handleMessage);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("typing", handleTyping);
+                    __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].on("chat:message:updated", handleMessageUpdated);
                 }
-            } catch (e) {
-                console.warn("socket subscribe failed:", e);
+            } catch  {
+            // ignore
             }
             return ({
                 "TeamChat.useEffect": ()=>{
                     try {
                         if (chatSocket && typeof chatSocket.off === "function") {
-                            chatSocket.off("chat:message", handler);
-                            chatSocket.off("message", handler);
-                            chatSocket.off("chat:read", readHandler);
+                            chatSocket.off("chat:message", handleMessage);
+                            chatSocket.off("message", handleMessage);
+                            chatSocket.off("typing", handleTyping);
+                            chatSocket.off("chat:message:updated", handleMessageUpdated);
                         } else {
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("chat:message", handler);
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("message", handler);
-                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("chat:read", readHandler);
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("chat:message", handleMessage);
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("message", handleMessage);
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("typing", handleTyping);
+                            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].off("chat:message:updated", handleMessageUpdated);
                         }
                     } catch  {}
                 }
@@ -1022,137 +1306,422 @@ function TeamChat({ chatId, currentUser }) {
         chatId,
         chatSocket
     ]);
-    // scroll to bottom when messages change
+    /* ------------------------
+     scrolling behaviour
+     ------------------------ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "TeamChat.useEffect": ()=>{
+            const el = listRef.current;
+            if (!el) return;
+            const onScroll = {
+                "TeamChat.useEffect.onScroll": ()=>{
+                    const remaining = el.scrollHeight - (el.scrollTop + el.clientHeight);
+                    isNearBottomRef.current = remaining < 160;
+                }
+            }["TeamChat.useEffect.onScroll"];
+            el.addEventListener("scroll", onScroll);
+            return ({
+                "TeamChat.useEffect": ()=>el.removeEventListener("scroll", onScroll)
+            })["TeamChat.useEffect"];
+        }
+    }["TeamChat.useEffect"], []);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TeamChat.useEffect": ()=>{
-            if (!listRef.current) return;
-            requestAnimationFrame({
-                "TeamChat.useEffect": ()=>{
-                    try {
-                        listRef.current.scrollTop = listRef.current.scrollHeight;
-                    } catch (e) {
-                    // ignore
+            const el_0 = listRef.current;
+            if (!el_0) return;
+            if (isNearBottomRef.current) {
+                requestAnimationFrame({
+                    "TeamChat.useEffect": ()=>{
+                        try {
+                            el_0.scrollTo({
+                                top: el_0.scrollHeight,
+                                behavior: "smooth"
+                            });
+                        } catch  {
+                            el_0.scrollTop = el_0.scrollHeight;
+                        }
                     }
-                }
-            }["TeamChat.useEffect"]);
+                }["TeamChat.useEffect"]);
+            }
         }
     }["TeamChat.useEffect"], [
         messages.length
     ]);
-    // handle outgoing messages via ComposeBox -> onSent
-    const handleOutgoing = async (m)=>{
-        // ComposeBox will call onSent twice:
-        //  - first with optimistic local message (id starts with local-)
-        //  - later with server-normalized message (id from server)
-        // We'll merge/update messages accordingly.
+    /* ------------------------
+     outgoing handler (ComposeBox)
+     ------------------------ */ const handleOutgoing = async (m_2)=>{
         try {
-            // If optimistic (local id), append if not present
-            if (typeof m.id === "string" && m.id.startsWith("local-")) {
-                if (!seenIdsRef.current.has(m.id)) {
-                    seenIdsRef.current.add(m.id);
-                    setMessages((prev)=>[
-                            ...prev,
-                            m
+            const isLocal = typeof m_2.id === "string" && m_2.id.startsWith("local-");
+            if (isLocal) {
+                if (!seenIdsRef.current.has(String(m_2.id))) {
+                    seenIdsRef.current.add(String(m_2.id));
+                    const localMsg = {
+                        id: String(m_2.id),
+                        chatId,
+                        content: m_2.content,
+                        sender: {
+                            id: m_2.senderId ?? currentUser?.id,
+                            name: m_2.senderName ?? currentUser?.name ?? null
+                        },
+                        attachments: m_2.attachments ?? undefined,
+                        createdAt: m_2.createdAt ?? new Date().toISOString(),
+                        __localId: String(m_2.id)
+                    };
+                    setMessages((prev_7)=>[
+                            ...prev_7,
+                            localMsg
                         ]);
                 }
                 return;
             }
-            // server-confirmed message: replace any optimistic with same content+sender OR append
-            setMessages((prev)=>{
-                const optIndex = prev.findIndex((p)=>typeof p.id === "string" && p.id.startsWith("local-") && p.content === m.content && p.sender?.id === m.senderId);
-                if (optIndex >= 0) {
-                    const copy = [
-                        ...prev
-                    ];
-                    // remove optimistic id from seen set
-                    const oldId = copy[optIndex].id;
-                    copy[optIndex] = m;
-                    if (oldId) seenIdsRef.current.delete(oldId);
-                    if (m.id) seenIdsRef.current.add(String(m.id));
-                    return copy;
+            setMessages((prev_8)=>{
+                const localKey = Object.keys(localToServerIdRef.current).find((lk)=>localToServerIdRef.current[lk] === m_2.id);
+                if (localKey) {
+                    const idx = prev_8.findIndex((p_1)=>p_1.id === localKey);
+                    if (idx >= 0) {
+                        const copy_1 = [
+                            ...prev_8
+                        ];
+                        const newMsg_0 = {
+                            id: String(m_2.id),
+                            chatId,
+                            content: m_2.content,
+                            sender: {
+                                id: m_2.senderId ?? currentUser?.id,
+                                name: m_2.senderName ?? currentUser?.name ?? null
+                            },
+                            createdAt: m_2.createdAt ?? new Date().toISOString(),
+                            attachments: m_2.attachments ?? undefined
+                        };
+                        copy_1[idx] = newMsg_0;
+                        seenIdsRef.current.delete(localKey);
+                        seenIdsRef.current.add(String(m_2.id));
+                        localToServerIdRef.current[localKey] = String(m_2.id);
+                        return copy_1;
+                    }
                 }
-                // avoid dup by server id
-                if (m.id && seenIdsRef.current.has(String(m.id))) return prev;
-                if (m.id) seenIdsRef.current.add(String(m.id));
+                const optIdx = prev_8.findIndex((p_2)=>typeof p_2.id === "string" && p_2.id.startsWith("local-") && p_2.content === m_2.content && (p_2.sender?.id && String(p_2.sender.id) === String(m_2.senderId) || p_2.sender?.name && p_2.sender.name === m_2.senderName));
+                if (optIdx >= 0) {
+                    const copy_2 = [
+                        ...prev_8
+                    ];
+                    const oldLocalId_0 = copy_2[optIdx].id;
+                    const newMsg_1 = {
+                        id: String(m_2.id),
+                        chatId,
+                        content: m_2.content,
+                        sender: {
+                            id: m_2.senderId ?? currentUser?.id,
+                            name: m_2.senderName ?? currentUser?.name ?? null
+                        },
+                        createdAt: m_2.createdAt ?? new Date().toISOString(),
+                        attachments: m_2.attachments ?? undefined
+                    };
+                    copy_2[optIdx] = newMsg_1;
+                    if (oldLocalId_0) {
+                        seenIdsRef.current.delete(oldLocalId_0);
+                        localToServerIdRef.current[oldLocalId_0] = String(m_2.id);
+                    }
+                    seenIdsRef.current.add(String(m_2.id));
+                    return copy_2;
+                }
+                if (m_2.id && seenIdsRef.current.has(String(m_2.id))) return prev_8;
+                if (m_2.id) seenIdsRef.current.add(String(m_2.id));
+                const appended_0 = {
+                    id: String(m_2.id ?? genLocalId("srv-")),
+                    chatId,
+                    content: m_2.content,
+                    sender: {
+                        id: m_2.senderId ?? currentUser?.id,
+                        name: m_2.senderName ?? currentUser?.name ?? null
+                    },
+                    createdAt: m_2.createdAt ?? new Date().toISOString(),
+                    attachments: m_2.attachments ?? undefined
+                };
                 return [
-                    ...prev,
-                    m
+                    ...prev_8,
+                    appended_0
                 ];
             });
-            // mark read for the author (they have read their own message)
             void markRead();
-        } catch (e) {
-            console.warn("handleOutgoing error:", e);
+        } catch (err_0) {
+            console.warn("handleOutgoing error:", err_0);
         }
     };
-    // optional: a minimal Message view; you can replace with a dedicated MessageBubble component
-    const MessageView = ({ msg })=>{
-        const isMine = currentUser && msg.sender?.id === currentUser.id;
+    /* ------------------------
+     edit / delete handlers
+     ------------------------ */ const handleStartEdit = (msg_1)=>{
+        if (!msg_1.id) return;
+        setEditingMessageId(String(msg_1.id));
+        setEditingDraft(msg_1.content);
+    };
+    const handleCancelEdit = ()=>{
+        setEditingMessageId(null);
+        setEditingDraft("");
+    };
+    const handleConfirmEdit = async (msg_2, newContent)=>{
+        if (!msg_2.id) return;
+        const idStr = String(msg_2.id);
+        const trimmed = newContent.trim();
+        if (!trimmed) {
+            // do not allow empty content on client
+            return;
+        }
+        // optimistic local update
+        setMessages((prev_9)=>prev_9.map((m_3)=>String(m_3.id) === idStr ? {
+                    ...m_3,
+                    content: trimmed,
+                    metadata: {
+                        ...m_3.metadata,
+                        edited: true
+                    }
+                } : m_3));
+        setEditingMessageId(null);
+        setEditingDraft("");
+        // best-effort: call backend PATCH /api/chats/[chatId]
+        try {
+            await fetch(`/api/chats/${encodeURIComponent(chatId)}`, {
+                method: "PATCH",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    messageId: idStr,
+                    content: trimmed
+                })
+            }).catch(()=>{});
+        } catch  {
+        // error is non-fatal, server will enforce real state
+        }
+    };
+    const handleDeleteForAll = async (msg_3)=>{
+        if (!msg_3.id) return;
+        const idStr_0 = String(msg_3.id);
+        // optimistic local update – keep a placeholder
+        setMessages((prev_10)=>prev_10.map((m_4)=>String(m_4.id) === idStr_0 ? {
+                    ...m_4,
+                    content: "This message was deleted",
+                    metadata: {
+                        ...m_4.metadata,
+                        deletedForEveryone: true
+                    }
+                } : m_4));
+        // best-effort: call backend DELETE /api/chats/[chatId]
+        try {
+            await fetch(`/api/chats/${encodeURIComponent(chatId)}`, {
+                method: "DELETE",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    messageId: idStr_0
+                })
+            }).catch(()=>{});
+        } catch  {
+        // ignore; server is source of truth
+        }
+    };
+    const handleDeleteForMe = (msg_4)=>{
+        const idStr_1 = String(msg_4.id ?? msg_4.__localId ?? "");
+        if (!idStr_1) return;
+        setHiddenForClient((prev_11)=>({
+                ...prev_11,
+                [idStr_1]: true
+            }));
+    };
+    /* ------------------------
+     UI pieces
+     ------------------------ */ const headerName = deriveChatDisplayName(info, currentUser ?? null);
+    const typingCount = Object.keys(typingUsers).length;
+    const Avatar = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-medium text-slate-700",
+            children: headerName && headerName[0] || "U"
+        }, void 0, false, {
+            fileName: "[project]/src/components/chat/TeamChat.tsx",
+            lineNumber: 665,
+            columnNumber: 24
+        }, this);
+    const MessageRow = ({ msg: msg_5 })=>{
+        const msgKey = String(msg_5.id ?? msg_5.__localId ?? "");
+        if (hiddenForClient[msgKey]) return null;
+        const isMine = currentUser && msg_5.sender && String(msg_5.sender?.id) === String(currentUser.id);
+        const isLocalOptimistic = typeof msg_5.id === "string" && msg_5.id.startsWith("local-");
+        const ts = msg_5.createdAt ? new Date(msg_5.createdAt).toLocaleString() : "";
+        const createdDate = msg_5.createdAt ? new Date(msg_5.createdAt) : null;
+        const msSince = createdDate && !Number.isNaN(createdDate.getTime()) ? Date.now() - createdDate.getTime() : Number.POSITIVE_INFINITY;
+        const withinEditWindow = msSince <= 15 * 60 * 1000; // 15 minutes
+        const isEditing = editingMessageId && String(editingMessageId) === String(msg_5.id);
+        const isDeletedForEveryone = !!msg_5.metadata?.deletedForEveryone || !!msg_5.metadata?.deletedForAll;
+        const displayContent = isDeletedForEveryone && !isEditing ? "This message was deleted" : msg_5.content;
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: `flex gap-3 ${isMine ? "justify-end" : "justify-start"}`,
             children: [
                 !isMine && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-sm",
-                    children: msg.sender?.name ? msg.sender.name[0] : "U"
+                    className: "w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-sm shrink-0",
+                    children: msg_5.sender?.name ? msg_5.sender.name[0] : "U"
                 }, void 0, false, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 247,
+                    lineNumber: 686,
                     columnNumber: 21
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: `max-w-[78%] p-3 rounded-xl ${isMine ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-800"}`,
+                    className: `max-w-[78%] p-3 rounded-xl break-words ${isMine ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-800"} ${isLocalOptimistic ? "opacity-80" : ""}`,
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "text-sm whitespace-pre-wrap",
-                            children: msg.content
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/chat/TeamChat.tsx",
-                            lineNumber: 252,
-                            columnNumber: 11
-                        }, this),
-                        msg.attachments?.length ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mt-2 space-y-1",
-                            children: msg.attachments.map((a, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
-                                    href: a.url,
-                                    target: "_blank",
-                                    rel: "noreferrer",
-                                    className: "text-xs underline",
-                                    children: a.name ?? a.url
-                                }, i, false, {
+                        isEditing ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                    className: "w-full text-sm rounded-md border border-slate-200 bg-white/90 text-slate-900 p-1 mb-2",
+                                    rows: 2,
+                                    value: editingDraft,
+                                    onChange: (e_1)=>setEditingDraft(e_1.target.value)
+                                }, void 0, false, {
                                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                                    lineNumber: 254,
-                                    columnNumber: 46
-                                }, this))
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/chat/TeamChat.tsx",
-                            lineNumber: 253,
-                            columnNumber: 38
-                        }, this) : null,
+                                    lineNumber: 691,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex justify-end gap-2 text-[11px]",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: ()=>handleConfirmEdit(msg_5, editingDraft),
+                                            className: "px-2 py-0.5 rounded-md bg-emerald-500 text-white",
+                                            children: "Save"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                            lineNumber: 693,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: handleCancelEdit,
+                                            className: "px-2 py-0.5 rounded-md bg-slate-200 text-slate-700",
+                                            children: "Cancel"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                            lineNumber: 696,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                    lineNumber: 692,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "text-sm whitespace-pre-wrap",
+                                    children: displayContent
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                    lineNumber: 701,
+                                    columnNumber: 15
+                                }, this),
+                                msg_5.attachments?.length ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mt-2 space-y-1",
+                                    children: msg_5.attachments.map((a, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                            href: a.url,
+                                            target: "_blank",
+                                            rel: "noreferrer",
+                                            className: "text-xs underline block",
+                                            children: a.name ?? a.url
+                                        }, i, false, {
+                                            fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                            lineNumber: 705,
+                                            columnNumber: 52
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                    lineNumber: 704,
+                                    columnNumber: 44
+                                }, this) : null
+                            ]
+                        }, void 0, true),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "text-[10px] text-slate-400 mt-1 text-right",
-                            children: msg.createdAt ? new Date(msg.createdAt).toLocaleString() : ""
-                        }, void 0, false, {
+                            className: "mt-1 flex items-center justify-between gap-2 text-[10px] text-slate-300",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-left",
+                                    children: [
+                                        ts,
+                                        " ",
+                                        isLocalOptimistic ? " • sending…" : "",
+                                        msg_5.metadata?.edited && !isEditing && !isDeletedForEveryone ? " • edited" : ""
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                    lineNumber: 712,
+                                    columnNumber: 13
+                                }, this),
+                                isMine && !isDeletedForEveryone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-2",
+                                    children: [
+                                        withinEditWindow && !isEditing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    type: "button",
+                                                    onClick: ()=>handleStartEdit(msg_5),
+                                                    className: "underline decoration-dotted",
+                                                    children: "Edit"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                                    lineNumber: 719,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    type: "button",
+                                                    onClick: ()=>handleDeleteForAll(msg_5),
+                                                    className: "underline decoration-dotted",
+                                                    children: "Delete"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                                    lineNumber: 722,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: ()=>handleDeleteForMe(msg_5),
+                                            className: "underline decoration-dotted",
+                                            children: "Delete for me"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                            lineNumber: 726,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                    lineNumber: 717,
+                                    columnNumber: 49
+                                }, this)
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/src/components/chat/TeamChat.tsx",
-                            lineNumber: 258,
+                            lineNumber: 711,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 251,
+                    lineNumber: 689,
                     columnNumber: 9
                 }, this),
                 isMine && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-9 h-9 rounded-full bg-transparent"
+                    className: "w-9 h-9 rounded-full bg-transparent shrink-0"
                 }, void 0, false, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 261,
+                    lineNumber: 732,
                     columnNumber: 20
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/chat/TeamChat.tsx",
-            lineNumber: 246,
+            lineNumber: 685,
             columnNumber: 12
         }, this);
     };
@@ -1160,57 +1729,127 @@ function TeamChat({ chatId, currentUser }) {
         className: "flex flex-col h-full min-h-[200px]",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "px-3 py-2 border-b flex items-center gap-3",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        type: "button",
+                        onClick: ()=>{
+                            try {
+                                window.history.back();
+                            } catch  {}
+                        },
+                        className: "p-1 rounded-md hover:bg-slate-100",
+                        "aria-label": "Back",
+                        children: "←"
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 737,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Avatar, {}, void 0, false, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 744,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex-1 min-w-0",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-sm font-semibold truncate",
+                                children: headerName
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                lineNumber: 746,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-xs text-slate-400",
+                                children: typingCount > 0 ? typingCount > 1 ? `${typingCount} people typing…` : "typing…" : info?.type && info.type.toString().toLowerCase().includes("team") ? "Group" : "Direct"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/chat/TeamChat.tsx",
+                                lineNumber: 749,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/chat/TeamChat.tsx",
+                        lineNumber: 745,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/chat/TeamChat.tsx",
+                lineNumber: 736,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 ref: listRef,
-                className: "flex-1 overflow-auto p-4 space-y-3",
+                className: "flex-1 overflow-auto p-4 space-y-3 bg-white",
                 children: loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "text-sm text-slate-500",
                     children: "Loading messages…"
                 }, void 0, false, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 266,
+                    lineNumber: 756,
                     columnNumber: 20
                 }, this) : messages.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "text-sm text-slate-500",
                     children: "No messages yet."
                 }, void 0, false, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 266,
-                    columnNumber: 110
-                }, this) : messages.map((m)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageView, {
-                        msg: m
-                    }, m.id, false, {
+                    lineNumber: 758,
+                    columnNumber: 44
+                }, this) : messages.map((m_5)=>{
+                    const key = m_5.id ?? m_5.__localId ?? genLocalId("k-");
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MessageRow, {
+                        msg: m_5
+                    }, String(key), false, {
                         fileName: "[project]/src/components/chat/TeamChat.tsx",
-                        lineNumber: 266,
-                        columnNumber: 193
-                    }, this))
+                        lineNumber: 762,
+                        columnNumber: 16
+                    }, this);
+                })
             }, void 0, false, {
                 fileName: "[project]/src/components/chat/TeamChat.tsx",
-                lineNumber: 265,
+                lineNumber: 755,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "p-3 border-t",
+                className: "p-3 border-t bg-white",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$chat$2f$ComposeBox$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                     chatId: chatId,
-                    onSent: handleOutgoing
+                    onSent: handleOutgoing,
+                    onTyping: ()=>{
+                        try {
+                            const payload_2 = {
+                                chatId,
+                                user: currentUser?.id ?? null
+                            };
+                            if (chatSocket && typeof chatSocket.emit === "function") {
+                                chatSocket.emit("typing", payload_2);
+                            } else if (__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit === "function") {
+                                __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].emit("typing", payload_2);
+                            }
+                        } catch  {}
+                    }
                 }, void 0, false, {
                     fileName: "[project]/src/components/chat/TeamChat.tsx",
-                    lineNumber: 270,
+                    lineNumber: 767,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/chat/TeamChat.tsx",
-                lineNumber: 269,
+                lineNumber: 766,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/chat/TeamChat.tsx",
-        lineNumber: 264,
+        lineNumber: 735,
         columnNumber: 10
     }, this);
 }
-_s(TeamChat, "4gfx99oEqMKWUHTLWw08snutsq8=");
+_s(TeamChat, "IXSG9XgJk3M6C5KvPf/RKeHgvoc=");
 _c = TeamChat;
 var _c;
 __turbopack_context__.k.register(_c, "TeamChat");

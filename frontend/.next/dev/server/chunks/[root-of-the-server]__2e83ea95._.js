@@ -427,17 +427,21 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5
 /**
  * Mark chat as read for current user.
  * - Updates chatMember.meta.lastReadAt = now (merges existing meta JSON)
- * - If chatMember row doesn't exist for this user, creates it (role MEMBER)
- * - Emits socket event "chat:read" to the chat room and to the org
+ * - If chatMember row doesn't exist for this user, creates it (role = user's role or EMPLOYEE)
+ * - Emits socket events:
+ *      - "chat:read" to chat:<chatId> and org:<orgId>
+ *      - "chat:read:ack" to user:<userId>
  *
  * Response:
  *  { ok: true, chatId, userId, lastReadAt }
- */ async function resolveSessionUser(req) {
+ */ /* -----------------------------------------------------------
+   Session Resolution (simple, via getSessionUser)
+----------------------------------------------------------- */ async function resolveSessionUser(req) {
     try {
         if (typeof __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"] === "function") {
             return await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getSessionUser"])(req);
         }
-    } catch (e) {
+    } catch  {
     // fall through
     }
     return null;
@@ -457,12 +461,14 @@ async function POST(req, ctx) {
         const chatId = params?.chatId;
         if (!chatId) return jsonError("chatId required", 400);
         const session = await resolveSessionUser(req);
-        if (!session || !session.id) return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            ok: false,
-            message: "Unauthorized"
-        }, {
-            status: 401
-        });
+        if (!session || !session.id) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: false,
+                message: "Unauthorized"
+            }, {
+                status: 401
+            });
+        }
         const userId = String(session.id);
         // Ensure chat exists and get organization id
         const chat = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.findUnique({
@@ -487,8 +493,11 @@ async function POST(req, ctx) {
             }
         });
         if (!user) return jsonError("User not found", 404);
-        if (user.organizationId !== chat.organizationId) return jsonError("Forbidden", 403);
+        if (user.organizationId !== chat.organizationId) {
+            return jsonError("Forbidden", 403);
+        }
         const now = new Date();
+        const nowIso = now.toISOString();
         // Upsert chatMember row and merge meta.lastReadAt
         const existing = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.findFirst({
             where: {
@@ -505,7 +514,7 @@ async function POST(req, ctx) {
             const prevMeta = existing.meta ?? {};
             const newMeta = {
                 ...prevMeta,
-                lastReadAt: now.toISOString()
+                lastReadAt: nowIso
             };
             await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chatMember.update({
                 where: {
@@ -531,7 +540,7 @@ async function POST(req, ctx) {
                     },
                     role: user.role ?? "EMPLOYEE",
                     meta: {
-                        lastReadAt: now.toISOString()
+                        lastReadAt: nowIso
                     }
                 }
             });
@@ -540,36 +549,31 @@ async function POST(req, ctx) {
         try {
             const io = /*TURBOPACK member replacement*/ __turbopack_context__.g.io || /*TURBOPACK member replacement*/ __turbopack_context__.g._io || /*TURBOPACK member replacement*/ __turbopack_context__.g.socketServer;
             if (io && typeof io.to === "function") {
-                // use consistent room naming: chat:<id>
+                const readPayload = {
+                    chatId,
+                    userId,
+                    lastReadAt: nowIso
+                };
+                // chat room
                 try {
-                    io.to(`chat:${chatId}`).emit("chat:read", {
-                        chatId,
-                        userId,
-                        lastReadAt: now.toISOString()
-                    });
-                } catch (e) {
-                    // fallback to emitting without room if needed
+                    io.to(`chat:${chatId}`).emit("chat:read", readPayload);
+                } catch  {
+                    // fallback to global emit
                     try {
-                        io.emit("chat:read", {
-                            chatId,
-                            userId,
-                            lastReadAt: now.toISOString()
-                        });
+                        io.emit("chat:read", readPayload);
                     } catch  {}
                 }
-                // emit to org room so admin dashboards can update if they watch org room
+                // org room (admin dashboards, analytics, etc.)
                 try {
-                    io.to(`org:${chat.organizationId}`).emit("chat:read", {
-                        chatId,
-                        userId,
-                        lastReadAt: now.toISOString()
-                    });
+                    if (chat.organizationId) {
+                        io.to(`org:${chat.organizationId}`).emit("chat:read", readPayload);
+                    }
                 } catch  {}
-                // also emit to user's personal socket room in case other tabs/sessions care
+                // user's personal room (other tabs / sessions)
                 try {
                     io.to(`user:${userId}`).emit("chat:read:ack", {
                         chatId,
-                        lastReadAt: now.toISOString()
+                        lastReadAt: nowIso
                     });
                 } catch  {}
             }
@@ -580,7 +584,7 @@ async function POST(req, ctx) {
             ok: true,
             chatId,
             userId,
-            lastReadAt: now.toISOString()
+            lastReadAt: nowIso
         }, {
             status: 200
         });

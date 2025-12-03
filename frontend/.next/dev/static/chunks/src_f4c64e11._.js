@@ -2134,11 +2134,11 @@ const ChatSocketContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$p
 function useChatSocket() {
     _s();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(1);
-    if ($[0] !== "1b192a08e4366d6f986cd79be99de6074c4d503153e240f8f9fd18bf6408c6f8") {
+    if ($[0] !== "00adb263ea7569f0f2ff04c44a53d5181fea388f190216e99ef3b2e133835da9") {
         for(let $i = 0; $i < 1; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "1b192a08e4366d6f986cd79be99de6074c4d503153e240f8f9fd18bf6408c6f8";
+        $[0] = "00adb263ea7569f0f2ff04c44a53d5181fea388f190216e99ef3b2e133835da9";
     }
     const ctx = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useContext"])(ChatSocketContext);
     if (!ctx) {
@@ -2152,7 +2152,6 @@ function ChatSocketProvider({ children, getToken }) {
     const [connected, setConnected] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [socketId, setSocketId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const tokenRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // internal handler that wires connect
     const doConnect = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatSocketProvider.useCallback[doConnect]": async (maybeToken)=>{
             try {
@@ -2163,21 +2162,18 @@ function ChatSocketProvider({ children, getToken }) {
                         token = typeof t === "string" ? t : null;
                     } catch  {}
                 }
-                // fallback global/local
                 if (!token && ("TURBOPACK compile-time value", "object") !== "undefined") {
                     token = window.__SESSION_TOKEN ?? localStorage.getItem("session") ?? null;
                 }
                 tokenRef.current = token;
                 const s = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["connectWithToken"])(token);
                 const inst = s ?? window.__socketInstance ?? null;
-                // wait a tick for connection state
                 setTimeout({
                     "ChatSocketProvider.useCallback[doConnect]": ()=>{
                         setConnected(Boolean(inst && inst.connected));
                         setSocketId(inst?.id ?? null);
                     }
                 }["ChatSocketProvider.useCallback[doConnect]"], 300);
-                // subscribe to connect/disconnect to update state
                 if (inst) {
                     inst.on?.("connect", {
                         "ChatSocketProvider.useCallback[doConnect]": ()=>{
@@ -2192,8 +2188,8 @@ function ChatSocketProvider({ children, getToken }) {
                         }
                     }["ChatSocketProvider.useCallback[doConnect]"]);
                 }
-            } catch (err) {
-            // ignore
+            } catch  {
+            // best-effort
             }
         }
     }["ChatSocketProvider.useCallback[doConnect]"], [
@@ -2211,11 +2207,9 @@ function ChatSocketProvider({ children, getToken }) {
     }["ChatSocketProvider.useCallback[doDisconnect]"], []);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "ChatSocketProvider.useEffect": ()=>{
-            // auto-connect on mount
             doConnect().catch({
                 "ChatSocketProvider.useEffect": ()=>{}
             }["ChatSocketProvider.useEffect"]);
-            // cleanup on unmount
             return ({
                 "ChatSocketProvider.useEffect": ()=>{
                     try {
@@ -2228,23 +2222,22 @@ function ChatSocketProvider({ children, getToken }) {
         doConnect,
         doDisconnect
     ]);
+    // IMPORTANT: join by raw chatId (server's "join-room" handler will map to room internally)
     const joinChat = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatSocketProvider.useCallback[joinChat]": async (chatId)=>{
             if (!chatId) return;
-            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["joinRoom"])(`chat:${chatId}`);
-        // also set up listener for messages if needed elsewhere
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["joinRoom"])(chatId);
         }
     }["ChatSocketProvider.useCallback[joinChat]"], []);
     const leaveChat = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatSocketProvider.useCallback[leaveChat]": async (chatId_0)=>{
             if (!chatId_0) return;
-            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["leaveRoom"])(`chat:${chatId_0}`);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["leaveRoom"])(chatId_0);
         }
     }["ChatSocketProvider.useCallback[leaveChat]"], []);
     const sendMessage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatSocketProvider.useCallback[sendMessage]": (chatId_1, payload)=>{
-            // send using standard event name; your server APIs also persist messages,
-            // but emitting here allows real-time UX. Use your API to persist (POST /api/chats/:id).
+            // Event for real-time UX; persistence happens via POST /api/chats/:id
             (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$socketClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["sendEvent"])("chat:message", {
                 chatId: chatId_1,
                 ...payload
@@ -2289,7 +2282,7 @@ function ChatSocketProvider({ children, getToken }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/ChatSocketProvider.tsx",
-        lineNumber: 135,
+        lineNumber: 126,
         columnNumber: 10
     }, this);
 }

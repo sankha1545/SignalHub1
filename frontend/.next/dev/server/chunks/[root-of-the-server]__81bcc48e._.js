@@ -503,13 +503,44 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
     return !!member;
 }
 /**
- * Normalize a chat for frontend use
- * Hides admin ChatMember rows when chat.type is TEAM so admin does not appear in the member list.
- */ function normalizeChat(chat) {
-    const isTeam = String(chat.type).toUpperCase() === "TEAM";
+ * Normalize a chat for frontend use.
+ *
+ * NEW BEHAVIOUR:
+ * - For DIRECT chats (or 2-member chats), we derive the `name` as:
+ *     "other participant's name/email" for the given currentUserId.
+ *   This gives you the classic DM UX: in my inbox I see *your* name,
+ *   in your inbox you see *my* name.
+ *
+ * For TEAM chats:
+ * - We keep the existing behavior: chat.name or `Team: {team.name}`.
+ *
+ * Also:
+ * - Hides admin ChatMember rows when chat.type is TEAM so admin does not
+ *   appear in the member list (existing behavior preserved).
+ */ function normalizeChat(chat, currentUserId) {
+    const type = String(chat.type || "").toUpperCase();
+    const isTeam = type === "TEAM";
+    let name;
+    if (isTeam) {
+        // TEAM CHAT: keep original behavior
+        name = chat.name ?? (chat.team ? `Team: ${chat.team.name}` : "Chat");
+    } else {
+        // DIRECT / PRIVATE / OTHERS
+        // Base name (if any explicit name)
+        name = chat.name ?? "Chat";
+        // If we know who is asking (currentUserId) and we have members, derive
+        // a more user-friendly title as "other participant's name/email".
+        if (currentUserId && Array.isArray(chat.members)) {
+            const others = chat.members.filter((m)=>m?.user?.id && String(m.user.id) !== String(currentUserId));
+            const primaryOther = others[0]?.user;
+            if (primaryOther) {
+                name = primaryOther.name || primaryOther.email || name; // fallback to existing name if nothing
+            }
+        }
+    }
     return {
         id: chat.id,
-        name: chat.name ?? (chat.team ? `Team: ${chat.team.name}` : "Chat"),
+        name,
         type: chat.type,
         teamId: chat.teamId ?? null,
         createdBy: chat.createdBy ? {
@@ -517,7 +548,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
             name: chat.createdBy.name
         } : null,
         members: (chat.members ?? []).filter((m)=>{
-            // For team chats, do not expose ChatMember rows with role ADMIN (these are implicit admin access)
+            // For team chats, do not expose ChatMember rows with role ADMIN
+            // (these are implicit admin access)
             if (isTeam && String(m.role).toUpperCase() === "ADMIN") return false;
             return !!(m.user && m.user.id);
         }).map((m)=>({
@@ -602,7 +634,7 @@ async function GET(req) {
             }
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: true,
-                chat: normalizeChat(chat)
+                chat: normalizeChat(chat, userId)
             }, {
                 status: 200
             });
@@ -703,7 +735,7 @@ async function GET(req) {
             const merged = [
                 ...teamChats,
                 ...directChats
-            ].map(normalizeChat);
+            ].map((c)=>normalizeChat(c, userId));
             // dedupe by id (teamChats + direct could overlap in edge cases)
             const byId = new Map();
             for (const c of merged)byId.set(c.id, c);
@@ -769,7 +801,7 @@ async function GET(req) {
             });
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: true,
-                chats: chats.map(normalizeChat)
+                chats: chats.map((c)=>normalizeChat(c, userId))
             }, {
                 status: 200
             });
@@ -882,7 +914,7 @@ async function POST(req) {
                 return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                     ok: true,
                     created: false,
-                    chat: normalizeChat(existingTeamChat)
+                    chat: normalizeChat(existingTeamChat, userId)
                 }, {
                     status: 200
                 });
@@ -900,7 +932,8 @@ async function POST(req) {
                 ...teamMembers.map((m)=>m.userId || ""),
                 userId
             ].filter(Boolean)));
-            // Remove org admins from membership list — admins have implicit access and should not be ChatMembers on team chats
+            // Remove org admins from membership list — admins have implicit access
+            // and should not be ChatMembers on team chats
             const users = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findMany({
                 where: {
                     id: {
@@ -998,7 +1031,7 @@ async function POST(req) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 ok: true,
                 created: true,
-                chat: normalizeChat(chat)
+                chat: normalizeChat(chat, userId)
             }, {
                 status: 201
             });
@@ -1100,7 +1133,7 @@ async function POST(req) {
             } else {
                 // EMPLOYEE
                 if (tgtRole === "ADMIN") {
-                    // employees can message admin? original design: employees cannot message other team managers? Your spec: "employees will be able to communicate within each other of that particular group or team in which they are assigned and with their respective manager." — they can message their manager but not admin.
+                    // employees cannot message admin directly
                     return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                         ok: false,
                         error: "Employees cannot message admin directly"
@@ -1147,8 +1180,6 @@ async function POST(req) {
                             id: true
                         }
                     });
-                    // simpler query: check if there exists a TeamMember row for employee target with team that also has a member userId
-                    // fallback: check team intersection
                     if (!commonTeam) {
                         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                             ok: false,
@@ -1160,8 +1191,64 @@ async function POST(req) {
                 }
             }
         }
-        // Passed ACL checks — create chat
-        // For simplicity we create a chat with all participants as ChatMembers; map roles appropriately; do not mark admins as ChatMember for team chats (there is no team here).
+        /* ----------------------------------------------
+       DEDUPE DIRECT CHATS:
+       if a DIRECT chat already exists with exactly
+       these participants, reuse it instead of creating
+       a duplicate.
+    ---------------------------------------------- */ const existingDirectCandidates = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].chat.findMany({
+            where: {
+                type: "DIRECT",
+                members: {
+                    some: {
+                        userId: {
+                            in: uniqueMemberIds
+                        }
+                    }
+                }
+            },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                },
+                team: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
+                createdBy: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+        const existingDirect = existingDirectCandidates.find((c)=>{
+            const memberIdsInChat = (c.members ?? []).map((m)=>m.userId ?? m.user?.id ?? null).filter(Boolean);
+            if (memberIdsInChat.length !== uniqueMemberIds.length) return false;
+            return uniqueMemberIds.every((id)=>memberIdsInChat.includes(id));
+        });
+        if (existingDirect) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                ok: true,
+                created: false,
+                chat: normalizeChat(existingDirect, userId)
+            }, {
+                status: 200
+            });
+        }
+        // Passed ACL checks and no existing chat — create new chat
+        // For simplicity we create a chat with all participants as ChatMembers; map roles appropriately.
         const participants = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findMany({
             where: {
                 id: {
@@ -1244,7 +1331,7 @@ async function POST(req) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             ok: true,
             created: true,
-            chat: normalizeChat(chat)
+            chat: normalizeChat(chat, userId)
         }, {
             status: 201
         });

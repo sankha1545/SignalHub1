@@ -5,13 +5,15 @@
 //  - PORT (default 4001)
 //  - JWT_SECRET (optional) — if provided, verifies client tokens
 //  - SOCKET_SERVER_KEY (required for backend → server emit endpoint)
-
+require('dotenv').config();
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
+
+
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4001;
 const JWT_SECRET = process.env.JWT_SECRET || "";

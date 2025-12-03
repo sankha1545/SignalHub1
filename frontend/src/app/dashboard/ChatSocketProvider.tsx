@@ -1,10 +1,24 @@
 // src/context/ChatSocketProvider.tsx
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import socketClient, { connectWithToken, disconnectSocket, joinRoom, leaveRoom, sendEvent, onEvent, offEvent } from "@/lib/socketClient";
-
-
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import socketClient, {
+  connectWithToken,
+  disconnectSocket,
+  joinRoom,
+  leaveRoom,
+  sendEvent,
+  onEvent,
+  offEvent,
+} from "@/lib/socketClient";
 
 type ChatSocketContextValue = {
   connected: boolean;
@@ -26,51 +40,56 @@ export function useChatSocket(): ChatSocketContextValue {
   return ctx;
 }
 
-export function ChatSocketProvider({ children, getToken }: { children: React.ReactNode; getToken?: (() => Promise<string | null> | string | null) }) {
+export function ChatSocketProvider({
+  children,
+  getToken,
+}: {
+  children: React.ReactNode;
+  getToken?: (() => Promise<string | null> | string | null);
+}) {
   const [connected, setConnected] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
   const tokenRef = useRef<string | null>(null);
 
-  // internal handler that wires connect
-  const doConnect = useCallback(async (maybeToken?: string | null) => {
-    try {
-      let token = maybeToken ?? null;
-      if (!token && getToken) {
-        try {
-          const t = await (getToken as any)();
-          token = typeof t === "string" ? t : null;
-        } catch {}
-      }
-      // fallback global/local
-      if (!token && typeof window !== "undefined") {
-        token = (window as any).__SESSION_TOKEN ?? localStorage.getItem("session") ?? null;
-      }
+  const doConnect = useCallback(
+    async (maybeToken?: string | null) => {
+      try {
+        let token = maybeToken ?? null;
+        if (!token && getToken) {
+          try {
+            const t = await (getToken as any)();
+            token = typeof t === "string" ? t : null;
+          } catch {}
+        }
+        if (!token && typeof window !== "undefined") {
+          token = (window as any).__SESSION_TOKEN ?? localStorage.getItem("session") ?? null;
+        }
 
-      tokenRef.current = token;
-      const s = await connectWithToken(token);
-      const inst = s ?? (window as any).__socketInstance ?? null;
+        tokenRef.current = token;
+        const s = await connectWithToken(token);
+        const inst = s ?? (window as any).__socketInstance ?? null;
 
-      // wait a tick for connection state
-      setTimeout(() => {
-        setConnected(Boolean(inst && inst.connected));
-        setSocketId(inst?.id ?? null);
-      }, 300);
+        setTimeout(() => {
+          setConnected(Boolean(inst && inst.connected));
+          setSocketId(inst?.id ?? null);
+        }, 300);
 
-      // subscribe to connect/disconnect to update state
-      if (inst) {
-        inst.on?.("connect", () => {
-          setConnected(true);
-          setSocketId(inst.id ?? null);
-        });
-        inst.on?.("disconnect", () => {
-          setConnected(false);
-          setSocketId(null);
-        });
+        if (inst) {
+          inst.on?.("connect", () => {
+            setConnected(true);
+            setSocketId(inst.id ?? null);
+          });
+          inst.on?.("disconnect", () => {
+            setConnected(false);
+            setSocketId(null);
+          });
+        }
+      } catch {
+        // best-effort
       }
-    } catch (err) {
-      // ignore
-    }
-  }, [getToken]);
+    },
+    [getToken]
+  );
 
   const doDisconnect = useCallback(() => {
     try {
@@ -82,9 +101,7 @@ export function ChatSocketProvider({ children, getToken }: { children: React.Rea
   }, []);
 
   useEffect(() => {
-    // auto-connect on mount
     doConnect().catch(() => {});
-    // cleanup on unmount
     return () => {
       try {
         doDisconnect();
@@ -92,20 +109,19 @@ export function ChatSocketProvider({ children, getToken }: { children: React.Rea
     };
   }, [doConnect, doDisconnect]);
 
+  // IMPORTANT: join by raw chatId (server's "join-room" handler will map to room internally)
   const joinChat = useCallback(async (chatId: string) => {
     if (!chatId) return;
-    await joinRoom(`chat:${chatId}`);
-    // also set up listener for messages if needed elsewhere
+    await joinRoom(chatId);
   }, []);
 
   const leaveChat = useCallback(async (chatId: string) => {
     if (!chatId) return;
-    await leaveRoom(`chat:${chatId}`);
+    await leaveRoom(chatId);
   }, []);
 
   const sendMessage = useCallback((chatId: string, payload: any) => {
-    // send using standard event name; your server APIs also persist messages,
-    // but emitting here allows real-time UX. Use your API to persist (POST /api/chats/:id).
+    // Event for real-time UX; persistence happens via POST /api/chats/:id
     sendEvent("chat:message", { chatId, ...payload });
   }, []);
 
