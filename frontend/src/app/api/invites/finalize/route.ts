@@ -1,34 +1,12 @@
-// src/app/api/invites/finalize/route.ts
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { signSession } from "@/lib/jwt";
 
-/**
- * POST /api/invites/finalize
- *
- * Accepts:
- *   { token?: string, password: string, name?: string, phone?: string, phoneVerified?: boolean }
- * or Authorization: Bearer <token>
- *
- * Behavior:
- *  - Validate token + password
- *  - Ensure invite exists, not expired, not already accepted
- *  - Ensure invite.email is not already registered under another org (prevent overlap)
- *  - Create user in a transaction, attach organization from invite
- *  - Create Profile and TeamMember (if invite.teamId present)
- *  - Mark invite.acceptedAt, status = ACCEPTED and "consume" the token in same transaction
- *    (we overwrite the token with a unique consumed value to preserve DB unique constraint).
- *  - Return 201 with userId/email/organizationId and optionally { token, redirect }
- *
- * Notes:
- *  - If you prefer to set token = null, migrate your Prisma schema so token is nullable (String?).
- *  - This implementation intentionally overwrites token with a unique consumed value to avoid
- *    unique-constraint errors on invite consumption when token column is non-nullable.
- */
-
-/* ---------- simple validators ---------- */
+/* ---------- validators ---------- */
 function validatePassword(p: unknown) {
   return typeof p === "string" && p.length >= 8;
 }
@@ -36,51 +14,45 @@ function validateName(n: unknown) {
   return n === undefined || (typeof n === "string" && n.trim().length > 0 && n.trim().length <= 200);
 }
 
-/* ---------- helper to generate a unique consumed token ---------- */
+/* ---------- consumed token helper ---------- */
 function makeConsumedToken(originalToken: string | undefined) {
-  // safe prefix of original in case you want to keep some reference (slice short)
-  const prefix = (originalToken && typeof originalToken === "string" ? originalToken.slice(0, 20) : "consumed");
-  const suffix = crypto.randomBytes(12).toString("hex"); // 24 hex chars, strong randomness
-  // keep total under typical varchar limits
+  const prefix =
+    originalToken && typeof originalToken === "string"
+      ? originalToken.slice(0, 20)
+      : "consumed";
+  const suffix = crypto.randomBytes(12).toString("hex");
   return `${prefix}-consumed-${Date.now().toString(36)}-${suffix}`.slice(0, 255);
 }
 
 export async function POST(req: Request) {
   try {
-    // defensive parse
     let body: any = {};
     try {
       body = (await req.json()) || {};
-    } catch {
-      body = {};
-    }
+    } catch {}
 
-    // token: body.token or Authorization: Bearer <token>
+    /* ---------- read token ---------- */
     let token: string | null =
       typeof body?.token === "string" && body.token.trim() ? body.token.trim() : null;
 
     if (!token) {
       const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-      if (authHeader && typeof authHeader === "string" && authHeader.toLowerCase().startsWith("bearer ")) {
+      if (authHeader?.toLowerCase().startsWith("bearer ")) {
         token = authHeader.slice(7).trim();
       }
     }
 
     if (!token) {
-      return NextResponse.json(
-        { ok: false, message: "Missing invite token (provide body.token or Authorization: Bearer <token>)" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, message: "Missing invite token" }, { status: 400 });
     }
 
     if (typeof token !== "string" || token.length < 16) {
       return NextResponse.json({ ok: false, message: "Invalid invite token" }, { status: 400 });
     }
 
-    // password + name + phone
     const password = body?.password;
     if (!validatePassword(password)) {
-      return NextResponse.json({ ok: false, message: "Invalid password — must be at least 8 characters." }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "Password must be at least 8 characters" }, { status: 400 });
     }
 
     const name = typeof body?.name === "string" && body.name.trim() ? body.name.trim() : undefined;
@@ -92,173 +64,137 @@ export async function POST(req: Request) {
     const phoneVerifiedFlag = !!body?.phoneVerified;
     const now = new Date();
 
-    /* ---------- transaction: create user, profile, teamMember, and consume invite ---------- */
+    /* ---------- TRANSACTION ---------- */
     const result = await prisma.$transaction(async (tx) => {
-      // 1) load invite by token
       const invite = await tx.invite.findUnique({ where: { token } });
       if (!invite) throw { code: "INVITE_NOT_FOUND" };
 
-      // 2) validate invite
-      if (invite.expiresAt && invite.expiresAt.getTime() <= now.getTime()) throw { code: "INVITE_EXPIRED" };
+      if (invite.expiresAt && invite.expiresAt <= now) throw { code: "INVITE_EXPIRED" };
       if (invite.acceptedAt) throw { code: "INVITE_ALREADY_USED" };
+
       const invitedEmail = (invite.email || "").trim().toLowerCase();
       if (!invitedEmail) throw { code: "INVITE_MISSING_EMAIL" };
 
-      // 3) ensure the invited email not already registered (global uniqueness)
       const existing = await tx.user.findUnique({ where: { email: invitedEmail } });
       if (existing) {
-        if (existing.organizationId && invite.organizationId && existing.organizationId !== invite.organizationId) {
+        if (existing.organizationId !== invite.organizationId)
           throw { code: "EMAIL_EXISTS_OTHER_ORG" };
-        }
         throw { code: "EMAIL_ALREADY_REGISTERED" };
       }
 
-      // 4) ensure invite has organization
       if (!invite.organizationId) throw { code: "INVITE_MISSING_ORG" };
-      const org = await tx.organization.findUnique({ where: { id: invite.organizationId } });
-      if (!org) throw { code: "INVITE_ORG_NOT_FOUND" };
 
-      // 5) hash password
       const passwordHash = await bcrypt.hash(String(password), 10);
+      const role = (invite.role || "EMPLOYEE").toUpperCase();
+      const isManager = role === "MANAGER";
 
-      // 6) normalize role
-      const roleFromInvite = (invite.role || "EMPLOYEE") as string;
-      const normalizedRole = typeof roleFromInvite === "string" ? roleFromInvite.toUpperCase() : "EMPLOYEE";
-      const isManager = normalizedRole === "MANAGER";
+      const newUser = await tx.user.create({
+        data: {
+          email: invitedEmail,
+          passwordHash,
+          name: name ?? null,
+          provider: "email",
+          emailVerified: true,
+          role,
+          isActive: true,
+          organization: { connect: { id: invite.organizationId } },
+          ...(phone && {
+            phone,
+            phoneVerified: isManager ? true : phoneVerifiedFlag,
+          }),
+        },
+      });
 
-      // 7) build user payload
-      const createUserData: any = {
-        email: invitedEmail,
-        passwordHash,
-        name: name ?? null,
-        provider: "email",
-        emailVerified: true, // invited email is considered pre-verified
-        role: normalizedRole,
-        organization: { connect: { id: invite.organizationId } },
-        isActive: true,
-      };
+      await tx.profile.create({
+        data: {
+          userId: newUser.id,
+          displayName: name,
+          ...(phone && {
+            phoneNumber: phone,
+            phoneVerified: isManager ? true : phoneVerifiedFlag,
+            phoneVerifiedAt: phoneVerifiedFlag ? now : undefined,
+          }),
+        },
+      });
 
-      if (phone) {
-        createUserData.phone = phone;
-        createUserData.phoneVerified = isManager ? true : !!phoneVerifiedFlag;
-      }
-
-      // 8) create the user
-      const newUser = await tx.user.create({ data: createUserData });
-
-      // 9) create profile
-      const profileData: any = { userId: newUser.id, displayName: name ?? undefined };
-      if (phone) {
-        profileData.phoneNumber = phone;
-        profileData.phoneVerified = isManager ? true : !!phoneVerifiedFlag;
-        if (profileData.phoneVerified) profileData.phoneVerifiedAt = now;
-      }
-      await tx.profile.create({ data: profileData });
-
-      // 10) create team membership when applicable (and team exists)
       if (invite.teamId) {
         const teamExists = await tx.team.findUnique({ where: { id: invite.teamId } });
         if (teamExists) {
           await tx.teamMember.create({
-            data: {
-              teamId: invite.teamId,
-              userId: newUser.id,
-              role: normalizedRole ?? "EMPLOYEE",
-            },
+            data: { teamId: invite.teamId, userId: newUser.id, role },
           });
         }
       }
 
-      // 11) consume invite: update acceptedAt, status, and overwrite token with unique consumed value.
-      // We attempt multiple times if (extremely unlikely) the generated consumed token collides with an existing token.
-      const maxAttempts = 4;
-      let lastErr: any = null;
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const consumedToken = makeConsumedToken(invite.token);
+      for (let i = 0; i < 4; i++) {
         try {
           await tx.invite.update({
             where: { id: invite.id },
-            data: { acceptedAt: now, status: "ACCEPTED", token: consumedToken },
+            data: {
+              acceptedAt: now,
+              status: "ACCEPTED",
+              token: makeConsumedToken(invite.token),
+            },
           });
-          // success — break loop
-          lastErr = null;
           break;
-        } catch (uErr: any) {
-          // If unique constraint on token triggered (very unlikely), retry with a new consumed token
-          lastErr = uErr;
-          // On final attempt we'll rethrow below
+        } catch (e) {
+          if (i === 3) throw { code: "INVITE_CONSUME_FAILED" };
         }
-      }
-      if (lastErr) {
-        // bubble up a recognizable error to outer catch
-        console.error("[invites/finalize] failed to consume invite token after retries:", lastErr);
-        throw { code: "INVITE_CONSUME_FAILED", meta: lastErr };
       }
 
       return {
         userId: newUser.id,
         email: newUser.email,
-        organizationId: invite.organizationId ?? null,
-        role: normalizedRole,
+        organizationId: invite.organizationId,
+        role,
       };
     });
 
-    // 12) Optionally sign a JWT if JWT_SECRET provided
-    let signedToken: string | undefined = undefined;
-    try {
-      const secret = process.env.JWT_SECRET;
-      if (secret) {
-        const payload = { sub: result.userId, email: result.email, org: result.organizationId, role: result.role };
-        const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
-        signedToken = jwt.sign(payload, secret, { expiresIn });
-      }
-    } catch (jwtErr) {
-      console.error("[invites/finalize] failed to sign JWT:", jwtErr);
-    }
+    /* ---------- LOGIN SESSION ---------- */
+/* ---------- LOGIN SESSION ---------- */
+const session = signSession(
+  { id: result.userId, role: result.role, organizationId: result.organizationId },
+  "7d"
+);
 
-    // Redirect hint for frontend (choose page based on role). Keep conservative default to avoid 404s.
-    const redirect = result.role && /MANAGER/i.test(result.role) ? "/dashboard/manager" : "/dashboard/employee/MySchedule";
+/* ---------- SAFE REDIRECT ---------- */
+const redirect =
+  /ADMIN/i.test(result.role) ? "/dashboard/admin" : "/dashboard/employee";
 
-    const responseBody: any = { ok: true, message: "Account created", ...result, redirect };
-    if (signedToken) responseBody.token = signedToken;
+/* ---------- RESPONSE + COOKIE ---------- */
+const res = NextResponse.json({ ok: true, redirect }, { status: 201 });
 
-    return NextResponse.json(responseBody, { status: 201 });
+res.cookies.set("session", session, {
+  httpOnly: true,
+  sameSite: "lax",
+  path: "/",
+});
+
+return res;
+
+
+
+    /* ---------- SAFE REDIRECT ---------- */
+   
+
   } catch (err: any) {
-    // map known transaction error codes thrown above
-    if (err && typeof err === "object" && "code" in err) {
-      switch (err.code) {
-        case "INVITE_NOT_FOUND":
-          return NextResponse.json({ ok: false, message: "Invalid invite token" }, { status: 404 });
-        case "INVITE_EXPIRED":
-          return NextResponse.json({ ok: false, message: "Invite expired" }, { status: 410 });
-        case "INVITE_ALREADY_USED":
-          return NextResponse.json({ ok: false, message: "Invite already used" }, { status: 410 });
-        case "INVITE_MISSING_EMAIL":
-          return NextResponse.json({ ok: false, message: "Invite missing target email" }, { status: 500 });
-        case "EMAIL_ALREADY_REGISTERED":
-          return NextResponse.json({ ok: false, message: "Account already exists for this email" }, { status: 409 });
-        case "EMAIL_EXISTS_OTHER_ORG":
-          return NextResponse.json({ ok: false, message: "An account with this email exists under another organization" }, { status: 409 });
-        case "INVITE_MISSING_ORG":
-          return NextResponse.json({ ok: false, message: "Invite missing organization" }, { status: 400 });
-        case "INVITE_ORG_NOT_FOUND":
-          return NextResponse.json({ ok: false, message: "Invite organization not found" }, { status: 404 });
-        case "INVITE_CONSUME_FAILED":
-          return NextResponse.json({ ok: false, message: "Failed to consume invite token (please retry)" }, { status: 500 });
-        default:
-          break;
+    if (err?.code) {
+      const map: any = {
+        INVITE_NOT_FOUND: [404, "Invalid invite token"],
+        INVITE_EXPIRED: [410, "Invite expired"],
+        INVITE_ALREADY_USED: [410, "Invite already used"],
+        INVITE_MISSING_EMAIL: [500, "Invite missing email"],
+        EMAIL_ALREADY_REGISTERED: [409, "Account already exists"],
+        EMAIL_EXISTS_OTHER_ORG: [409, "Email exists in another org"],
+        INVITE_MISSING_ORG: [400, "Invite missing organization"],
+        INVITE_CONSUME_FAILED: [500, "Failed to consume invite token"],
+      };
+      if (map[err.code]) {
+        return NextResponse.json({ ok: false, message: map[err.code][1] }, { status: map[err.code][0] });
       }
     }
 
-    // Prisma unique constraint fallback
-    if (err && (err.code === "P2002" || err?.meta?.target)) {
-      const target = Array.isArray(err?.meta?.target) ? (err.meta.target as string[]).join(", ") : err?.meta?.target;
-      console.error("[invites/finalize] Prisma unique constraint error:", target, err);
-      return NextResponse.json({ ok: false, message: `Unique constraint failed: ${target}` }, { status: 409 });
-    }
-
-    console.error("[invites/finalize] Fatal error:", err);
-    const isDev = process.env.NODE_ENV !== "production";
-    return NextResponse.json({ ok: false, message: isDev ? (err?.message || String(err)) : "Server error" }, { status: 500 });
+    console.error("[invites/finalize] Fatal:", err);
+    return NextResponse.json({ ok: false, message: "Server error" }, { status: 500 });
   }
 }

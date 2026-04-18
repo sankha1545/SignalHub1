@@ -89,7 +89,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const phone = (body?.phone ?? "").toString().trim();
+function normalizePhone(input: any): string | null {
+  if (!input) return null;
+  const s = String(input).trim();
+  const digits = s.replace(/\D/g, "");
+  if (digits.length < 7) return null;
+  return `+${digits}`;
+}
+
+const phone = normalizePhone(body?.phone);
+if (!phone) {
+  return NextResponse.json({ ok: false, error: "invalid_phone" }, { status: 400 });
+}
+
     const tempToken = body?.tempToken ?? null;
     const resend = Boolean(body?.resend);
 
@@ -142,7 +154,8 @@ export async function POST(req: Request) {
     let status: string | null = null;
     let devOtpLogged = false;
 
-    if (TW_SID && TW_TOKEN && TW_FROM) {
+if (false && TW_SID && TW_TOKEN && TW_FROM) {
+
       // Try to dynamically import Twilio and send SMS
       try {
         const Twilio = (await import("twilio")).default;
