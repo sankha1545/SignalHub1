@@ -1,10 +1,7 @@
-// components/ui/card.tsx
 "use client";
 
 import React from "react";
 import clsx from "clsx";
-
-
 
 type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
@@ -12,62 +9,47 @@ type CardProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 export const Card: React.FC<CardProps> = ({ asChild = false, children, className, ...rest }) => {
+  const mergedClass = clsx("premium-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg", className);
+
   if (asChild && React.isValidElement(children)) {
-    const child = children as React.ReactElement;
-    const mergedClass = clsx(
-      "block bg-white border border-slate-100 rounded-2xl shadow-sm transition-shadow hover:shadow-md",
-      className
-    );
-
-    const childProps = {
+    const child = children as React.ReactElement<{ className?: string }>;
+    return React.cloneElement(child, {
       ...rest,
-      className: clsx(mergedClass, (child.props && child.props.className) || ""),
-    };
-
-    return React.cloneElement(child, childProps);
+      className: clsx(mergedClass, child.props?.className ?? ""),
+    });
   }
 
   return (
-    <div
-      {...rest}
-      className={clsx(
-        "bg-white border border-slate-100 rounded-2xl shadow-sm transition-shadow hover:shadow-md",
-        className
-      )}
-    >
+    <div {...rest} className={mergedClass}>
       {children}
     </div>
   );
 };
 
 export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className, ...rest }) => (
-  <div {...rest} className={clsx("px-4 py-3 border-b border-slate-100", className)}>
+  <div {...rest} className={clsx("border-b border-border/70 px-5 py-4", className)}>
     {children}
   </div>
 );
 
 export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className, ...rest }) => (
-  <div {...rest} className={clsx("p-4", className)}>
+  <div {...rest} className={clsx("p-5", className)}>
     {children}
   </div>
 );
 
 export default Card;
 
-/* ============================
-   CardSquare - square, avatar-ring card
-   ============================ */
-
 type CardSquareProps = {
   id?: string | number;
   name: string;
   subtitle?: string | null;
   avatarUrl?: string | null;
-  size?: "sm" | "md" | "lg"; // controls card and avatar sizing
+  size?: "sm" | "md" | "lg";
   className?: string;
   onClick?: (e: React.MouseEvent) => void;
-  asChild?: boolean; // if true, renders an interactive button root (accessible)
-  showBorder?: boolean; // keep border (default true)
+  asChild?: boolean;
+  showBorder?: boolean;
 };
 
 export const CardSquare: React.FC<CardSquareProps> = ({
@@ -81,7 +63,6 @@ export const CardSquare: React.FC<CardSquareProps> = ({
   asChild = false,
   showBorder = true,
 }) => {
-  // size mapping
   const sizeMap = {
     sm: { card: "p-3", avatar: "w-12 h-12", text: "text-sm", subtitle: "text-xs" },
     md: { card: "p-4", avatar: "w-16 h-16", text: "text-base", subtitle: "text-sm" },
@@ -89,8 +70,8 @@ export const CardSquare: React.FC<CardSquareProps> = ({
   }[size];
 
   const baseCardClass = clsx(
-    "bg-white rounded-2xl shadow-sm transition-shadow hover:shadow-md flex items-center gap-4",
-    showBorder ? "border border-slate-100" : "",
+    "flex w-full items-center gap-4 rounded-2xl border border-border/70 bg-card/90 transition-all duration-200 hover:border-primary/25 hover:shadow-lg",
+    showBorder ? "border" : "border-transparent",
     sizeMap.card,
     className
   );
@@ -98,7 +79,7 @@ export const CardSquare: React.FC<CardSquareProps> = ({
   const content = (
     <div
       role={onClick ? "button" : undefined}
-      tabIndex={0}
+      tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
       onKeyDown={(e) => {
         if (!onClick) return;
@@ -107,66 +88,34 @@ export const CardSquare: React.FC<CardSquareProps> = ({
           onClick(e as unknown as React.MouseEvent);
         }
       }}
-      aria-pressed="false"
       data-id={id}
-      className={clsx(baseCardClass, "w-full")}
+      className={baseCardClass}
     >
-      {/* avatar with ring */}
-      <div className={clsx("flex-shrink-0", "flex items-center justify-center")}>
-        <div
-          className={clsx(
-            "rounded-full flex items-center justify-center overflow-hidden ring-2 ring-slate-100",
-            // add small shadow and ring color for presence later if needed
-            avatarUrl ? "bg-transparent" : "bg-slate-100"
-          )}
-          style={{ width: sizeMap.avatar.split(" ")[0] === undefined ? undefined : undefined }} // just preserve structure
-        >
+      <div className="shrink-0">
+        <div className={clsx("overflow-hidden rounded-full ring-2 ring-primary/15", avatarUrl ? "bg-transparent" : "bg-muted")}>
           {avatarUrl ? (
-            // image inside ring
-            <img
-              src={avatarUrl}
-              alt={name}
-              className={clsx("object-cover rounded-full", sizeMap.avatar.replace(" ", " "))}
-              // Tailwind width/height classes applied via className
-            />
+            <img src={avatarUrl} alt={name} className={clsx("rounded-full object-cover", sizeMap.avatar)} />
           ) : (
-            // fallback initials
-            <div
-              className={clsx(
-                "flex items-center justify-center font-semibold text-slate-700",
-                sizeMap.avatar === "w-12 h-12" ? "w-12 h-12" : sizeMap.avatar === "w-16 h-16" ? "w-16 h-16" : "w-20 h-20"
-              )}
-            >
-              {getInitials(name)}
-            </div>
+            <div className={clsx("flex items-center justify-center font-semibold text-foreground", sizeMap.avatar)}>{getInitials(name)}</div>
           )}
         </div>
       </div>
-
-      {/* text */}
       <div className="min-w-0">
-        <div className={clsx("font-semibold text-slate-900", sizeMap.text, "truncate")}>{name}</div>
-        {subtitle && <div className={clsx("text-slate-500 mt-0.5 truncate", sizeMap.subtitle)}>{subtitle}</div>}
+        <p className={clsx("truncate font-semibold text-foreground", sizeMap.text)}>{name}</p>
+        {subtitle && <p className={clsx("mt-0.5 truncate text-muted-foreground", sizeMap.subtitle)}>{subtitle}</p>}
       </div>
     </div>
   );
 
-  if (asChild) {
-    // render the content inside a button so the outer CardSquare can be used as interactive element
-    return (
-      <Card asChild className="w-full">
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-        <div className={baseCardClass} role="button" tabIndex={0} onClick={onClick} onKeyDown={() => {}}>
-          {content}
-        </div>
-      </Card>
-    );
-  }
+  if (!asChild) return content;
 
-  return <div className={baseCardClass}>{content}</div>;
+  return (
+    <Card asChild className="w-full">
+      <div>{content}</div>
+    </Card>
+  );
 };
 
-/* helper: initials */
 function getInitials(name: string) {
   if (!name) return "";
   const parts = name.trim().split(/\s+/);

@@ -16,7 +16,8 @@ import {
   Activity,
   Award,
   Target,
-  Edit,
+Edit,
+  Eye,
   Trash2,
   MessageSquare,
   X,
@@ -26,6 +27,7 @@ import {
 import CreateTeamForm from "@/app/ui/forms/create-team/page";
 import ScheduleMeetingForm from "@/app/ui/forms/Schedule-meeting/page";
 import Modal from "@/components/ui/modal"; // shared Modal (backdrop + panel)
+import { useRouter } from "next/navigation";
 
 /* ----------------- Helpers ----------------- */
 function safeParseListResponse(j: any) {
@@ -336,6 +338,7 @@ function ChatWidget({
 const TeamCard = ({ team, delay = 0, onOpenSchedule, onEdit, onDelete, onViewMembers, onMessage }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <motion.div
@@ -374,7 +377,7 @@ const TeamCard = ({ team, delay = 0, onOpenSchedule, onEdit, onDelete, onViewMem
               className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg z-50"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
+<button
                 type="button"
                 className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
                 onClick={(e) => {
@@ -384,6 +387,17 @@ const TeamCard = ({ team, delay = 0, onOpenSchedule, onEdit, onDelete, onViewMem
                 }}
               >
                 <Edit className="w-4 h-4" /> Edit
+              </button>
+              <button
+                type="button"
+                className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen(false);
+                  router.push(`/dashboard/admin/teams/${team.id}`);
+                }}
+              >
+                <Eye className="w-4 h-4" /> View
               </button>
               <button
                 type="button"

@@ -141,46 +141,46 @@ function ScheduleModal({
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.12 }}
-        className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl z-10"
+        className="premium-panel relative z-10 w-full max-w-md p-6"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Schedule meeting</h3>
-          <button className="p-1 rounded-md hover:bg-slate-100" onClick={() => onClose(false)}>
+          <button className="rounded-md p-1 transition hover:bg-muted" onClick={() => onClose(false)}>
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <form onSubmit={(e) => handleSubmit(e)} className="space-y-3">
           <div>
-            <label className="text-xs text-slate-600">Organizer</label>
+            <label className="text-xs text-muted-foreground">Organizer</label>
             <input
               value={organizer}
               onChange={(e) => setOrganizer(e.target.value)}
-              className="w-full mt-1 p-2 border rounded-md text-sm"
+              className="mt-1 w-full rounded-xl border border-input bg-card/90 p-2 text-sm"
               placeholder="Organizer name or email"
             />
           </div>
 
           <div>
-            <label className="text-xs text-slate-600">Date & time</label>
+            <label className="text-xs text-muted-foreground">Date and time</label>
             <input
               type="datetime-local"
               value={datetime}
               onChange={(e) => setDatetime(e.target.value)}
-              className="w-full mt-1 p-2 border rounded-md text-sm"
+              className="mt-1 w-full rounded-xl border border-input bg-card/90 p-2 text-sm"
             />
           </div>
 
           <div>
-            <label className="text-xs text-slate-600">Reminder (before meeting)</label>
-            <select value={String(reminder)} onChange={(e) => setReminder(Number(e.target.value))} className="w-full mt-1 p-2 border rounded-md text-sm">
+            <label className="text-xs text-muted-foreground">Reminder (before meeting)</label>
+            <select value={String(reminder)} onChange={(e) => setReminder(Number(e.target.value))} className="mt-1 w-full rounded-xl border border-input bg-card/90 p-2 text-sm">
               {[10, 20, 30, 40, 50, 60].map((m) => (
                 <option key={m} value={m}>
                   {m} minutes before
                 </option>
               ))}
             </select>
-            <p className="text-xs text-slate-400 mt-1">Reminder will be scheduled as: meeting_time - reminder.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Reminder will be scheduled as: meeting_time - reminder.</p>
           </div>
 
           {error && <div className="text-sm text-rose-600">{error}</div>}
@@ -189,8 +189,8 @@ function ScheduleModal({
             <button type="button" className="px-3 py-1 rounded-md text-sm" onClick={() => onClose(false)} disabled={loading}>
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="px-4 py-2 rounded-md bg-slate-900 text-white text-sm flex items-center gap-2">
-              {loading ? "Scheduling…" : "Schedule"}
+            <button type="submit" disabled={loading} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+              {loading ? "Scheduling..." : "Schedule"}
             </button>
           </div>
         </form>
@@ -334,7 +334,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
 
   /* ------------------- Sidebar content ------------------- */
   const sidebarContent = (isMobile = false) => (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Header */}
       <div className="p-6 pb-4">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.36 }} className="flex items-center gap-3 mb-6">
@@ -344,8 +344,8 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
           </div>
 
           <div className="flex-1">
-            <div className="text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">SignalHub</div>
-            <div className="text-xs text-slate-500 font-medium flex items-center gap-1">
+            <div className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-base font-bold text-transparent">SignalHub</div>
+            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Sparkles className="w-3 h-3" />
               Unified Inbox
             </div>
@@ -355,12 +355,12 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
         {/* Manager team switcher (only visible to manager portal) */}
         {portal === "manager" && (
           <div className="mb-3">
-            <label className="text-xs text-slate-500">Team</label>
+            <label className="text-xs text-muted-foreground">Team</label>
             <div className="mt-2">
               {teamsLoading ? (
                 <div className="text-xs text-slate-400">Loading teams…</div>
               ) : (
-                <select value={currentTeamId ?? ""} onChange={(e) => setCurrentTeamId(e.target.value || null)} className="w-full p-2 rounded-md border text-sm">
+                <select value={currentTeamId ?? ""} onChange={(e) => setCurrentTeamId(e.target.value || null)} className="w-full rounded-xl border border-input bg-card/90 p-2 text-sm shadow-sm">
                   {teams.length === 0 && <option value="">No teams</option>}
                   {teams.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -375,19 +375,19 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
 
         {/* Search */}
         <motion.div className="relative group" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.32, delay: 0.06 }}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             aria-label="Search navigation"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-200"
+            className="w-full rounded-xl border border-input bg-card/90 py-2.5 pl-10 pr-4 text-sm placeholder:text-muted-foreground transition-all duration-200 focus:border-primary/40 focus:ring-3 focus:ring-ring"
           />
         </motion.div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent" aria-label="Primary">
+      <nav className="flex-1 overflow-y-auto px-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border" aria-label="Primary">
         <div className="space-y-1">
           {filteredNav.map((item, index) => {
             const Icon = item.icon as any;
@@ -404,8 +404,8 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
                   onMouseEnter={() => setHoveredItem(item.id)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={clsx(
-                    "relative flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group",
-                    isActive ? "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 shadow-sm" : "text-slate-600 hover:bg-slate-50"
+                    "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200",
+                    isActive ? "bg-gradient-to-r from-primary/15 to-primary/5 text-primary shadow-sm" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -415,7 +415,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
 
                   <div className="relative">
                     <motion.div className={clsx("w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200", isActive ? `bg-gradient-to-br ${item.gradient} shadow-lg` : "bg-slate-100 group-hover:bg-slate-200")} animate={isActive ? { scale: [1, 1.05, 1] } : {}}>
-                      <Icon className={clsx("w-4 h-4 transition-colors", isActive ? "text-white" : "text-slate-600")} />
+                      <Icon className={clsx("w-4 h-4 transition-colors", isActive ? "text-white" : "text-muted-foreground")} />
                     </motion.div>
 
                     {item.badge && (
@@ -428,12 +428,12 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
                   <span className="flex-1 text-left">{item.label}</span>
 
                   <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: isHovered && !isActive ? 1 : 0, x: isHovered && !isActive ? 0 : -5 }} transition={{ duration: 0.18 }} aria-hidden="true">
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </motion.div>
 
                   {isActive && (
                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.18 }}>
-                      <ArrowRight className="w-4 h-4 text-blue-600" />
+                      <ArrowRight className="h-4 w-4 text-primary" />
                     </motion.div>
                   )}
                 </Link>
@@ -444,7 +444,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
 
         {/* Quick actions (portal specific) */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.36, delay: 0.18 }} className="mt-6 mb-4 px-3">
-          <div className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Actions</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Quick Actions</div>
 
           {portal === "admin" && (
             <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl text-white relative overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow duration-300">
@@ -464,14 +464,14 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
                 <button onClick={() => setScheduleOpen(true)} className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 text-white px-3 py-2 text-sm hover:bg-indigo-700 transition">
                   <Calendar className="w-4 h-4" /> Schedule meeting
                 </button>
-                <button className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm" onClick={() => {
+                <button className="inline-flex items-center gap-2 rounded-md border border-input bg-card/90 px-3 py-2 text-sm text-foreground" onClick={() => {
                   // client-side shortcut to create task - adapt to your create task flow
                   window.location.href = "/dashboard/manager/tasks/create";
                 }}>
                   <Plus className="w-4 h-4" /> Task
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-2">Quickly schedule meetings for your team or create tasks.</p>
+              <p className="mt-2 text-xs text-muted-foreground">Quickly schedule meetings for your team or create tasks.</p>
             </>
           )}
 
@@ -484,18 +484,18 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
                 }}>
                   <Clock className="w-4 h-4" /> Start break
                 </button>
-                <button className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm" onClick={() => window.location.href = "/dashboard/employee/notes/create"}>
+                <button className="inline-flex items-center gap-2 rounded-md border border-input bg-card/90 px-3 py-2 text-sm text-foreground" onClick={() => window.location.href = "/dashboard/employee/notes/create"}>
                   <Plus className="w-4 h-4" /> Note
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-2">Set your status or jot down a quick note.</p>
+              <p className="mt-2 text-xs text-muted-foreground">Set your status or jot down a quick note.</p>
             </>
           )}
         </motion.div>
       </nav>
 
       {/* Profile section */}
-      <div className="p-4 border-t border-slate-200 bg-slate-50/50">
+      <div className="border-t border-border/70 bg-muted/30 p-4">
         <ProfileMenu />
       </div>
 
@@ -524,13 +524,13 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
     <>
       {/* Floating mobile hamburger toggle */}
       {!hideToggle && (
-        <div className="lg:hidden fixed top-4 left-4 z-50">
+        <div className="fixed left-4 top-4 z-50 lg:hidden">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen(!open)}
-            className="p-3 rounded-xl bg-white shadow-lg shadow-slate-900/10 text-slate-700 border border-slate-200 backdrop-blur-sm"
+            className="rounded-xl border border-border bg-card/90 p-3 text-foreground shadow-lg backdrop-blur-sm"
           >
             <AnimatePresence mode="wait">
               {open ? (
@@ -548,7 +548,7 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
       )}
 
       {/* Desktop fixed sidebar */}
-      <motion.aside initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.36 }} className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:flex-col lg:w-72 lg:min-h-screen lg:border-r lg:border-slate-200 lg:bg-white/80 lg:backdrop-blur-xl z-30" aria-hidden={false}>
+      <motion.aside initial={{ x: -12, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.36 }} className="z-30 hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:min-h-screen lg:w-72 lg:flex-col lg:border-r lg:border-sidebar-border lg:bg-sidebar/85 lg:backdrop-blur-xl" aria-hidden={false}>
         {sidebarContent(false)}
       </motion.aside>
 
@@ -556,11 +556,11 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
       <AnimatePresence>
         {open && (
           <>
-            <motion.div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} onClick={() => setOpen(false)} aria-hidden="true" />
+            <motion.div className="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} onClick={() => setOpen(false)} aria-hidden="true" />
 
-            <motion.aside initial={{ x: "-100%", opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: "-100%", opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-label="Main menu">
+            <motion.aside initial={{ x: "-100%", opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: "-100%", opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed inset-y-0 left-0 z-50 w-80 border-r border-sidebar-border bg-sidebar shadow-2xl backdrop-blur-xl" role="dialog" aria-modal="true" aria-label="Main menu">
               <div className="absolute top-4 right-4 z-10">
-                <motion.button ref={closeBtnRef} whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" aria-label="Close menu" onClick={() => setOpen(false)}>
+                <motion.button ref={closeBtnRef} whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} className="rounded-lg bg-muted p-2 text-foreground transition-colors hover:bg-muted/80" aria-label="Close menu" onClick={() => setOpen(false)}>
                   <X className="w-5 h-5" />
                 </motion.button>
               </div>
@@ -573,3 +573,5 @@ export default function Sidebar({ portal = "admin", isOpen: isOpenProp, onClose,
     </>
   );
 }
+
+

@@ -1,30 +1,32 @@
-// src/app/layout.tsx
 import "./globals.css";
 import type { ReactNode } from "react";
+import { Geist, Manrope } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-display" });
 
 export const metadata = {
   title: "UnifyReach",
-  description: "UnifyReach — centralize customer conversations",
+  description: "UnifyReach - centralize customer conversations",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="bg-slate-50 min-h-screen antialiased text-slate-900">
+    <html lang="en" className={cn("h-full", "font-sans", geist.variable, manrope.variable)}>
+      <body className="min-h-screen text-foreground">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:relative focus:z-50 focus:inline-block focus:px-4 focus:py-2 focus:bg-white focus:rounded-md focus:shadow"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:inline-flex focus:items-center focus:rounded-xl focus:border focus:border-primary/30 focus:bg-card px-4 py-2 text-sm focus:shadow-lg"
         >
           Skip to content
         </a>
 
-        {/* Root layout intentionally minimal: do not render dashboard sidebar here.
-            Dashboard-specific chrome (sidebar/header) should be added inside
-            app/dashboard/layout.tsx so ONLY dashboard routes render it. */}
-        <div className="flex min-h-screen">
+        <div className="relative flex min-h-screen">
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 premium-grid-bg opacity-35" />
           <div className="flex-1 flex flex-col">
             <main id="main" className="flex-1 overflow-auto">
-              <div className="max-w-7xl mx-auto px-4 py-6">{children}</div>
+              <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
             </main>
           </div>
         </div>

@@ -44,11 +44,11 @@ const StatCard = ({ title, value, change, trend, icon: Icon, gradient, delay = 0
       onMouseLeave={() => setIsHovered(false)}
       className="relative group"
     >
-      <div className="p-5 sm:p-6 bg-white rounded-2xl border border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50">
+      <div className="p-5 sm:p-6 bg-card/90 rounded-2xl border border-border/70 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-500 mb-1 truncate">{title}</p>
-            <h3 className="text-2xl sm:text-3xl font-bold text-slate-800">{value}</h3>
+            <p className="text-sm font-medium text-muted-foreground mb-1 truncate">{title}</p>
+            <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{value}</h3>
           </div>
           <motion.div
             className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg flex-shrink-0`}
@@ -68,7 +68,7 @@ const StatCard = ({ title, value, change, trend, icon: Icon, gradient, delay = 0
             {trend === "up" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {change}
           </div>
-          <span className="text-xs text-slate-500">vs last month</span>
+          <span className="text-xs text-muted-foreground">vs last month</span>
         </div>
 
         <motion.div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -92,7 +92,7 @@ const ActivityItem = ({ icon: Icon, title, description, time, gradient, delay = 
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.3, delay }}
-    className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors duration-200 group cursor-pointer"
+    className="flex items-start gap-4 p-4 rounded-xl hover:bg-muted/70 transition-colors duration-200 group cursor-pointer"
   >
     <div
       className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow`}
@@ -100,10 +100,10 @@ const ActivityItem = ({ icon: Icon, title, description, time, gradient, delay = 
       <Icon className="w-5 h-5 text-white" />
     </div>
     <div className="flex-1 min-w-0">
-      <h4 className="text-sm font-semibold text-slate-800 mb-1 truncate">{title}</h4>
-      <p className="text-xs text-slate-500 truncate">{description}</p>
+      <h4 className="text-sm font-semibold text-foreground mb-1 truncate">{title}</h4>
+      <p className="text-xs text-muted-foreground truncate">{description}</p>
     </div>
-    <div className="flex items-center gap-1 text-xs text-slate-400 whitespace-nowrap">
+    <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
       <Clock className="w-3 h-3" />
       {time}
     </div>
@@ -250,16 +250,16 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.12 }}
-        className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl"
+        className="relative w-full max-w-md bg-card/90 rounded-2xl p-6 shadow-xl"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Invite manager</h3>
-          <button className="p-1 rounded-md hover:bg-slate-100" onClick={() => onClose(false)} aria-label="Close invite modal">
+          <button className="p-1 rounded-md hover:bg-muted" onClick={() => onClose(false)} aria-label="Close invite modal">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <label className="text-xs text-slate-600">To (email)</label>
+        <label className="text-xs text-muted-foreground">To (email)</label>
         <input
           type="email"
           value={email}
@@ -271,7 +271,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
 
         <div className="grid grid-cols-2 gap-2 items-end">
           <div>
-            <label className="text-xs text-slate-600">Role</label>
+            <label className="text-xs text-muted-foreground">Role</label>
             <select value={role} onChange={(e) => setRole(e.target.value as any)} className="w-full mt-1 p-2 border rounded-md text-sm">
               <option value="MANAGER">Manager</option>
               <option value="EMPLOYEE">Employee</option>
@@ -279,7 +279,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
           </div>
 
           <div>
-            <label className="text-xs text-slate-600">Expires</label>
+            <label className="text-xs text-muted-foreground">Expires</label>
             <select value={String(expiresHours)} onChange={(e) => setExpiresHours(Number(e.target.value))} className="w-full mt-1 p-2 border rounded-md text-sm">
               <option value={24}>24 hours</option>
               <option value={48}>48 hours</option>
@@ -289,11 +289,11 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
         </div>
 
         <div className="mt-3">
-          <label className="text-xs text-slate-600">Assign to team (optional)</label>
+          <label className="text-xs text-muted-foreground">Assign to team (optional)</label>
           {loadingTeams ? (
-            <div className="mt-2 text-xs text-slate-500">Loading teams…</div>
+            <div className="mt-2 text-xs text-muted-foreground">Loading teams…</div>
           ) : teams.length === 0 ? (
-            <div className="mt-2 text-xs text-slate-400">No teams yet — invite will create a user without team assignment.</div>
+            <div className="mt-2 text-xs text-muted-foreground">No teams yet — invite will create a user without team assignment.</div>
           ) : (
             <select value={teamId ?? ""} onChange={(e) => setTeamId(e.target.value || null)} className="w-full mt-2 p-2 border rounded-md text-sm">
               <option value="">(No team)</option>
@@ -314,7 +314,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: (success?: boo
               <LinkIcon className="w-4 h-4" /> <span className="truncate">{inviteLink}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={copyLink} className="px-2 py-1 rounded bg-white border text-xs">Copy</button>
+              <button onClick={copyLink} className="px-2 py-1 rounded bg-card/90 border text-xs">Copy</button>
             </div>
           </div>
         )}
@@ -361,7 +361,7 @@ export default function OverviewPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-transparent p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -373,7 +373,7 @@ export default function OverviewPage() {
               <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>
                 <Zap className="w-6 h-6 text-yellow-500" />
               </motion.div>
-              <p className="text-slate-500 flex items-center gap-1 sm:ml-3 text-sm">
+              <p className="text-muted-foreground flex items-center gap-1 sm:ml-3 text-sm">
                 <Calendar className="w-4 h-4" /> Welcome back! Here's what's happening today.
               </p>
             </div>
@@ -381,7 +381,7 @@ export default function OverviewPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setInviteOpen(true)}
-                className="px-3 py-2 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition"
+                className="px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm hover:brightness-110 transition"
               >
                 Invite managers
               </button>
@@ -405,9 +405,9 @@ export default function OverviewPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Activity */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }} className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div className="premium-card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800">Recent Activity</h2>
+                <h2 className="text-xl font-bold text-foreground">Recent Activity</h2>
                 <button className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors">
                   View all
                   <ArrowUpRight className="w-4 h-4" />
@@ -426,32 +426,32 @@ export default function OverviewPage() {
             {/* Performance Goal */}
             <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl">
               <div className="relative z-10">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                <div className="w-12 h-12 bg-card/90/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
                   <Award className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Performance Goal</h3>
                 <p className="text-sm text-blue-50 mb-4">You're 94% towards your monthly goal. Keep it up!</p>
-                <div className="w-full bg-white/20 rounded-full h-2 mb-2 backdrop-blur-sm">
+                <div className="w-full bg-card/90/20 rounded-full h-2 mb-2 backdrop-blur-sm">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: "94%" }}
                     transition={{ duration: 1, delay: 0.8 }}
-                    className="h-full bg-white rounded-full"
+                    className="h-full bg-card/90 rounded-full"
                   />
                 </div>
                 <p className="text-xs text-blue-100">2,680 / 2,850 messages</p>
               </div>
-              <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-card/90/10 rounded-full blur-3xl" />
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Stats</h3>
+            <div className="premium-card p-6">
+              <h3 className="text-lg font-bold text-foreground mb-4">Quick Stats</h3>
               <div className="space-y-4 text-sm">
-                <div className="flex items-center justify-between"><span className="text-slate-600">Avg. Response</span><span className="font-semibold text-slate-800">2.4 hours</span></div>
-                <div className="flex items-center justify-between"><span className="text-slate-600">Success Rate</span><span className="font-semibold text-emerald-600">94.2%</span></div>
-                <div className="flex items-center justify-between"><span className="text-slate-600">Active Teams</span><span className="font-semibold text-slate-800">8</span></div>
-                <div className="flex items-center justify-between"><span className="text-slate-600">Pending Tasks</span><span className="font-semibold text-orange-600">12</span></div>
+                <div className="flex items-center justify-between"><span className="text-muted-foreground">Avg. Response</span><span className="font-semibold text-foreground">2.4 hours</span></div>
+                <div className="flex items-center justify-between"><span className="text-muted-foreground">Success Rate</span><span className="font-semibold text-emerald-600">94.2%</span></div>
+                <div className="flex items-center justify-between"><span className="text-muted-foreground">Active Teams</span><span className="font-semibold text-foreground">8</span></div>
+                <div className="flex items-center justify-between"><span className="text-muted-foreground">Pending Tasks</span><span className="font-semibold text-orange-600">12</span></div>
               </div>
             </div>
           </motion.div>
@@ -479,3 +479,4 @@ export default function OverviewPage() {
     </div>
   );
 }
+
